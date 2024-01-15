@@ -3,7 +3,6 @@ import Head from 'next/head';
 import React, { useEffect, useState } from 'react';
 import netlifyIdentity from 'netlify-identity-widget';
 import { CartProvider } from '../context/CartContext';
-import Navbar from '../components/Navbar'; // Assurez-vous que le chemin est correct
 import Sidebar from '../components/Sidebar'; // Assurez-vous que le chemin est correct
 
 const MyApp = ({ Component, pageProps }) => {
@@ -34,7 +33,6 @@ const MyApp = ({ Component, pageProps }) => {
         <link rel="preconnect" href="https://stijndv.com" />
         <link rel="stylesheet" href="https://stijndv.com/fonts/Eudoxus-Sans.css" />
       </Head>
-      <Navbar user={appUser} setUser={setAppUser} />
       <Sidebar user={appUser} setUser={setAppUser} />
       <Component {...pageProps} user={appUser} setUser={setAppUser} />
     </CartProvider>
