@@ -469,3 +469,57 @@ box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 box-shadow: 0 0 0 3px #4a90e2; 
 outline: none; 
 }
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 250px; /* Largeur du Sidebar */
+  height: 100vh; /* Hauteur totale */
+  background-color: #1a1a2e; /* Couleur de fond bleu nuit */
+  box-shadow: 2px 0px 5px rgba(0, 0, 0, 0.5);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  align-items: center;
+  z-index: 1000;
+  overflow-y: auto;
+}
+
+.sidebar a, .sidebar button {
+  color: #e0e0e0; /* Couleur de texte claire */
+  padding: 10px 15px;
+  margin: 5px 0;
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: none;
+  outline: none;
+  font-size: 16px;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.sidebar a:hover, .sidebar button:hover {
+  background-color: #4834d4; /* Couleur bleu/violet au survol */
+  color: #fff;
+}
+
+.sidebar .cart-summary {
+  margin-top: 20px;
+  background-color: #0f3460; /* Bleu plus profond pour le résumé du panier */
+  color: #fff;
+  padding: 10px;
+  border-radius: 5px;
+  width: 100%;
+}
+
+.sidebar.open {
+  transform: translateX(0);
+}
+
+.sidebar.closed {
+  transform: translateX(-100%);
+}
+
+/* Ajoutez ici d'autres styles spécifiques à votre application */
