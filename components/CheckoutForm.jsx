@@ -10,7 +10,7 @@ import products from './cartItems'; // Assurez-vous que ce chemin est correct
 
 // Chargez Stripe avec votre clé publique
 const stripePromise = loadStripe(
-  process.env.REACT_APP_STRIPE_PUBLIC_KEY || 'pk_test_51OPtGvDWmnYPaxs1gSpLL1WpDyU6gaxOBszqNCSu9iHVeEYuPcjUEvOpKzjwdbF6NUWquoEPf24Y3qMwIDLmeLvl00FwQkUSKx',
+  process.env.REACT_APP_STRIPE_PUBLIC_KEY || 'pk_live_51OPtGvDWmnYPaxs1rCkSDYaT2vKuT86SiEQWFaKitTJKKcx2y80tdP2Zv395BUd3XQyTGGU7xIp9Y7mi6At8b7wI00M1RjQp5z',
 );
 
 const CheckoutForm = ({ cartItems }) => {

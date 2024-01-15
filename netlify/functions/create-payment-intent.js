@@ -1,10 +1,10 @@
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY || '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');
 
 const productPrices = {
-  base: 2000, // 20 euros en centimes
-  bronze: 4000, // 40 euros en centimes
-  silver: 6000, // 60 euros en centimes
-  gold: 10000, // 100 euros en centimes
+  base: 20, // 20 euros en centimes
+  bronze: 40, // 40 euros en centimes
+  silver: 60, // 60 euros en centimes
+  gold: 100, // 100 euros en centimes
 };
 
 exports.handler = async (event) => {
