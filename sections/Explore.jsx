@@ -25,16 +25,16 @@ const Explore = () => {
           textStyles="text-center"
         />
         <div className="mt-[50px] flex lg:flex-row flex-col min-h-[70vh] gap-5">
-        {exploreWorlds.map((world, index) => (
-        <ExploreCard
-        key={world.id}
-        {...world}
-        index={index}
-        active={active}
-        handleClick={() => setActive(world.id)}
-        sectionId={world.sectionId} // Assurez-vous de passer cette prop
-        />
-))}
+          {exploreWorlds.map((world, index) => (
+            <ExploreCard
+              key={world.id}
+              {...world}
+              index={index}
+              active={active}
+              handleClick={() => setActive(world.id)}
+              sectionId={world.sectionId} // Assurez-vous de passer cette prop
+            />
+          ))}
         </div>
       </motion.div>
     </section>

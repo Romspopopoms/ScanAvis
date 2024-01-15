@@ -214,61 +214,258 @@ text-decoration: none;
 cursor: pointer;
 }
 
-button {
-margin-top: 10px; /* Space out the buttons a bit /
-display: block; / Block-level buttons /
-width: 100%; / Take up the full container width */
+.button {
+margin-top: 10px; 
+display: block; 
+width: 100%; 
+background-color: #E5594F; /* Couleur de votre choix pour le bouton */
+color: white;
+border-radius: 4px;
+cursor
+
+: pointer;
+text-align: center;
+display: block; 
+margin-top: 10px; 
 }
 
-.user-menu-dropdown {
-  display: block;
+.button:hover {
+  background: #3d7ebc; 
+  box-shadow: 0 2px 4px 0 rgba(0,0,0,0.2); 
+}
+
+
+.cart-dropdown {
   position: absolute;
-  top: 60px; /* Ajustez cette valeur pour aligner avec le bas de l'icône de recherche */
-  left: 0; /* Alignez à gauche avec l'icône de recherche */
-  background-color: #f9f9f9;
-  min-width: 160px;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-  z-index: 1;
+  right: 0;
+  top: 55px; /* Ajustez cette valeur pour qu'elle corresponde à la hauteur de votre barre de navigation */
+  background-color: #fff;
+  width: 300px; /* ou ajustez selon la largeur souhaitée */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  padding: 10px;
+  box-sizing: border-box;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
 }
 
-.user-menu-dropdown a {
-  color: black;
-  padding: 12px 16px;
-  text-decoration: none;
-  display: block;
+.cart-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
 }
 
-.user-menu-dropdown a:hover {
-  background-color: #ddd;
+.cart-item:last-child {
+border-bottom: none;
 }
 
-.profil-container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
-  background: #ffffff; /* Ou utilisez un effet de gradient ou une image futuriste */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
+.cart-item-image {
+width: 50px; 
+height: auto;
+margin-right: 10px; 
 }
 
-.profil-table {
-  width: 100%;
-  border-collapse: collapse;
+.cart-item-details {
+flex-grow: 1;
+margin-right: 10px; /* Espace entre les détails et le bouton de suppression */
 }
 
-.profil-table th,
-.profil-table td {
-  text-align: left;
-  padding: 12px;
-  border-bottom: 1px solid #ddd; /* Pour un look épuré */
+.cart-item h4 {
+margin: 0 0 5px 0; 
+font-size: 16px;
 }
 
-.profil-table th {
-  font-weight: bold;
+.cart-item p {
+margin: 0;
+color: #333;
+font-size: 14px;
 }
 
-.profil-table tr:hover {
-  background-color: #f5f5f5; /* Un léger effet de survol */
+.remove-item-btn {
+background: none;
+border: none;
+color: #ff6b6b; /* Rouge doux pour le bouton de suppression */
+cursor: pointer;
+font-size: 12px;
 }
 
-/* Ajoutez des médias queries si nécessaire pour gérer les affichages sur différents appareils */
+.cart-total {
+display: flex;
+align-items: center;
+justify-content: space-between;
+margin-top: 10px; /* Espace entre les articles du panier et le total */
+}
+
+.cart-total strong {
+font-size: 16px;
+}
+
+.checkout-btn {
+background-color: #237479; /* Couleur de votre choix pour le bouton */
+color: white;
+padding: 10px 20px;
+border: none;
+border-radius: 4px;
+cursor
+
+: pointer;
+text-align: center;
+display: block; 
+margin-top: 10px; 
+}
+
+
+.cart-items {
+overflow-y: auto;
+max-height: 300px;
+}
+
+/* Style pour le message du panier vide */
+.cart-empty-message {
+text-align: center;
+padding: 20px;
+color: #666;
+}
+
+/* Styles pour les caractéristiques du service dans le panier */
+.feature-list {
+list-style: none;
+padding: 0;
+}
+
+.feature-list li {
+margin-bottom: 5px; /* Espacement entre les éléments de liste */
+}
+
+/* PaymentForm.css */
+
+
+.payment-form {
+  background: #fff;
+  padding: 2.5rem;
+  border-radius: 16px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  max-width: 700px; 
+  width: 90%; 
+  display: flex;
+  flex-direction: column;
+  align-items: stretch; 
+}
+
+.payment-details h2 {
+color: #333;
+margin-bottom: 2rem; 
+font-size: 2rem; 
+font-weight: 600; 
+}
+
+.payment-details ul {
+list-style: none;
+padding: 0;
+margin: 0;
+width: 100%;
+}
+
+.payment-details ul li {
+margin-bottom: 1.5rem; 
+padding-bottom: 1.5rem; 
+border-bottom: 2px solid #f0f0f0; 
+color: #333;
+font-size: 1.2rem; 
+display: flex;
+justify-content: space-between;
+align-items: center;
+}
+
+.StripeElement {
+height: 50px;
+width: 100%;
+padding: 12px 20px; 
+background: #fafafa; 
+border: 1px solid #e0e0e0; 
+border-radius: 6px; 
+margin-bottom: 24px; 
+}
+
+.payment-form button {
+background: #4a90e2; 
+font-weight: 500; 
+padding: 1rem 2rem; 
+border: none;
+border-radius: 8px; 
+cursor: pointer;
+transition: all 0.2s ease-in-out; 
+margin-top: 2rem;
+width: auto; 
+font-size: 1.2rem; 
+}
+
+.payment-form button:hover {
+background: #3d7ebc; 
+box-shadow: 0 2px 4px 0 rgba(0,0,0,0.2); 
+}
+
+.empty-cart-message {
+text-align: center;
+padding: 2rem;
+font-size: 1.2rem;
+color: #333;
+background: #fff;
+border-radius: 12px;
+box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+max-width: 600px;
+width: 90%; 
+margin: 3rem auto;
+}
+
+.error-message {
+color: #ff3860;
+margin-top: 1rem;
+font-size: 1.1rem; 
+width: 100%;
+text-align: center;
+}
+
+.page-container {
+padding: 2rem;
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: 2rem;
+position: relative;
+z-index: 1; 
+}
+
+@media (max-width: 768px) {
+.StripeElement {
+font-size: 16px; 
+}
+
+.payment-form {
+padding: 1.5rem; 
+margin-top: 2rem; 
+}
+
+.payment-form button {
+padding: 0.8rem 1.5rem; 
+font-size: 1rem;
+
+/* Taille de police adaptée aux mobiles */
+}
+
+.empty-cart-message, .payment-form {
+margin-top: 2rem; 
+}
+}
+
+.StripeElement:hover, .payment-form button:hover {
+box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.StripeElement:focus, .payment-form button:focus {
+box-shadow: 0 0 0 3px #4a90e2; 
+outline: none; 
+}
