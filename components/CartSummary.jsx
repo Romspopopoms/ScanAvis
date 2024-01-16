@@ -1,11 +1,23 @@
 import React from 'react';
-import { useCart } from '../context/CartContext'; // Modifiez le chemin si nécessaire
+import { motion } from 'framer-motion'; // Importez Framer Motion
+import { useCart } from '../context/CartContext';
 
 const CartSummary = () => {
   const { cartItems, removeFromCart, clearCart, totalPrice } = useCart();
 
+  // Variants pour l'animation
+  const cartVariants = {
+    open: { opacity: 1, scale: 1, transition: { type: 'spring', stiffness: 120 } },
+    closed: { opacity: 0, scale: 0.95, transition: { type: 'spring', stiffness: 120 } },
+  };
+
   return (
-    <div className="cart-container">
+    <motion.div
+      className="cart-container"
+      initial="closed"
+      animate={cartItems.length > 0 ? 'open' : 'closed'}
+      variants={cartVariants}
+    >
       <h2>Mon Panier</h2>
       {cartItems.length > 0 ? (
         <>
@@ -33,7 +45,7 @@ const CartSummary = () => {
       ) : (
         <p>Votre panier est vide.</p>
       )}
-    </div>
+    </motion.div>
   );
 };
 

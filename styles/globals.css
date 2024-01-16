@@ -236,26 +236,29 @@ margin-top: 10px;
 
 
 .cart-dropdown {
-  position: absolute;
-  right: 0;
-  top: 55px; /* Ajustez cette valeur pour qu'elle corresponde à la hauteur de votre barre de navigation */
-  background-color: #fff;
-  width: 300px; /* ou ajustez selon la largeur souhaitée */
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-  border-radius: 8px;
-  padding: 10px;
-  box-sizing: border-box;
-  z-index: 1000;
-  display: flex;
-  flex-direction: column;
+position: fixed; /* Changement en fixed pour une position constante */
+ right: 10px; /* Positionnement en bas à gauche */
+bottom: 10px;
+background-color: #1a1a2e; /* Bleu nuit */
+width: 300px;
+box-shadow: 0 8px 16px rgba(0
+, 0, 0, 0.3); 
+border-radius: 10px; 
+padding: 15px;
+box-sizing: border-box;
+z-index: 1000;
+display: flex;
+flex-direction: column;
+overflow-y: auto; 
+max-height: 70vh;
 }
 
 .cart-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px;
-  border-bottom: 1px solid #ddd;
+display: flex;
+align-items: center;
+justify-content: space-between;
+padding: 10px;
+border-bottom: 1px solid #2b2e4a; /* Bleu plus foncé pour la séparation */
 }
 
 .cart-item:last-child {
@@ -263,31 +266,31 @@ border-bottom: none;
 }
 
 .cart-item-image {
-width: 50px; 
+width: 50px;
 height: auto;
-margin-right: 10px; 
+margin-right: 10px;
 }
 
 .cart-item-details {
 flex-grow: 1;
-margin-right: 10px; /* Espace entre les détails et le bouton de suppression */
+margin-right: 10px;
 }
 
 .cart-item h4 {
-margin: 0 0 5px 0; 
+margin: 0 0 5px 0;
 font-size: 16px;
+color: #e0e0e0; /* Texte clair */
 }
 
 .cart-item p {
 margin: 0;
-color: #333;
-font-size: 14px;
+color: #a9b3c1; /* Texte gris clair */
 }
 
 .remove-item-btn {
 background: none;
 border: none;
-color: #ff6b6b; /* Rouge doux pour le bouton de suppression */
+color: #ff6b6b;
 cursor: pointer;
 font-size: 12px;
 }
@@ -296,48 +299,45 @@ font-size: 12px;
 display: flex;
 align-items: center;
 justify-content: space-between;
-margin-top: 10px; /* Espace entre les articles du panier et le total */
+margin-top: 10px;
 }
 
 .cart-total strong {
 font-size: 16px;
+color: #e0e0e0;
 }
 
 .checkout-btn {
-background-color: #237479; /* Couleur de votre choix pour le bouton */
+background-color: #4834d4; /* Bleu/violet */
 color: white;
 padding: 10px 20px;
 border: none;
 border-radius: 4px;
-cursor
-
-: pointer;
+cursor: pointer;
 text-align: center;
-display: block; 
-margin-top: 10px; 
+display: block;
+margin-top: 10px;
 }
-
 
 .cart-items {
 overflow-y: auto;
 max-height: 300px;
 }
 
-/* Style pour le message du panier vide */
 .cart-empty-message {
 text-align: center;
 padding: 20px;
 color: #666;
 }
 
-/* Styles pour les caractéristiques du service dans le panier */
 .feature-list {
 list-style: none;
 padding: 0;
 }
 
 .feature-list li {
-margin-bottom: 5px; /* Espacement entre les éléments de liste */
+margin-bottom: 5px;
+color: #a9b3c1; /* Texte gris clair */
 }
 
 /* PaymentForm.css */
