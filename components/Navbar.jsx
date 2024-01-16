@@ -43,11 +43,11 @@ const Navbar = () => {
           </button>
         ) : (
           <button type="button" onClick={handleLogin}>
-            <img src="/images/icon-user.svg" alt="User" />
+            <img src="/user.svg" alt="User" />
           </button>
         )}
         <button type="button" onClick={handleToggleMenu} className="ml-4">
-          <img src="/images/icon-menu.svg" alt="Menu" />
+          <img src="/menu.svg" alt="Menu" />
         </button>
       </div>
       <motion.div
