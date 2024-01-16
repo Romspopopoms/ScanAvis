@@ -43,11 +43,11 @@ const Navbar = () => {
           </button>
         ) : (
           <button type="button" onClick={handleLogin}>
-            <img src="/user.svg" alt="User" />
+            <img src="/user.svg" alt="User" style={{ width: '24px', height: '24px' }} />
           </button>
         )}
         <button type="button" onClick={handleToggleMenu} className="ml-4">
-          <img src="/menu.svg" alt="Menu" />
+          <img src="/menu.svg" alt="Menu" style={{ width: '24px', height: '24px' }} />
         </button>
       </div>
       <motion.div
