@@ -64,14 +64,14 @@ const Navbar = () => {
           >
             Fermer
           </button>
-          <Link href="/" className="px-4 py-2 hover:bg-gray-700">
-            Accueil
-          </Link>
           {user && (
           <Link href="/mon-profil" className="px-4 py-2 hover:bg-gray-700">
             Mon Profil
           </Link>
           )}
+          <Link href="/" className="px-4 py-2 hover:bg-gray-700">
+            Accueil
+          </Link>
           <Link href="/tarifs" className="px-4 py-2 hover:bg-gray-700">
             Nos offres
           </Link>
