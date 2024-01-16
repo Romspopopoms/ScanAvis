@@ -1,72 +1,81 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import netlifyIdentity from 'netlify-identity-widget';
-import styles from '../styles';
-import { navVariants } from '../utils/motion';
+import Link from 'next/link';
 
 const Navbar = () => {
-  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const user = netlifyIdentity.currentUser();
 
   useEffect(() => {
-    netlifyIdentity.init({ autoOpen: false });
-    netlifyIdentity.on('login', () => setIsUserMenuOpen(true));
-    netlifyIdentity.on('logout', () => setIsUserMenuOpen(false));
-
-    return () => {
-      netlifyIdentity.off('login');
-      netlifyIdentity.off('logout');
-    };
+    netlifyIdentity.init();
   }, []);
-
-  const toggleUserMenu = () => {
-    setIsUserMenuOpen(!isUserMenuOpen);
-  };
-
-  const handleLogout = () => {
-    netlifyIdentity.logout();
-    setIsUserMenuOpen(false);
-  };
 
   const handleLogin = () => {
     netlifyIdentity.open('login');
   };
 
+  const handleLogout = () => {
+    netlifyIdentity.logout();
+  };
+
+  const handleToggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  // Variants pour l'animation du menu
+  const menuVariants = {
+    open: { x: 0 },
+    closed: { x: '-100%' },
+  };
+
   return (
-    <motion.nav
-      variants={navVariants}
-      initial="hidden"
-      animate="show"
-      className={`${styles.xPaddings} py-8 relative`}
-    >
-      <div className={`${styles.innerWidth} mx-auto flex justify-between items-center`}>
+    <nav className="fixed top-0 left-0 w-full flex justify-between items-center px-4 bg-gray-900 text-white z-50">
+      <h2 className="font-extrabold text-2xl">
+        <Link href="/">
+          SCAN'AVIS
+        </Link>
+      </h2>
+      <div className="flex items-center">
         {user ? (
-          <img
-            src="/user.svg"
-            alt="User"
-            className="w-[24px] h-[24px] object-contain cursor-pointer"
-            onClick={toggleUserMenu}
-          />
+          <button type="button" onClick={handleLogout} className="mr-4">
+            Déconnexion
+          </button>
         ) : (
-          <button type="button" onClick={handleLogin}>Connexion</button>
+          <button type="button" onClick={handleLogin}>
+            Connexion
+          </button>
         )}
-        <h2 className="font-extrabold text-[24px] leading-[30.24px] text-white">
-          <a href="/" aria-label="Home">SCAN'AVIS</a>
-        </h2>
-        {isUserMenuOpen && user && (
-          <div className="user-menu-dropdown">
-            <button type="button" className="button">
-              <a href="/mon-profil">Mon Profil</a>
-            </button>
-            <a href="/mon-abonnement">Mon Abonnement</a>
-            <button type="button" className="button" onClick={handleLogout}>
-              Déconnexion
-            </button>
-          </div>
-        )}
+        <button type="button" onClick={handleToggleMenu} className="ml-4">
+          Menu
+        </button>
       </div>
-    </motion.nav>
+      <motion.div
+        initial={false}
+        animate={isMenuOpen ? 'open' : 'closed'}
+        variants={menuVariants}
+        className="fixed top-0 left-0 w-[250px] h-full bg-gray-800 shadow-lg z-40"
+      >
+        <nav className="flex flex-col">
+          <button
+            type="button"
+            onClick={handleToggleMenu}
+            className="text-right px-4 py-2"
+          >
+            Fermer
+          </button>
+          {user && (
+          <Link href="/mon-profil" className="px-4 py-2 hover:bg-gray-700">
+            Mon Profil
+          </Link>
+          )}
+          <Link href="/tarifs" className="px-4 py-2 hover:bg-gray-700">
+            Nos offres
+          </Link>
+        </nav>
+      </motion.div>
+
+    </nav>
   );
 };
-
 export default Navbar;
