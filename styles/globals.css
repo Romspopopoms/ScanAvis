@@ -475,30 +475,30 @@ outline: none;
   bottom: 20px;
   left: 20px;
   z-index: 100;
-  background-color: rgba(255, 255, 255, 0.98); /* Augmenter l'opacité pour la lisibilité */
-  backdrop-filter: blur(10px);
+  background-color: rgba(45, 52, 54, 0.9); /* Fond bleu nuit pour un look futuriste */
+  backdrop-filter: blur(14px);
   border-radius: 20px;
   padding: 1rem;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
-  align-items: stretch; /* Aligner les enfants en étirement pour utiliser toute la largeur */
-  width: 300px; /* Ajuster la largeur selon votre contenu */
+  align-items: stretch; 
+  width: 300px; 
   transition: transform 0.3s ease;
   overflow: hidden;
 }
 
 .cart-bubble:hover {
-  transform: translateY(-10px) scale(1.03); /* Légère transformation au survol */
+  transform: translateY(-10px) scale(1.03);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
 }
 
 .cart-items {
   width: 100%;
-  background: rgba(255, 255, 255, 0.8);
-  padding: 0.5rem; /* Ajustement du padding */
+  background: rgba(74, 84, 89, 0.8); /* Fond bleu-gris pour les articles */
+  padding: 0.5rem;
   border-radius: 12px;
-  margin-bottom: 1rem; /* Espace entre les articles et le total */
+  margin-bottom: 1rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
@@ -507,85 +507,97 @@ outline: none;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 0.5rem;
-  background: #fff;
+  background: rgba(255, 255, 255, 0.5); /* Fond clair avec transparence pour un effet de verre */
   border-radius: 10px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  padding: 0.5rem; /* Réduire le padding pour un aspect plus compact */
+  padding: 0.5rem;
 }
 
 .cart-item-image {
   border-radius: 8px;
-  width: 48px; /* Taille ajustée de l'image */
+  width: 48px;
   height: 48px;
 }
 
 .cart-item-details {
   flex-grow: 1;
-  padding: 0 0.5rem; /* Ajout d'un peu d'espacement */
+  padding: 0 0.5rem;
 }
 
 .cart-item button {
-  background-color: #ff6b6b;
+  background-color: #e55039; /* Bouton rouge pour une action de suppression */
   color: white;
   border: none;
-  padding: 0.375rem 0.75rem; /* Padding plus petit pour un bouton plus compact */
+  padding: 0.375rem 0.75rem;
   border-radius: 6px;
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
 
 .cart-item button:hover {
-  background-color: #ff4757;
+  background-color: #eb2f06; /* Rouge plus foncé au survol */
 }
 
 .cart-total {
   display: flex;
-  justify-content: space-between; /* Espacer les boutons de manière égale */
+  justify-content: space-around; 
   align-items: center;
-  padding: 0.5rem; /* Ajustement du padding */
-  background: #f7f7f7; /* Fond légèrement différent pour la section totale */
+  padding: 0.5rem;
+  background: rgba(9, 132, 227, 0.8); /* Fond bleu ciel pour le total */
   border-radius: 12px;
 }
 
 .cart-total strong {
   font-size: 1.2rem;
+  color: #fff; /* Texte blanc pour contraster avec le fond bleu */
 }
 
-/* Boutons 'Vider le Panier' et 'Payer' avec une meilleure distinction */
 .cart-total button {
-  flex: 1; /* Les boutons utilisent l'espace de manière équitable */
-  margin: 0 0.25rem; /* Espacement réduit entre les boutons */
-  padding: 0.5rem 1rem; /* Padding ajusté pour un bouton plus compact */
+  background-color: #00b894; /* Vert futuriste pour les boutons d'action */
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  flex: 1;
+  margin: 0 0.25rem;
 }
 
 .cart-total button:hover {
-  transform: scale(1.03); /* Légère transformation au survol */
+  background-color: #079992; /* Vert plus foncé au survol */
 }
 
-/* Styles pour le bouton 'Payer' comme un lien */
 .checkout-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   text-decoration: none;
-  display: inline-block; /* Permettre l'utilisation de margin et padding */
-  text-align: center;
-  width: 100%; /* Le bouton occupe toute la largeur disponible */
 }
 
 .checkout-btn a {
   color: white;
-  display: block;
-  padding: 0.5rem 1rem; /* Padding ajusté pour correspondre au bouton 'Vider le Panier' */
+  padding: 0.5rem 1rem;
+  background-color: #0984e3; /* Bleu ciel pour le bouton 'Payer' */
+  border-radius: 6px;
+  width: 100%;
+  text-align: center;
+  transition: background-color 0.2s ease;
 }
 
-/* Adaptation pour les petits écrans */
+.checkout-btn a:hover {
+  background-color: #74b9ff; /* Bleu ciel plus clair au survol */
+}
+
 @media (max-width: 360px) {
   .cart-bubble {
-    width: 95%; /* La bulle de panier prend presque toute la largeur de l'écran */
-    left: 2.5%; /* Centré avec une marge égale de chaque côté */
-    bottom: 10px; /* Moins d'espace au fond pour les appareils à petit écran */
+    width: 95%;
+    left: 2.5%;
+    bottom: 10px;
   }
 
   .cart-total button {
-    margin: 0.25rem 0.125rem; /* Espacement réduit pour les boutons sur petits écrans */
+    margin: 0.25rem 0.125rem;
   }
 }
+
 
