@@ -475,59 +475,100 @@ outline: none;
   bottom: 20px;
   left: 20px;
   z-index: 100;
-  background-color: rgba(255, 255, 255, 0.75); /* Effet de verre */
-  backdrop-filter: blur(10px); /* Effet de flou pour l'arrière-plan */
-  border-radius: 20px; /* Coins arrondis pour un look moderne */
-  padding: 15px;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  background-color: rgba(255, 255, 255, 0.9); /* Effet de verre plus prononcé */
+  backdrop-filter: blur(14px); /* Augmentation de l'effet de flou */
+  border-radius: 16px; /* Coins arrondis doux */
+  padding: 20px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); /* Ombre plus profonde pour un effet 3D */
   display: flex;
   flex-direction: column;
-  max-width: 300px; /* Limiter la largeur du panier */
-  transition: transform 0.3s ease; /* Transition pour l'animation */
-  transform: translateY(0); /* Position initiale */
+  width: 340px; /* Ajustez la largeur selon le contenu */
+  transition: all 0.3s ease; /* Transition fluide pour toutes les propriétés */
+  overflow: hidden; /* Cache le débordement pour une bordure nette */
 }
 
 .cart-bubble:hover {
-  transform: translateY(-5px); /* Légère élévation lors du survol */
+  transform: translateY(-10px) scale(1.02); /* Effet de survol plus prononcé */
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25); /* Ombre plus intense au survol */
 }
 
-/* Style pour l'icône de panier dans la Navbar */
-.navbar-cart-icon {
-  position: relative;
+/* Styles pour le contenu du panier */
+.cart-items, .cart-total {
+  background: rgba(255, 255, 255, 0.8); /* Fond légèrement transparent */
+  padding: 10px 15px;
+  margin-bottom: 10px; /* Espacement entre les éléments */
+  border-radius: 12px; /* Coins arrondis pour les conteneurs intérieurs */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Ombre subtile pour la séparation des éléments */
+}
+
+.cart-item {
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 48px; /* Taille de l'icône */
-  height: 48px; /* Taille de l'icône */
-  cursor: pointer;
+  justify-content: space-between; /* Espace entre les détails de l'article et le bouton */
+  margin-bottom: 8px; /* Espacement entre les articles */
 }
 
-/* Cercle indicateur de quantité sur l'icône de panier */
-.navbar-cart-icon::after {
-  content: attr(data-count); /* Afficher la quantité d'articles */
-  position: absolute;
-  top: -10px;
-  right: -10px;
-  background-color: red;
-  color: white;
-  border-radius: 50%;
-  padding: 2px 6px;
-  font-size: 0.75rem;
-  font-weight: bold;
+.cart-item:last-child {
+  margin-bottom: 0; /* Pas de marge pour le dernier élément */
 }
 
-/* Styles pour les boutons du panier */
-.cart-bubble button {
-  background-color: #4a90e2; /* Bleu futuriste */
+.cart-item-image {
+  border-radius: 8px; /* Coins arrondis pour les images */
+  width: 50px; /* Taille ajustée pour les images */
+  height: 50px; /* Taille ajustée pour les images */
+  object-fit: cover; /* Assurez-vous que l'image couvre la zone */
+}
+
+.cart-item-details {
+  flex-grow: 1;
+  margin: 0 10px; /* Espacement autour des détails */
+}
+
+.cart-item h4, .cart-item p {
+  margin: 0; /* Enlevez la marge par défaut pour un alignement précis */
+}
+
+/* Bouton pour retirer un élément du panier */
+.cart-item button {
+  background-color: #ff6b6b; /* Couleur rouge pour une action de suppression */
+  border-radius: 4px;
+  padding: 4px 8px; /* Plus petit pour une action discrète */
+  transition: all 0.2s ease; /* Transition fluide */
+}
+
+.cart-item button:hover {
+  background-color: #ff4757; /* Rouge plus foncé au survol */
+}
+
+/* Bouton pour vider le panier et payer */
+.cart-total button, .cart-total .checkout-btn {
+  background-color: #4caf50; /* Vert pour les actions principales */
   color: white;
   border: none;
-  padding: 8px 16px;
-  margin-top: 10px;
-  border-radius: 4px;
+  padding: 12px 24px; /* Padding plus généreux pour une meilleure accessibilité */
+  margin-right: 10px; /* Espace entre les boutons */
+  border-radius: 8px; /* Coins arrondis pour l'esthétique */
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: all 0.2s ease;
+  text-transform: uppercase; /* Texte en majuscules pour plus d'emphase */
+  font-weight: bold; /* Gras pour l'importance */
 }
 
-.cart-bubble button:hover {
-  background-color: #3d7ebc; /* Couleur plus foncée au survol */
+.cart-total button:last-child, .cart-total .checkout-btn:last-child {
+  margin-right: 0; /* Pas de marge à droite pour le dernier bouton */
+}
+
+.cart-total button:hover, .cart-total .checkout-btn:hover {
+  background-color: #43a047; /* Vert plus foncé pour le feedback au survol */
+  transform: scale(1.05); /* Légère augmentation de la taille au survol */
+}
+
+/* Assurez-vous que le lien dans le bouton 'Payer' occupe tout l'espace disponible */
+.checkout-btn a {
+  display: block;
+  height: 100%;
+  width: 100%;
+  line-height: 1; /* Assurez-vous que le texte du lien s'aligne verticalement */
+  color: white; /* Texte blanc pour la visibilité */
+  text-decoration: none; /* Pas de soulignement du lien */
 }
