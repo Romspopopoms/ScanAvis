@@ -475,34 +475,34 @@ outline: none;
   bottom: 20px;
   left: 20px;
   z-index: 100;
-  background: rgba(18, 18, 52, 0.95); /* Bleu nuit */
+  background: rgba(25, 20, 50, 0.95); /* Bleu nuit */
   backdrop-filter: blur(10px);
   border-radius: 15px;
-  padding: 20px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  padding: 1rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   display: flex;
   flex-direction: column;
-  width: 340px; /* Ajusté pour l'équilibre */
+  width: 340px; 
   transition: transform 0.3s ease;
-  color: white; /* Texte en blanc pour la lisibilité */
+  color: white;
 }
 
 .cart-bubble:hover {
   transform: translateY(-5px) scale(1.02);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
 }
 
 .cart-items {
-  background: rgba(56, 56, 178, 0.8); /* Bleu profond */
+  background: rgba(45, 52, 54, 0.8); /* Bleu-gris profond */
   border-radius: 12px;
-  margin-bottom: 15px;
-  padding: 15px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2); /* Ombre intérieure pour l'effet de profondeur */
 }
 
 .cart-item {
-  background: rgba(255, 255, 255, 0.1); /* Transparence pour l'effet de verre */
-  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.1); /* Effet de verre */
+  border-radius: 8px;
   margin-bottom: 10px;
   padding: 10px;
   display: flex;
@@ -512,16 +512,16 @@ outline: none;
 
 .cart-item h4 {
   margin: 0;
-  color: #fff;
+  color: #ddd; /* Gris clair pour le nom de l'article */
 }
 
 .cart-item p {
   margin: 0;
-  color: #ddd;
+  color: #bbb; /* Gris pour les détails */
 }
 
 .cart-item button {
-  background-color: #e55039;
+  background-color: #ff5555; /* Rouge vif pour l'action de suppression */
   border: none;
   border-radius: 6px;
   padding: 8px 16px;
@@ -530,65 +530,58 @@ outline: none;
 }
 
 .cart-item button:hover {
-  background-color: #ff4757;
+  background-color: #ff2e2e; /* Rouge plus intense au survol */
 }
 
 .cart-total {
   display: flex;
   justify-content: space-between;
   padding: 10px;
-  background: rgba(30, 39, 46, 0.85); /* Bleu ciel sombre */
+  background: rgba(30, 39, 46, 0.9); /* Bleu ciel sombre */
   border-radius: 12px;
 }
 
 .cart-total strong {
   font-weight: bold;
+  color: #ddd; /* Gris clair pour le texte */
 }
 
-.cart-total button {
-  background-color: #4cd137; /* Vert futuriste */
+/* Boutons 'Vider le Panier' et 'Payer' de la même taille et du même style */
+.cart-total button, .checkout-btn a {
+  background-color: #4c4e7e; /* Bleu-violet */
   border: none;
   border-radius: 6px;
-  padding: 10px 20px;
-  margin: 0 5px; /* Espace entre les boutons */
-  transition: background-color 0.2s ease;
-  flex-grow: 1; /* Les boutons s'étendent pour remplir l'espace */
-}
-
-.cart-total button:hover {
-  background-color: #44bd32;
-}
-
-.checkout-btn {
-  display: block;
-  background-color: #8c7ae6; /* Violet */
-  color: #fff;
-  text-decoration: none;
-  border-radius: 6px;
-  text-align: center;
-  padding: 10px 20px;
+  padding: 8px 20px;
   margin: 0 5px;
   transition: background-color 0.2s ease;
+  flex: 1; /* Les boutons prennent une largeur égale */
+  text-align: center;
+  color: white;
+  text-transform: uppercase; /* Texte en majuscules pour l'accentuation */
+  font-weight: bold;
+  text-decoration: none; /* Enlever le soulignement des liens */
 }
 
-.checkout-btn:hover {
-  background-color: #9c88ff; /* Violet clair au survol */
+.cart-total button:hover, .checkout-btn a:hover {
+  background-color: #7678b5; /* Bleu-violet plus clair au survol */
+  transform: translateY(-2px); /* Légère élévation au survol */
 }
 
 @media (max-width: 360px) {
   .cart-bubble {
-    width: calc(100% - 40px); /* Adaptation à la largeur de l'écran avec une marge */
+    width: calc(100% - 40px);
     bottom: 10px;
     left: 50%;
     transform: translateX(-50%);
   }
 
-  .cart-total button,
-  .checkout-btn {
-    padding: 8px 10px; /* Adaptation pour les écrans plus petits */
-    font-size: 0.8rem; /* Taille de police plus petite pour les petits écrans */
+  .cart-total button, .checkout-btn a {
+    padding: 8px; /* Réduire le padding sur les petits écrans */
+    margin: 2px; /* Réduire la marge pour éviter le surpeuplement */
+    font-size: 0.8rem; /* Réduire la taille de la police pour l'adapter */
   }
 }
+
 
 
 
