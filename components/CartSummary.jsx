@@ -31,7 +31,7 @@ const CartSummary = ({ isCartOpen, toggleCart }) => {
           <div className="cart-items">
             {cartItems.map((item) => (
               <div className="cart-item" key={item.id}>
-                <img src={item.imgUrl} alt={item.name} className="item-image" />
+                {/* L'image a été retirée */}
                 <div className="item-details">
                   <h4 className="item-name">{item.name}</h4>
                   <p className="item-price">{item.price}$ - Quantité: {item.quantity}</p>
