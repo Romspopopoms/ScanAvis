@@ -475,16 +475,16 @@ outline: none;
   bottom: 20px;
   left: 20px;
   z-index: 100;
-  background: rgba(25, 20, 50, 0.95); /* Bleu nuit */
+  background: rgba(25, 20, 50, 0.95); /* Bleu nuit pour un look futuriste */
   backdrop-filter: blur(10px);
   border-radius: 15px;
-  padding: 1rem;
+  padding: 20px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   display: flex;
   flex-direction: column;
-  width: 340px; 
+  width: 340px; /* Ajusté pour un meilleur équilibre */
   transition: transform 0.3s ease;
-  color: white;
+  color: white; /* Texte en blanc pour la lisibilité */
 }
 
 .cart-bubble:hover {
@@ -493,7 +493,7 @@ outline: none;
 }
 
 .cart-items {
-  background: rgba(45, 52, 54, 0.8); /* Bleu-gris profond */
+  background: rgba(45, 52, 54, 0.8); /* Bleu-gris profond pour les articles */
   border-radius: 12px;
   margin-bottom: 1rem;
   padding: 0.5rem;
@@ -537,7 +537,7 @@ outline: none;
   display: flex;
   justify-content: space-between;
   padding: 10px;
-  background: rgba(30, 39, 46, 0.9); /* Bleu ciel sombre */
+  background: rgba(30, 39, 46, 0.9); /* Bleu ciel sombre pour le total */
   border-radius: 12px;
 }
 
@@ -546,20 +546,19 @@ outline: none;
   color: #ddd; /* Gris clair pour le texte */
 }
 
-/* Boutons 'Vider le Panier' et 'Payer' de la même taille et du même style */
 .cart-total button, .checkout-btn a {
-  background-color: #4c4e7e; /* Bleu-violet */
+  background-color: #4c4e7e; /* Bleu-violet pour les actions */
   border: none;
   border-radius: 6px;
-  padding: 8px 20px;
-  margin: 0 5px;
-  transition: background-color 0.2s ease;
-  flex: 1; /* Les boutons prennent une largeur égale */
+  padding: 10px 20px; /* Uniformisation du padding */
+  margin: 0 5px; /* Espace entre les boutons */
+  flex: 1; /* Distribution équitable de l'espace */
   text-align: center;
   color: white;
   text-transform: uppercase; /* Texte en majuscules pour l'accentuation */
   font-weight: bold;
   text-decoration: none; /* Enlever le soulignement des liens */
+  transition: background-color 0.2s ease, transform 0.2s ease;
 }
 
 .cart-total button:hover, .checkout-btn a:hover {
@@ -569,16 +568,16 @@ outline: none;
 
 @media (max-width: 360px) {
   .cart-bubble {
-    width: calc(100% - 40px);
+    width: calc(100% - 40px); /* Adaptation à la largeur de l'écran avec une marge */
     bottom: 10px;
     left: 50%;
     transform: translateX(-50%);
   }
 
   .cart-total button, .checkout-btn a {
-    padding: 8px; /* Réduire le padding sur les petits écrans */
-    margin: 2px; /* Réduire la marge pour éviter le surpeuplement */
-    font-size: 0.8rem; /* Réduire la taille de la police pour l'adapter */
+    margin: 0.25rem; /* Espace uniforme autour des boutons */
+    padding: 8px 16px; /* Padding réduit pour les petits écrans */
+    font-size: 0.8rem; /* Taille de police réduite pour les petits écrans */
   }
 }
 
