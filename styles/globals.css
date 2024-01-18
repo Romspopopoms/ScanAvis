@@ -475,70 +475,63 @@ outline: none;
   bottom: 20px;
   left: 20px;
   z-index: 100;
-  background-color: rgba(255, 255, 255, 0.95); /* Augmentation de l'opacité pour améliorer la lisibilité */
-  backdrop-filter: blur(14px); 
-  border-radius: 16px; 
+  background-color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(14px);
+  border-radius: 20px;
   padding: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); /* Ombre plus douce pour un effet 3D subtil */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
+  align-items: center; /* Centrer les éléments */
   width: 340px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Ajout d'une transition pour l'ombre */
-  overflow: hidden;
+  transition: all 0.3s ease;
 }
 
 .cart-bubble:hover {
-  transform: translateY(-10px) scale(1.02);
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2); 
+  transform: translateY(-10px) scale(1.05);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
 }
 
 .cart-items {
+  width: 100%; /* Utiliser toute la largeur disponible */
   background: rgba(255, 255, 255, 0.8);
-  padding: 10px 15px;
-  margin-bottom: 10px;
+  padding: 10px;
   border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  margin-bottom: 20px; /* Ajouter plus d'espace avant la section du total */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .cart-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px;
-  background: #f0f0f0; /* Fond pour chaque élément de la liste pour améliorer la séparation */
-  border-radius: 8px;
+  margin-bottom: 10px; /* Ajouter un peu plus d'espace entre les éléments */
+  padding: 10px; /* Ajouter un peu de padding à l'intérieur de chaque article */
+  background: #fff; /* Fond blanc pour chaque article */
+  border-radius: 10px; /* Coins légèrement arrondis pour les articles */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Ombre douce pour un effet de profondeur */
+}
+
+.cart-item:last-child {
+  margin-bottom: 0;
 }
 
 .cart-item-image {
   border-radius: 8px;
-  width: 60px;
-  height: 60px;
-  object-fit: cover;
+  margin-right: 10px; /* Ajouter un espace entre l'image et le texte */
 }
 
 .cart-item-details {
   flex-grow: 1;
-  margin-left: 10px;
-}
-
-.cart-item h4 {
-  color: #333;
-  font-size: 1rem;
-}
-
-.cart-item p {
-  color: #666;
-  font-size: 0.875rem;
 }
 
 .cart-item button {
   background-color: #ff6b6b;
-  border-radius: 6px;
+  color: white;
+  border: none;
   padding: 6px 12px;
-  font-size: 0.875rem;
+  border-radius: 6px;
+  cursor: pointer;
 }
 
 .cart-item button:hover {
@@ -546,43 +539,45 @@ outline: none;
 }
 
 .cart-total {
+  width: 100%; /* Utiliser toute la largeur disponible */
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around; /* Espacer uniformément les boutons */
   align-items: center;
-  padding: 10px;
-  background: #f7f7f7; /* Fond légèrement différent pour distinguer la section totale */
-  border-radius: 12px;
+  margin-top: 10px; /* Ajouter un peu d'espace au-dessus de la section totale */
 }
 
 .cart-total strong {
-  font-size: 1rem;
-  color: #333;
+  font-size: 1.2rem; /* Augmenter légèrement la taille pour le total */
 }
 
-.cart-total button, .cart-total .checkout-btn {
+.cart-total button {
   background-color: #4caf50;
   color: white;
   border: none;
-  padding: 10px 20px;
-  margin-right: 10px;
+  padding: 8px 16px;
   border-radius: 6px;
-  font-size: 0.875rem;
-  font-weight: bold;
-  transition: background-color 0.2s ease;
-  text-align: center;
+  cursor: pointer;
+  flex: 1; /* Les boutons utilisent un espace équitable */
+  margin: 0 10px; /* Ajouter un espace entre les boutons */
+  transition: background-color 0.2s;
 }
 
-.cart-total button:last-child, .cart-total .checkout-btn:last-child {
-  margin-right: 0;
-}
-
-.cart-total button:hover, .cart-total .checkout-btn:hover {
+.cart-total button:hover {
   background-color: #43a047;
-  transform: scale(1.05);
 }
 
 .checkout-btn a {
   display: block;
   color: white;
   text-decoration: none;
+  text-align: center;
+}
+
+/* Assurer que les boutons ne soient pas trop proches sur les petits écrans */
+@media (max-width: 360px) {
+  .cart-total button {
+    padding: 8px; /* Réduire le padding sur les petits écrans */
+    margin: 0 5px; /* Réduire l'espace entre les boutons */
+    font-size: 0.9rem; /* Adapter la taille de la police */
+  }
 }
