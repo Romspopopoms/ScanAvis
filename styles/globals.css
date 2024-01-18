@@ -470,56 +470,64 @@ box-shadow: 0 0 0 3px #4a90e2;
 outline: none; 
 }
 
-.sidebar {
+.cart-bubble {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 250px; /* Largeur du Sidebar */
-  height: 100vh; /* Hauteur totale */
-  background-color: #1a1a2e; /* Couleur de fond bleu nuit */
-  box-shadow: 2px 0px 5px rgba(0, 0, 0, 0.5);
-  padding: 20px;
+  bottom: 20px;
+  left: 20px;
+  z-index: 100;
+  background-color: rgba(255, 255, 255, 0.75); /* Effet de verre */
+  backdrop-filter: blur(10px); /* Effet de flou pour l'arrière-plan */
+  border-radius: 20px; /* Coins arrondis pour un look moderne */
+  padding: 15px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  justify-content: start;
+  max-width: 300px; /* Limiter la largeur du panier */
+  transition: transform 0.3s ease; /* Transition pour l'animation */
+  transform: translateY(0); /* Position initiale */
+}
+
+.cart-bubble:hover {
+  transform: translateY(-5px); /* Légère élévation lors du survol */
+}
+
+/* Style pour l'icône de panier dans la Navbar */
+.navbar-cart-icon {
+  position: relative;
+  display: flex;
   align-items: center;
-  z-index: 2;
-  overflow-y: auto;
+  justify-content: center;
+  width: 48px; /* Taille de l'icône */
+  height: 48px; /* Taille de l'icône */
+  cursor: pointer;
 }
 
-.sidebar a, .sidebar button {
-  color: #e0e0e0; /* Couleur de texte claire */
-  padding: 10px 15px;
-  margin: 5px 0;
-  width: 100%;
-  text-align: left;
+/* Cercle indicateur de quantité sur l'icône de panier */
+.navbar-cart-icon::after {
+  content: attr(data-count); /* Afficher la quantité d'articles */
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background-color: red;
+  color: white;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+
+/* Styles pour les boutons du panier */
+.cart-bubble button {
+  background-color: #4a90e2; /* Bleu futuriste */
+  color: white;
   border: none;
-  background: none;
-  outline: none;
-  font-size: 16px;
-  transition: background-color 0.3s, color 0.3s;
+  padding: 8px 16px;
+  margin-top: 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
-.sidebar a:hover, .sidebar button:hover {
-  background-color: #4834d4; /* Couleur bleu/violet au survol */
-  color: #fff;
+.cart-bubble button:hover {
+  background-color: #3d7ebc; /* Couleur plus foncée au survol */
 }
-
-.sidebar .cart-summary {
-  margin-top: 20px;
-  background-color: #0f3460; /* Bleu plus profond pour le résumé du panier */
-  color: #fff;
-  padding: 10px;
-  border-radius: 5px;
-  width: 100%;
-}
-
-.sidebar.open {
-  transform: translateX(0);
-}
-
-.sidebar.closed {
-  transform: translateX(-100%);
-}
-
-/* Ajoutez ici d'autres styles spécifiques à votre application */

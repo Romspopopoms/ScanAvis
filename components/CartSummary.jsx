@@ -1,8 +1,9 @@
 import React from 'react';
 import { motion } from 'framer-motion'; // Importez Framer Motion
+import Link from 'next/link';
 import { useCart } from '../context/CartContext';
 
-const CartSummary = () => {
+const CartSummary = ({ isCartOpen, toggleCart }) => {
   const { cartItems, removeFromCart, clearCart, totalPrice } = useCart();
 
   // Variants pour l'animation
@@ -11,12 +12,20 @@ const CartSummary = () => {
     closed: { opacity: 0, scale: 0.95, transition: { type: 'spring', stiffness: 120 } },
   };
 
+  // Gère le clic sur le container pour fermer le panier si ouvert
+  const handleClickOutside = (e) => {
+    if (isCartOpen && e.target.classList.contains('cart-container')) {
+      toggleCart();
+    }
+  };
+
   return (
     <motion.div
-      className="cart-container"
+      className="cart-container cart-bubble"
       initial="closed"
-      animate={cartItems.length > 0 ? 'open' : 'closed'}
+      animate={isCartOpen ? 'open' : 'closed'}
       variants={cartVariants}
+      onClick={handleClickOutside} // Gère le clic pour fermer le panier
     >
       <h2>Mon Panier</h2>
       {cartItems.length > 0 ? (
@@ -40,10 +49,15 @@ const CartSummary = () => {
             <button type="button" onClick={clearCart}>
               Vider le Panier
             </button>
+            <button type="button" className="checkout-btn">
+              <Link href="/paiement">
+                Payer {/* Assurez-vous que la classe checkout-btn a les styles appropriés */}
+              </Link>
+            </button>
           </div>
         </>
       ) : (
-        <p>Votre panier est vide.</p>
+        <p className="cart-empty-message">Votre panier est vide.</p>
       )}
     </motion.div>
   );
