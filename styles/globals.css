@@ -475,29 +475,30 @@ outline: none;
   bottom: 20px;
   left: 20px;
   z-index: 100;
-  background-color: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(14px);
+  background-color: rgba(255, 255, 255, 0.98); /* Augmenter l'opacité pour la lisibilité */
+  backdrop-filter: blur(10px);
   border-radius: 20px;
-  padding: 20px;
+  padding: 1rem;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
-  align-items: center; /* Centrer les éléments */
-  width: 340px;
-  transition: all 0.3s ease;
+  align-items: stretch; /* Aligner les enfants en étirement pour utiliser toute la largeur */
+  width: 300px; /* Ajuster la largeur selon votre contenu */
+  transition: transform 0.3s ease;
+  overflow: hidden;
 }
 
 .cart-bubble:hover {
-  transform: translateY(-10px) scale(1.05);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+  transform: translateY(-10px) scale(1.03); /* Légère transformation au survol */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
 }
 
 .cart-items {
-  width: 100%; /* Utiliser toute la largeur disponible */
+  width: 100%;
   background: rgba(255, 255, 255, 0.8);
-  padding: 10px;
+  padding: 0.5rem; /* Ajustement du padding */
   border-radius: 12px;
-  margin-bottom: 20px; /* Ajouter plus d'espace avant la section du total */
+  margin-bottom: 1rem; /* Espace entre les articles et le total */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
@@ -505,33 +506,32 @@ outline: none;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 10px; /* Ajouter un peu plus d'espace entre les éléments */
-  padding: 10px; /* Ajouter un peu de padding à l'intérieur de chaque article */
-  background: #fff; /* Fond blanc pour chaque article */
-  border-radius: 10px; /* Coins légèrement arrondis pour les articles */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Ombre douce pour un effet de profondeur */
-}
-
-.cart-item:last-child {
-  margin-bottom: 0;
+  margin-bottom: 0.5rem;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 0.5rem; /* Réduire le padding pour un aspect plus compact */
 }
 
 .cart-item-image {
   border-radius: 8px;
-  margin-right: 10px; /* Ajouter un espace entre l'image et le texte */
+  width: 48px; /* Taille ajustée de l'image */
+  height: 48px;
 }
 
 .cart-item-details {
   flex-grow: 1;
+  padding: 0 0.5rem; /* Ajout d'un peu d'espacement */
 }
 
 .cart-item button {
   background-color: #ff6b6b;
   color: white;
   border: none;
-  padding: 6px 12px;
+  padding: 0.375rem 0.75rem; /* Padding plus petit pour un bouton plus compact */
   border-radius: 6px;
   cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
 .cart-item button:hover {
@@ -539,45 +539,53 @@ outline: none;
 }
 
 .cart-total {
-  width: 100%; /* Utiliser toute la largeur disponible */
   display: flex;
-  justify-content: space-around; /* Espacer uniformément les boutons */
+  justify-content: space-between; /* Espacer les boutons de manière égale */
   align-items: center;
-  margin-top: 10px; /* Ajouter un peu d'espace au-dessus de la section totale */
+  padding: 0.5rem; /* Ajustement du padding */
+  background: #f7f7f7; /* Fond légèrement différent pour la section totale */
+  border-radius: 12px;
 }
 
 .cart-total strong {
-  font-size: 1.2rem; /* Augmenter légèrement la taille pour le total */
+  font-size: 1.2rem;
 }
 
+/* Boutons 'Vider le Panier' et 'Payer' avec une meilleure distinction */
 .cart-total button {
-  background-color: #4caf50;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 6px;
-  cursor: pointer;
-  flex: 1; /* Les boutons utilisent un espace équitable */
-  margin: 0 10px; /* Ajouter un espace entre les boutons */
-  transition: background-color 0.2s;
+  flex: 1; /* Les boutons utilisent l'espace de manière équitable */
+  margin: 0 0.25rem; /* Espacement réduit entre les boutons */
+  padding: 0.5rem 1rem; /* Padding ajusté pour un bouton plus compact */
 }
 
 .cart-total button:hover {
-  background-color: #43a047;
+  transform: scale(1.03); /* Légère transformation au survol */
+}
+
+/* Styles pour le bouton 'Payer' comme un lien */
+.checkout-btn {
+  text-decoration: none;
+  display: inline-block; /* Permettre l'utilisation de margin et padding */
+  text-align: center;
+  width: 100%; /* Le bouton occupe toute la largeur disponible */
 }
 
 .checkout-btn a {
-  display: block;
   color: white;
-  text-decoration: none;
-  text-align: center;
+  display: block;
+  padding: 0.5rem 1rem; /* Padding ajusté pour correspondre au bouton 'Vider le Panier' */
 }
 
-/* Assurer que les boutons ne soient pas trop proches sur les petits écrans */
+/* Adaptation pour les petits écrans */
 @media (max-width: 360px) {
+  .cart-bubble {
+    width: 95%; /* La bulle de panier prend presque toute la largeur de l'écran */
+    left: 2.5%; /* Centré avec une marge égale de chaque côté */
+    bottom: 10px; /* Moins d'espace au fond pour les appareils à petit écran */
+  }
+
   .cart-total button {
-    padding: 8px; /* Réduire le padding sur les petits écrans */
-    margin: 0 5px; /* Réduire l'espace entre les boutons */
-    font-size: 0.9rem; /* Adapter la taille de la police */
+    margin: 0.25rem 0.125rem; /* Espacement réduit pour les boutons sur petits écrans */
   }
 }
+
