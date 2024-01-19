@@ -546,7 +546,7 @@ outline: none;
   color: #ddd; /* Gris clair pour le texte */
 }
 
-.cart-total button, .checkout-btn a {
+.cart-total button, .checkout-btn {
   background-color: #4c4e7e; /* Bleu-violet pour les actions */
   border: none;
   border-radius: 6px;
