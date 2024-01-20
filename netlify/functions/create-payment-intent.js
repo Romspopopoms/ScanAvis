@@ -1,20 +1,21 @@
-const stripe = require('stripe')(process.env.REACT_APP_STRIPE_SECRET_KEY || 'sk_test_51OPtGvDWmnYPaxs1DJZliUMMDttrNP1a4usU0uBgZgjnfe4Ho3WuCzFivSpwXhqL0YgVl9c41lbsuHI1O4nHAUhz00ibE6rzPX');
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const mysql = require('mysql2/promise');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: JSON.stringify({ message: 'Method Not Allowed' }) };
   }
 
+  let connection;
+
   try {
     const { items } = JSON.parse(event.body);
-    console.log('Received items:', items);
 
     if (!Array.isArray(items)) {
       throw new Error('Invalid items format: Items should be an array');
     }
 
     const totalAmount = items.reduce((total, item) => {
-      // Vérifiez si l'ID est un nombre et si la quantité et le prix sont des nombres
       if ((!Number.isInteger(item.id) && typeof item.id !== 'string') || typeof item.quantity !== 'number' || typeof item.price !== 'number') {
         throw new Error(`Invalid item structure: ${JSON.stringify(item)}`);
       }
@@ -26,7 +27,14 @@ exports.handler = async (event) => {
       currency: 'eur',
     });
 
-    console.log(`PaymentIntent created: ${paymentIntent.id}`);
+    connection = await mysql.createConnection(process.env.DATABASE_URL);
+
+    await connection.execute(
+      'INSERT INTO Transactions (items, totalAmount, paymentIntentId, clientSecret) VALUES (?, ?, ?, ?)',
+      [JSON.stringify(items), totalAmount, paymentIntent.id, paymentIntent.client_secret],
+    );
+
+    await connection.end();
 
     return {
       statusCode: 200,
@@ -35,6 +43,9 @@ exports.handler = async (event) => {
     };
   } catch (error) {
     console.error('Error:', error);
+    if (connection) {
+      await connection.end();
+    }
     return {
       statusCode: 500,
       headers: { 'Content-Type': 'application/json' },

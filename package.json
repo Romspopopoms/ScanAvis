@@ -13,6 +13,7 @@
     "@stripe/stripe-js": "^2.3.0",
     "eslint-config-next": "13.0.3",
     "framer-motion": "^10.17.9",
+    "mysql2": "^3.7.1",
     "netlify-identity-widget": "^1.9.2",
     "next": "13.0.3",
     "react": "^18.2.0",
