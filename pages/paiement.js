@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
+import { useRouter } from 'next/router';
 import PaymentForm from '../components/tableauStripe'; // Vérifiez le chemin
 import Navbar from '../components/Navbar'; // Vérifiez le chemin
 import Footer from '../components/Footer'; // Vérifiez le chemin
@@ -11,6 +12,7 @@ const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY || 'pk_
 const PagePaiement = () => {
   const [isClient, setIsClient] = useState(false);
   const { clearCart } = useCart();
+  const router = useRouter();
 
   useEffect(() => {
     setIsClient(true);
@@ -22,12 +24,14 @@ const PagePaiement = () => {
 
   const handleSuccessfulPayment = () => {
     clearCart();
-    // Redirection ou message de succès
+    // Redirection vers la page de statut de paiement avec le statut 'succeeded'
+    router.push('/payment-status?paymentStatus=succeeded');
   };
 
   const handleFailedPayment = (message) => {
     console.error('Erreur de paiement:', message);
-    // Gestion de l'échec du paiement
+    // Redirection vers la page de statut de paiement avec le statut 'failed'
+    router.push('/payment-status?paymentStatus=failed');
   };
 
   return (

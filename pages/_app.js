@@ -11,17 +11,22 @@ const MyApp = ({ Component, pageProps }) => {
   const router = useRouter();
 
   useEffect(() => {
+    // Initialisation de Netlify Identity
     netlifyIdentity.init();
 
+    // Gérer la connexion
     netlifyIdentity.on('login', (user) => setAppUser(user));
+    // Gérer la déconnexion
     netlifyIdentity.on('logout', () => setAppUser(null));
 
+    // Nettoyage de l'effet
     return () => {
       netlifyIdentity.off('login');
       netlifyIdentity.off('logout');
     };
   }, []);
 
+  // Décider si le résumé du panier doit être affiché
   const shouldDisplayCartSummary = router.pathname !== '/paiement';
 
   return (
