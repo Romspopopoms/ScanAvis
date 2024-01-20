@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
-import products from './cartItems'; // Assurez-vous que le chemin d'accès est correct
 
 const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY || 'pk_test_...');
 
@@ -15,20 +14,16 @@ const CheckoutForm = ({ cartItems }) => {
   useEffect(() => {
     const fetchPaymentIntent = async () => {
       try {
-        // Enrichir les cartItems avec les informations des produits
-        const enrichedCartItems = cartItems.map((item) => {
-          const product = products[item.id];
-          if (!product) {
-            console.error(`Produit introuvable pour l'ID : ${item.id}`);
-            return null;
-          }
-          return { ...item, price: product.price * 100 }; // Multiplier par 100 pour convertir en centimes
-        }).filter((item) => item !== null); // Filtrer les éléments non valides
+        // Convertir les cartItems en un format approprié pour le backend
+        const formattedCartItems = cartItems.map((item) => ({
+          id: item.id,
+          quantity: item.quantity,
+        }));
 
         const response = await fetch('/.netlify/functions/create-payment-intent', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ items: enrichedCartItems }),
+          body: JSON.stringify({ items: formattedCartItems }),
         });
 
         const data = await response.json();
@@ -38,7 +33,9 @@ const CheckoutForm = ({ cartItems }) => {
       }
     };
 
-    fetchPaymentIntent();
+    if (cartItems.length > 0) {
+      fetchPaymentIntent();
+    }
   }, [cartItems]);
 
   const handleSubmit = async (event) => {
