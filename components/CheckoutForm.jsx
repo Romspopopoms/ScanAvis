@@ -9,7 +9,7 @@ import {
 import products from './cartItems'; // Assurez-vous que le chemin d'accès est correct
 
 // Chargez Stripe avec votre clé publique
-const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY);
+const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY || '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');
 
 const CheckoutForm = ({ cartItems }) => {
   const stripe = useStripe();

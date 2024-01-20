@@ -1,4 +1,4 @@
-const stripe = require('stripe')(process.env.REACT_APP_STRIPE_SECRET_KEY);
+const stripe = require('stripe')(process.env.REACT_APP_STRIPE_SECRET_KEY || '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');
 
 const productPrices = {
   base: 2000, // 20 euros en centimes
