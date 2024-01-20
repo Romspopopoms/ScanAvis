@@ -54,13 +54,11 @@ const CartSummary = ({ isCartOpen, toggleCart }) => {
             >
               Vider le Panier
             </button>
-            <button
-              type="button"
-              className="checkout-btn"
-            >
-              Payer
-              <Link href="/paiement" />
-            </button>
+            <Link href="/paiement">
+              <button type="button" className="checkout-btn">
+                Payer
+              </button>
+            </Link>
           </div>
         </div>
       ) : (
