@@ -1,6 +1,5 @@
 import React, { createContext, useState, useMemo, useContext } from 'react';
 
-// Création du contexte avec une valeur par défaut
 const CartContext = createContext({
   cartItems: [],
   addToCart: () => {},
@@ -10,7 +9,6 @@ const CartContext = createContext({
   formatCartItemsForPayment: () => {},
 });
 
-// Utilisation d'un hook personnalisé pour accéder au contexte
 export const useCart = () => useContext(CartContext);
 
 export const CartProvider = ({ children }) => {
@@ -20,10 +18,10 @@ export const CartProvider = ({ children }) => {
     setCartItems((prevItems) => {
       const existingItem = prevItems.find((item) => item.id === newItem.id);
       if (existingItem) {
-        // Augmenter la quantité si l'article existe déjà dans le panier
-        return prevItems.map((item) => (item.id === newItem.id ? { ...item, quantity: item.quantity + 1 } : item));
+        return prevItems.map((item) => (item.id === newItem.id
+          ? { ...item, quantity: item.quantity + 1 }
+          : item));
       }
-      // Ajouter un nouvel article
       return [...prevItems, { ...newItem, quantity: 1 }];
     });
   };
@@ -36,26 +34,30 @@ export const CartProvider = ({ children }) => {
     setCartItems([]);
   };
 
-  const totalPrice = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+  const totalPrice = cartItems.reduce(
+    (total, item) => total + item.price * item.quantity,
+    0,
+  );
 
   const formatCartItemsForPayment = () => cartItems.map((item) => ({
-    id: item.id,
+    id: typeof item.id === 'number' ? item.id : String(item.id),
     quantity: item.quantity,
+    price: item.price, // Assurez-vous que le prix est également envoyé
   }));
 
-  // Mémorisation des valeurs du contexte
-  const value = useMemo(() => ({
-    cartItems,
-    addToCart,
-    removeFromCart,
-    clearCart,
-    totalPrice,
-    formatCartItemsForPayment,
-  }), [cartItems, totalPrice]);
-
-  return (
-    <CartContext.Provider value={value}>
-      {children}
-    </CartContext.Provider>
+  const value = useMemo(
+    () => ({
+      cartItems,
+      addToCart,
+      removeFromCart,
+      clearCart,
+      totalPrice,
+      formatCartItemsForPayment,
+    }),
+    [cartItems, totalPrice],
   );
+
+  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 };
+
+export default CartProvider;
