@@ -8,6 +8,7 @@ const productPrices = {
 };
 
 exports.handler = async (event) => {
+  console.log('Received event body:', event.body);
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
