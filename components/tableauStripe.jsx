@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
 import { useStripe, useElements, CardNumberElement, CardExpiryElement, CardCvcElement } from '@stripe/react-stripe-js';
-import { useCart } from '../context/CartContext'; // Utilisation du hook personnalisé
+import { useCart } from '../context/CartContext';
 
-const PaymentForm = ({ onSuccessfulPayment }) => {
-  // Utilisation du hook personnalisé pour accéder aux données du panier
+const PaymentForm = ({ onSuccessfulPayment, onFailedPayment }) => {
   const { cartItems, formatCartItemsForPayment } = useCart();
-
   const stripe = useStripe();
   const elements = useElements();
   const [isProcessing, setIsProcessing] = useState(false);
@@ -51,11 +49,13 @@ const PaymentForm = ({ onSuccessfulPayment }) => {
 
       if (paymentResult.error) {
         setErrorMessage(paymentResult.error.message);
+        onFailedPayment(paymentResult.error.message);
       } else if (paymentResult.paymentIntent.status === 'succeeded') {
         onSuccessfulPayment();
       }
     } catch (error) {
       setErrorMessage(error.message);
+      onFailedPayment(error.message);
     } finally {
       setIsProcessing(false);
     }

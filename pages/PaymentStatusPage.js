@@ -8,6 +8,11 @@ const PaymentStatusPage = () => {
   const router = useRouter();
   const { paymentStatus } = router.query;
 
+  if (!paymentStatus) {
+    // Rediriger vers une page appropriée ou afficher un message si paymentStatus n'est pas défini
+    return <div>Accès non autorisé à cette page ou paramètre manquant.</div>;
+  }
+
   return (
     <div className="payment-status-page">
       {paymentStatus === 'succeeded' ? (
