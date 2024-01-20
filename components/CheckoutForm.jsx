@@ -1,15 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
-import {
-  Elements,
-  CardElement,
-  useStripe,
-  useElements,
-} from '@stripe/react-stripe-js';
+import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import products from './cartItems'; // Assurez-vous que le chemin d'accès est correct
 
-// Chargez Stripe avec votre clé publique
-const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY || 'pk_test_51OPtGvDWmnYPaxs1gSpLL1WpDyU6gaxOBszqNCSu9iHVeEYuPcjUEvOpKzjwdbF6NUWquoEPf24Y3qMwIDLmeLvl00FwQkUSKx');
+const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY || 'pk_test_...');
 
 const CheckoutForm = ({ cartItems }) => {
   const stripe = useStripe();
@@ -19,24 +13,24 @@ const CheckoutForm = ({ cartItems }) => {
   const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
-    // Fonction pour calculer le total du panier
-    const calculateTotalAmount = () => cartItems.reduce((total, item) => {
-      const product = products[item.id];
-      if (!product) {
-        console.error(`Produit introuvable pour l'ID : ${item.id}`);
-        return total;
-      }
-      return total + item.quantity * product.price;
-    }, 0);
-
-    // Créez l'intention de paiement dès que le composant est monté ou que cartItems change
     const fetchPaymentIntent = async () => {
       try {
+        // Enrichir les cartItems avec les informations des produits
+        const enrichedCartItems = cartItems.map((item) => {
+          const product = products[item.id];
+          if (!product) {
+            console.error(`Produit introuvable pour l'ID : ${item.id}`);
+            return null;
+          }
+          return { ...item, price: product.price * 100 }; // Multiplier par 100 pour convertir en centimes
+        }).filter((item) => item !== null); // Filtrer les éléments non valides
+
         const response = await fetch('/.netlify/functions/create-payment-intent', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ amount: calculateTotalAmount() }),
+          body: JSON.stringify({ items: enrichedCartItems }),
         });
+
         const data = await response.json();
         setClientSecret(data.clientSecret);
       } catch (error) {
@@ -54,37 +48,32 @@ const CheckoutForm = ({ cartItems }) => {
       return;
     }
 
-    setIsProcessing(true); // Commence le traitement du paiement
+    setIsProcessing(true);
 
-    const cardElement = elements.getElement(CardElement); // Récupère l'élément de la carte
+    const cardElement = elements.getElement(CardElement);
 
     try {
       const result = await stripe.confirmCardPayment(clientSecret, {
         payment_method: {
           card: cardElement,
-          // Ajoutez des détails de facturation si nécessaire
         },
       });
 
       if (result.error) {
-        // Gère les erreurs survenues lors de la confirmation du paiement
         setErrorMessage(`Erreur de paiement : ${result.error.message}`);
         setIsProcessing(false);
       } else if (result.paymentIntent.status === 'succeeded') {
-        // Gère le succès du paiement
         alert('Paiement réussi!');
         setIsProcessing(false);
         // TODO: Ajouter la logique de redirection ou de nettoyage du panier ici
       }
     } catch (error) {
-      // Gère les erreurs survenues lors du traitement du paiement
       console.error('Erreur lors du traitement du paiement :', error);
       setErrorMessage('Erreur lors du traitement du paiement. Veuillez réessayer.');
       setIsProcessing(false);
     }
   };
 
-  // Formulaire de paiement avec Stripe CardElement et gestion des messages d'erreur
   return (
     <form onSubmit={handleSubmit}>
       {errorMessage && <div className="error-message">{errorMessage}</div>}
