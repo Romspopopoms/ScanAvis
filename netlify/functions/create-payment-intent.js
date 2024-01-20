@@ -14,18 +14,12 @@ exports.handler = async (event) => {
     }
 
     items.forEach((item) => {
-      if ((!Number.isInteger(item.id) && typeof item.id !== 'string') || typeof item.quantity !== 'number') {
+      if ((!Number.isInteger(item.id) && typeof item.id !== 'string') || typeof item.quantity !== 'number' || typeof item.price !== 'number') {
         throw new Error(`Invalid item structure: ${JSON.stringify(item)}`);
       }
     });
 
-    const totalAmount = items.reduce((total, item) => {
-      const itemPrice = item.price;
-      if (typeof itemPrice === 'undefined') {
-        throw new Error(`Price not found for item ID: ${item.id}`);
-      }
-      return total + itemPrice * item.quantity;
-    }, 0);
+    const totalAmount = items.reduce((total, item) => total + item.price * item.quantity, 0);
 
     const paymentIntent = await stripe.paymentIntents.create({
       amount: totalAmount,
