@@ -18,6 +18,8 @@ const CheckoutForm = ({ cartItems }) => {
         const formattedCartItems = cartItems.map((item) => ({
           id: item.id,
           quantity: item.quantity,
+          name: item.name, // Ajout du nom du produit
+          price: item.price, // Ajout du prix du produit
         }));
 
         const response = await fetch('/.netlify/functions/create-payment-intent', {

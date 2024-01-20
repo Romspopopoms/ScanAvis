@@ -23,8 +23,8 @@ const PaymentForm = ({ cartItems, onSuccessfulPayment }) => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
+    // Vérifier si Stripe.js est chargé et si les éléments sont prêts
     if (!stripe || !elements) {
-      // Stripe.js n'a pas encore été chargé
       console.log('Stripe.js n’a pas encore été chargé!');
       return;
     }
@@ -32,10 +32,14 @@ const PaymentForm = ({ cartItems, onSuccessfulPayment }) => {
     setIsProcessing(true);
     setErrorMessage('');
 
+    // Récupérer l'élément de la carte de Stripe
     const cardElement = elements.getElement(CardNumberElement);
 
     try {
+      // Créer un PaymentIntent avec le total du panier
       const paymentIntent = await createPaymentIntent(calculateTotal());
+
+      // Confirmer le paiement avec Stripe
       const paymentResult = await stripe.confirmCardPayment(paymentIntent.clientSecret, {
         payment_method: {
           card: cardElement,
@@ -43,11 +47,10 @@ const PaymentForm = ({ cartItems, onSuccessfulPayment }) => {
         },
       });
 
+      // Gérer le résultat du paiement
       if (paymentResult.error) {
-        // Afficher l'erreur au client
         setErrorMessage(paymentResult.error.message);
       } else if (paymentResult.paymentIntent.status === 'succeeded') {
-        // Le paiement a été traité avec succès
         onSuccessfulPayment();
       }
     } catch (error) {
