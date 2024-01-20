@@ -14,7 +14,8 @@ exports.handler = async (event) => {
     }
 
     const totalAmount = items.reduce((total, item) => {
-      if (typeof item.id !== 'string' || typeof item.quantity !== 'number' || typeof item.price !== 'number') {
+      // Vérifiez si l'ID est un nombre et si la quantité et le prix sont des nombres
+      if ((!Number.isInteger(item.id) && typeof item.id !== 'string') || typeof item.quantity !== 'number' || typeof item.price !== 'number') {
         throw new Error(`Invalid item structure: ${JSON.stringify(item)}`);
       }
       return total + item.price * item.quantity;
