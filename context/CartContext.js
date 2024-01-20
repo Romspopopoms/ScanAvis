@@ -1,7 +1,16 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useMemo, useContext } from 'react';
 
-const CartContext = createContext();
+// Création du contexte avec une valeur par défaut
+const CartContext = createContext({
+  cartItems: [],
+  addToCart: () => {},
+  removeFromCart: () => {},
+  clearCart: () => {},
+  totalPrice: 0,
+  formatCartItemsForPayment: () => {},
+});
 
+// Utilisation d'un hook personnalisé pour accéder au contexte
 export const useCart = () => useContext(CartContext);
 
 export const CartProvider = ({ children }) => {
@@ -29,25 +38,24 @@ export const CartProvider = ({ children }) => {
 
   const totalPrice = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
 
-  // Fonction pour formater les cartItems pour le paiement
-  // Prépare les items du panier dans le format attendu par le backend pour le paiement
   const formatCartItemsForPayment = () => cartItems.map((item) => ({
     id: item.id,
     quantity: item.quantity,
   }));
 
+  // Mémorisation des valeurs du contexte
+  const value = useMemo(() => ({
+    cartItems,
+    addToCart,
+    removeFromCart,
+    clearCart,
+    totalPrice,
+    formatCartItemsForPayment,
+  }), [cartItems, totalPrice]);
+
   return (
-    <CartContext.Provider value={{
-      cartItems,
-      addToCart,
-      removeFromCart,
-      clearCart,
-      totalPrice,
-      formatCartItemsForPayment, // Exposez cette fonction pour que les composants consommateurs puissent l'utiliser
-    }}
-    >
+    <CartContext.Provider value={value}>
       {children}
     </CartContext.Provider>
   );
 };
-
