@@ -19,7 +19,8 @@ const enrichedCartItems = cartItems.map((item) => {
     throw new Error(`Produit non trouvé pour l'ID : ${item.id}`);
   }
   return {
-    ...item,
+    id: item.id, // Assurez-vous d'inclure l'id pour correspondre au format attendu par le backend
+    quantity: item.quantity,
     name: product.name,
     price: product.price, // le prix doit être en centimes pour Stripe
     imgUrl: product.imgUrl,

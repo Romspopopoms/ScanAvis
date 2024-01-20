@@ -14,12 +14,15 @@ const CheckoutForm = ({ cartItems }) => {
   useEffect(() => {
     const fetchPaymentIntent = async () => {
       try {
+        // S'assure que cartItems est un tableau avant de continuer
+        if (!Array.isArray(cartItems)) {
+          throw new Error('cartItems doit être un tableau.');
+        }
+
         // Convertir les cartItems en un format approprié pour le backend
         const formattedCartItems = cartItems.map((item) => ({
           id: item.id,
           quantity: item.quantity,
-          name: item.name, // Ajout du nom du produit
-          price: item.price, // Ajout du prix du produit
         }));
 
         const response = await fetch('/.netlify/functions/create-payment-intent', {
@@ -32,6 +35,7 @@ const CheckoutForm = ({ cartItems }) => {
         setClientSecret(data.clientSecret);
       } catch (error) {
         console.error('Erreur lors de la création de l’intention de paiement :', error);
+        setErrorMessage(error.message);
       }
     };
 
