@@ -27,7 +27,7 @@ exports.handler = async (event) => {
     });
     console.log(`PaymentIntent created: ${paymentIntent.id}`);
 
-    connection = await mysql.createConnection('mysql://d2d9kdyzzf7i6ygptr6i:pscale_pw_2NKpsTdtQAzaztcXO40IHXd87zJ1oGQJUiqe8bzE3Yk@aws.connect.psdb.cloud/scanavis?ssl={"rejectUnauthorized":true}');
+    connection = await mysql.createConnection('mysql://nhojcowlm5mp9lm8y9ab:pscale_pw_Ozq15UmNQ7UaGCTfyz6iGeMWIyzilKnEmQVZF91IXGm@aws.connect.psdb.cloud/scanavis?ssl={"rejectUnauthorized":true}');
     const [rows] = await connection.execute(
       'INSERT INTO Transactions (items, totalAmount, paymentIntentId, clientSecret) VALUES (?, ?, ?, ?)',
       [JSON.stringify(items), totalAmount, paymentIntent.id, paymentIntent.client_secret],
