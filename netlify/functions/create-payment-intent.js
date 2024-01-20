@@ -12,29 +12,19 @@ exports.handler = async (event) => {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
 
-  let items;
   try {
-    const body = event.body ? JSON.parse(event.body) : {};
-    items = body.items;
+    const { items } = JSON.parse(event.body);
 
-    if (!Array.isArray(items) || items.length === 0) {
-      throw new Error('Items are missing or not in array format');
+    if (!items || !Array.isArray(items)) {
+      throw new Error('Invalid items format');
     }
-  } catch (error) {
-    console.error('Error parsing event body:', event.body, error);
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ error: 'Bad request. Invalid input format.' }),
-    };
-  }
 
-  try {
     const totalAmount = items.reduce((total, item) => {
-      const itemPrice = productPrices[item.name];
+      const itemPrice = productPrices[item.id];
       if (!itemPrice) {
-        throw new Error(`Prix non trouvé pour l'article: ${item.name}`);
+        throw new Error(`Prix non trouvé pour l'article: ${item.id}`);
       }
-      return total + (itemPrice * item.quantity);
+      return total + itemPrice * item.quantity;
     }, 0);
 
     const paymentIntent = await stripe.paymentIntents.create({
@@ -50,7 +40,7 @@ exports.handler = async (event) => {
       body: JSON.stringify({ clientSecret: paymentIntent.client_secret }),
     };
   } catch (error) {
-    console.error('Error processing payment:', error);
+    console.error('Error:', error);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: error.message }),
