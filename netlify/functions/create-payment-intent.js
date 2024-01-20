@@ -13,11 +13,16 @@ exports.handler = async (event) => {
   }
 
   try {
-    const { items } = JSON.parse(event.body);
+    if (!event.body) {
+      throw new Error('No body in the request');
+    }
 
-    // Validez les éléments reçus ici si nécessaire
+    const parsedBody = JSON.parse(event.body);
+    if (!parsedBody.items || !Array.isArray(parsedBody.items)) {
+      throw new Error('Items are not properly formatted');
+    }
 
-    const totalAmount = items.reduce((total, item) => {
+    const totalAmount = parsedBody.items.reduce((total, item) => {
       const itemPrice = productPrices[item.name];
       if (!itemPrice) {
         throw new Error(`Prix non trouvé pour l'article: ${item.name}`);
@@ -38,7 +43,7 @@ exports.handler = async (event) => {
       body: JSON.stringify({ clientSecret: paymentIntent.client_secret }),
     };
   } catch (error) {
-    console.error(error); // Bonne pratique pour le debugging
+    console.error(error);
     return {
       statusCode: 500,
       headers: {
