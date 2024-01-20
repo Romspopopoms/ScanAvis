@@ -1,4 +1,4 @@
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const stripe = require('stripe')('sk_test_51OPtGvDWmnYPaxs1DJZliUMMDttrNP1a4usU0uBgZgjnfe4Ho3WuCzFivSpwXhqL0YgVl9c41lbsuHI1O4nHAUhz00ibE6rzPX');
 const mysql = require('mysql2/promise');
 
 exports.handler = async (event) => {
@@ -27,7 +27,7 @@ exports.handler = async (event) => {
     });
     console.log(`PaymentIntent created: ${paymentIntent.id}`);
 
-    connection = await mysql.createConnection(process.env.DATABASE_URL);
+    connection = await mysql.createConnection('mysql://d2d9kdyzzf7i6ygptr6i:pscale_pw_2NKpsTdtQAzaztcXO40IHXd87zJ1oGQJUiqe8bzE3Yk@aws.connect.psdb.cloud/scanavis?ssl={"rejectUnauthorized":true}');
     const [rows] = await connection.execute(
       'INSERT INTO Transactions (items, totalAmount, paymentIntentId, clientSecret) VALUES (?, ?, ?, ?)',
       [JSON.stringify(items), totalAmount, paymentIntent.id, paymentIntent.client_secret],
