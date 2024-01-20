@@ -25,6 +25,8 @@ const CheckoutForm = ({ cartItems }) => {
           quantity: item.quantity,
         }));
 
+        console.log('Envoi de ces items au backend:', formattedCartItems); // Log pour débogage
+
         const response = await fetch('/.netlify/functions/create-payment-intent', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
