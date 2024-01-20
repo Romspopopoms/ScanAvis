@@ -1,13 +1,5 @@
 const stripe = require('stripe')(process.env.REACT_APP_STRIPE_SECRET_KEY || 'sk_test_...');
 
-// Définir les prix des produits
-const productPrices = {
-  base: 2000, // Exemple de prix en centimes
-  bronze: 4000,
-  silver: 6000,
-  gold: 10000,
-};
-
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: JSON.stringify({ message: 'Method Not Allowed' }) };
@@ -22,11 +14,10 @@ exports.handler = async (event) => {
     }
 
     const totalAmount = items.reduce((total, item) => {
-      const itemPrice = productPrices[item.id];
-      if (!itemPrice) {
-        throw new Error(`Price not found for item ID: ${item.id}`);
+      if (typeof item.id !== 'string' || typeof item.quantity !== 'number' || typeof item.price !== 'number') {
+        throw new Error(`Invalid item structure: ${JSON.stringify(item)}`);
       }
-      return total + itemPrice * item.quantity;
+      return total + item.price * item.quantity;
     }, 0);
 
     const paymentIntent = await stripe.paymentIntents.create({
