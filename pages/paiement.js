@@ -7,7 +7,7 @@ import Footer from '../components/Footer'; // Assurez-vous que le chemin est cor
 import { useCart } from '../context/CartContext'; // Assurez-vous que ce chemin est correct
 
 // Chargez Stripe avec votre clé publique
-const stripePromise = loadStripe(process.env.STRIPE_PUBLIC_KEY || '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');
+const stripePromise = loadStripe(process.env.STRIPE_PUBLIC_KEY || 'pk_test_51OPtGvDWmnYPaxs1gSpLL1WpDyU6gaxOBszqNCSu9iHVeEyuPcjUEvOpKzjwdbF6NUWquoEPf24Y3qMwIDLmeLvl00FwQkUSKx');
 
 const PagePaiement = () => {
   const [isClient, setIsClient] = useState(false);

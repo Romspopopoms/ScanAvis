@@ -25,6 +25,7 @@ const PaymentForm = ({ cartItems, onSuccessfulPayment }) => {
 
     if (!stripe || !elements) {
       // Stripe.js n'a pas encore été chargé
+      console.log('Stripe.js n’a pas encore été chargé!');
       return;
     }
 
