@@ -1,10 +1,10 @@
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY || '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');
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 const productPrices = {
-  base: 20, // 20 euros en centimes
-  bronze: 40, // 40 euros en centimes
-  silver: 60, // 60 euros en centimes
-  gold: 100, // 100 euros en centimes
+  base: 2000, // 20 euros en centimes
+  bronze: 4000, // 40 euros en centimes
+  silver: 6000, // 60 euros en centimes
+  gold: 10000, // 100 euros en centimes
 };
 
 exports.handler = async (event) => {
@@ -14,6 +14,8 @@ exports.handler = async (event) => {
 
   try {
     const { items } = JSON.parse(event.body);
+
+    // Validez les éléments reçus ici si nécessaire
 
     const totalAmount = items.reduce((total, item) => {
       const itemPrice = productPrices[item.name];
@@ -30,11 +32,18 @@ exports.handler = async (event) => {
 
     return {
       statusCode: 200,
+      headers: {
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify({ clientSecret: paymentIntent.client_secret }),
     };
   } catch (error) {
+    console.error(error); // Bonne pratique pour le debugging
     return {
       statusCode: 500,
+      headers: {
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify({ error: error.message }),
     };
   }

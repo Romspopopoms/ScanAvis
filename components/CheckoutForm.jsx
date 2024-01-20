@@ -6,12 +6,10 @@ import {
   useStripe,
   useElements,
 } from '@stripe/react-stripe-js';
-import products from './cartItems'; // Assurez-vous que ce chemin est correct
+import products from './cartItems'; // Assurez-vous que le chemin d'accès est correct
 
 // Chargez Stripe avec votre clé publique
-const stripePromise = loadStripe(
-  process.env.REACT_APP_STRIPE_PUBLIC_KEY || 'pk_live_51OPtGvDWmnYPaxs1rCkSDYaT2vKuT86SiEQWFaKitTJKKcx2y80tdP2Zv395BUd3XQyTGGU7xIp9Y7mi6At8b7wI00M1RjQp5z',
-);
+const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY);
 
 const CheckoutForm = ({ cartItems }) => {
   const stripe = useStripe();
@@ -31,24 +29,18 @@ const CheckoutForm = ({ cartItems }) => {
       return total + item.quantity * product.price;
     }, 0);
 
-    // Créez l'intention de paiement dès que le composant monte ou que cartItems change
+    // Créez l'intention de paiement dès que le composant est monté ou que cartItems change
     const fetchPaymentIntent = async () => {
       try {
-        const response = await fetch(
-          '/.netlify/functions/create-payment-intent',
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ amount: calculateTotalAmount() }),
-          },
-        );
+        const response = await fetch('/.netlify/functions/create-payment-intent', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ amount: calculateTotalAmount() }),
+        });
         const data = await response.json();
         setClientSecret(data.clientSecret);
       } catch (error) {
-        console.error(
-          'Erreur lors de la création de l’intention de paiement :',
-          error,
-        );
+        console.error('Erreur lors de la création de l’intention de paiement :', error);
       }
     };
 
@@ -58,7 +50,6 @@ const CheckoutForm = ({ cartItems }) => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (!stripe || !elements) {
-      // Stripe.js n'est pas encore chargé ou il y a une erreur avec Stripe.js ou Elements
       console.log('Stripe.js n’a pas encore été chargé!');
       return;
     }
@@ -88,9 +79,7 @@ const CheckoutForm = ({ cartItems }) => {
     } catch (error) {
       // Gère les erreurs survenues lors du traitement du paiement
       console.error('Erreur lors du traitement du paiement :', error);
-      setErrorMessage(
-        'Erreur lors du traitement du paiement. Veuillez réessayer.',
-      );
+      setErrorMessage('Erreur lors du traitement du paiement. Veuillez réessayer.');
       setIsProcessing(false);
     }
   };
