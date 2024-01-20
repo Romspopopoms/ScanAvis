@@ -26,12 +26,12 @@ const PagePaiement = () => {
 
   const handleSuccessfulPayment = () => {
     clearCart();
-    router.push('/payment-status?paymentStatus=succeeded');
+    router.push('/paymentstatus?paymentStatus=succeeded'); // Notez que le tiret a été retiré
   };
 
   const handleFailedPayment = (message) => {
     console.error('Erreur de paiement:', message);
-    router.push('/payment-status?paymentStatus=failed');
+    router.push('/paymentstatus?paymentStatus=failed'); // Notez que le tiret a été retiré
   };
 
   if (loading) {
