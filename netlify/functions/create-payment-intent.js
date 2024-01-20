@@ -12,17 +12,24 @@ exports.handler = async (event) => {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
 
+  let items;
   try {
-    if (!event.body) {
-      throw new Error('No body in the request');
-    }
+    const body = event.body ? JSON.parse(event.body) : {};
+    items = body.items;
 
-    const parsedBody = JSON.parse(event.body);
-    if (!parsedBody.items || !Array.isArray(parsedBody.items)) {
-      throw new Error('Items are not properly formatted');
+    if (!Array.isArray(items) || items.length === 0) {
+      throw new Error('Items are missing or not in array format');
     }
+  } catch (error) {
+    console.error('Error parsing event body:', event.body, error);
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: 'Bad request. Invalid input format.' }),
+    };
+  }
 
-    const totalAmount = parsedBody.items.reduce((total, item) => {
+  try {
+    const totalAmount = items.reduce((total, item) => {
       const itemPrice = productPrices[item.name];
       if (!itemPrice) {
         throw new Error(`Prix non trouvé pour l'article: ${item.name}`);
@@ -43,12 +50,9 @@ exports.handler = async (event) => {
       body: JSON.stringify({ clientSecret: paymentIntent.client_secret }),
     };
   } catch (error) {
-    console.error(error);
+    console.error('Error processing payment:', error);
     return {
       statusCode: 500,
-      headers: {
-        'Content-Type': 'application/json',
-      },
       body: JSON.stringify({ error: error.message }),
     };
   }
