@@ -1,4 +1,4 @@
-const stripe = require('stripe')('sk_test_51OPtGvDWmnYPaxs1DJZliUMMDttrNP1a4usU0uBgZgjnfe4Ho3WuCzFivSpwXhqL0YgVl9c41lbsuHI1O4nHAUhz00ibE6rzPX');
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const mysql = require('mysql2/promise');
 
 exports.handler = async (event) => {
@@ -10,7 +10,6 @@ exports.handler = async (event) => {
 
   try {
     const { items } = JSON.parse(event.body);
-
     if (!Array.isArray(items)) {
       throw new Error('Invalid items format: Items should be an array');
     }
@@ -26,13 +25,14 @@ exports.handler = async (event) => {
       amount: totalAmount,
       currency: 'eur',
     });
+    console.log(`PaymentIntent created: ${paymentIntent.id}`);
 
     connection = await mysql.createConnection(process.env.DATABASE_URL);
-
-    await connection.execute(
+    const [rows] = await connection.execute(
       'INSERT INTO Transactions (items, totalAmount, paymentIntentId, clientSecret) VALUES (?, ?, ?, ?)',
       [JSON.stringify(items), totalAmount, paymentIntent.id, paymentIntent.client_secret],
     );
+    console.log('Insertion into database successful', rows);
 
     await connection.end();
 
@@ -43,6 +43,9 @@ exports.handler = async (event) => {
     };
   } catch (error) {
     console.error('Error:', error);
+    if (error.sqlMessage) {
+      console.error('SQL Error:', error.sqlMessage);
+    }
     if (connection) {
       await connection.end();
     }
