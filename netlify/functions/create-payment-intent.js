@@ -1,12 +1,11 @@
+// Importez Stripe et PlanetScale DB
 const stripe = require('stripe')('sk_test_51OPtGvDWmnYPaxs1DJZliUMMDttrNP1a4usU0uBgZgjnfe4Ho3WuCzFivSpwXhqL0YgVl9c41lbsuHI1O4nHAUhz00ibE6rzPX');
-const mysql = require('mysql2/promise');
+const { conn } = require('../../utils/db');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: JSON.stringify({ message: 'Method Not Allowed' }) };
   }
-
-  let connection;
 
   try {
     const { items } = JSON.parse(event.body);
@@ -27,14 +26,12 @@ exports.handler = async (event) => {
     });
     console.log(`PaymentIntent created: ${paymentIntent.id}`);
 
-    connection = await mysql.createConnection('mysql://nhojcowlm5mp9lm8y9ab:pscale_pw_Ozq15UmNQ7UaGCTfyz6iGeMWIyzilKnEmQVZF91IXGm@aws.connect.psdb.cloud/scanavis?ssl={"rejectUnauthorized":true}');
-    const [rows] = await connection.execute(
+    // Utilisez la connexion PlanetScale pour exécuter votre requête
+    const [rows] = await conn.execute(
       'INSERT INTO Transactions (items, totalAmount, paymentIntentId, clientSecret) VALUES (?, ?, ?, ?)',
       [JSON.stringify(items), totalAmount, paymentIntent.id, paymentIntent.client_secret],
     );
     console.log('Insertion into database successful', rows);
-
-    await connection.end();
 
     return {
       statusCode: 200,
@@ -45,9 +42,6 @@ exports.handler = async (event) => {
     console.error('Error:', error);
     if (error.sqlMessage) {
       console.error('SQL Error:', error.sqlMessage);
-    }
-    if (connection) {
-      await connection.end();
     }
     return {
       statusCode: 500,
