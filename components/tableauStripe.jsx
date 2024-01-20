@@ -1,29 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useStripe, useElements, CardNumberElement, CardExpiryElement, CardCvcElement } from '@stripe/react-stripe-js';
+import CartContext from '../context/CartContext'; // Assurez-vous que le chemin est correct
 
-const PaymentForm = ({ cartItems, onSuccessfulPayment }) => {
+const PaymentForm = ({ onSuccessfulPayment }) => {
+  // Récupération des cartItems du contexte
+  const { cartItems, formatCartItemsForPayment } = useContext(CartContext);
+
+  // Initialisation des hooks et des états
   const stripe = useStripe();
   const elements = useElements();
   const [isProcessing, setIsProcessing] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  // Calculer le total du panier
-  const calculateTotal = () => cartItems.reduce((total, item) => total + item.quantity * item.price, 0);
+  // Calculer le total du panier en euros
+  const calculateTotal = () => cartItems.reduce((total, item) => total + item.quantity * item.price, 0) / 100;
 
   // Fonction pour créer un PaymentIntent sur le serveur
-  const createPaymentIntent = async (amount) => {
-    const response = await fetch('/.netlify/functions/create-payment-intent', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ amount }),
-    });
-    return response.json();
+  const createPaymentIntent = async () => {
+    try {
+      // Utiliser la fonction formatCartItemsForPayment pour préparer les items
+      const formattedCartItems = formatCartItemsForPayment();
+
+      // Envoyer la requête pour créer le PaymentIntent
+      const response = await fetch('/.netlify/functions/create-payment-intent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items: formattedCartItems }),
+      });
+      const data = await response.json();
+      return data.clientSecret;
+    } catch (error) {
+      console.error('Erreur lors de la création de l’intention de paiement:', error);
+      throw error;
+    }
   };
 
+  // Gestionnaire de soumission du formulaire
   const handleSubmit = async (event) => {
     event.preventDefault();
-
-    // Vérifier si Stripe.js est chargé et si les éléments sont prêts
     if (!stripe || !elements) {
       console.log('Stripe.js n’a pas encore été chargé!');
       return;
@@ -32,18 +46,13 @@ const PaymentForm = ({ cartItems, onSuccessfulPayment }) => {
     setIsProcessing(true);
     setErrorMessage('');
 
-    // Récupérer l'élément de la carte de Stripe
-    const cardElement = elements.getElement(CardNumberElement);
-
     try {
-      // Créer un PaymentIntent avec le total du panier
-      const paymentIntent = await createPaymentIntent(calculateTotal());
-
-      // Confirmer le paiement avec Stripe
-      const paymentResult = await stripe.confirmCardPayment(paymentIntent.clientSecret, {
+      // Créer le PaymentIntent et confirmer le paiement
+      const clientSecret = await createPaymentIntent();
+      const cardElement = elements.getElement(CardNumberElement);
+      const paymentResult = await stripe.confirmCardPayment(clientSecret, {
         payment_method: {
           card: cardElement,
-          // Ajouter d'autres informations de paiement si nécessaire
         },
       });
 
@@ -60,6 +69,7 @@ const PaymentForm = ({ cartItems, onSuccessfulPayment }) => {
     }
   };
 
+  // Rendu du formulaire de paiement
   return (
     <div className="payment-form">
       <div className="payment-details">
@@ -67,11 +77,11 @@ const PaymentForm = ({ cartItems, onSuccessfulPayment }) => {
         <ul>
           {cartItems.map((item) => (
             <li key={item.id}>
-              {item.name} - {item.quantity} x {item.price}$
+              {item.name} - {item.quantity} x {(item.price / 100).toFixed(2)}$ {/* Afficher le prix en euros */}
             </li>
           ))}
         </ul>
-        <p className="cart-total">Total à payer: {calculateTotal()}$</p>
+        <p className="cart-total">Total à payer: {calculateTotal().toFixed(2)}$</p> {/* Afficher le total en euros */}
       </div>
       <form onSubmit={handleSubmit}>
         {errorMessage && <div className="error-message">{errorMessage}</div>}

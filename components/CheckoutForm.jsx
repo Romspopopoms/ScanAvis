@@ -1,31 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import CartContext from '../context/CartContext'; // Assurez-vous que le chemin est correct
 
-const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY || 'pk_test_51OPtGvDWmnYPaxs1gSpLL1WpDyU6gaxOBszqNCSu9iHVeEYuPcjUEvOpKzjwdbF6NUWquoEPf24Y3qMwIDLmeLvl00FwQkUSKx');
+const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY || 'pk_test_51OPtGvDWmnYPaxs1gSpLL1WpDyU6gaxOBszqNCSu9iHVeEyuPcjUEvOpKzjwdbF6NUWquoEPf24Y3qMwIDLmeLvl00FwQkUSKx');
 
-const CheckoutForm = ({ cartItems }) => {
+const CheckoutForm = () => {
   const stripe = useStripe();
   const elements = useElements();
   const [clientSecret, setClientSecret] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const { cartItems, formatCartItemsForPayment } = useContext(CartContext);
 
   useEffect(() => {
     const fetchPaymentIntent = async () => {
       try {
-        // S'assure que cartItems est un tableau avant de continuer
-        if (!Array.isArray(cartItems)) {
-          throw new Error('cartItems doit être un tableau.');
-        }
+        const formattedCartItems = formatCartItemsForPayment();
 
-        // Convertir les cartItems en un format approprié pour le backend
-        const formattedCartItems = cartItems.map((item) => ({
-          id: item.id,
-          quantity: item.quantity,
-        }));
-
-        console.log('Envoi de ces items au backend:', formattedCartItems); // Log pour débogage
+        console.log('Sending these items to backend:', formattedCartItems); // Log for debugging
 
         const response = await fetch('/.netlify/functions/create-payment-intent', {
           method: 'POST',
@@ -36,7 +29,7 @@ const CheckoutForm = ({ cartItems }) => {
         const data = await response.json();
         setClientSecret(data.clientSecret);
       } catch (error) {
-        console.error('Erreur lors de la création de l’intention de paiement :', error);
+        console.error('Error creating payment intent:', error);
         setErrorMessage(error.message);
       }
     };
@@ -44,12 +37,12 @@ const CheckoutForm = ({ cartItems }) => {
     if (cartItems.length > 0) {
       fetchPaymentIntent();
     }
-  }, [cartItems]);
+  }, [cartItems, formatCartItemsForPayment]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (!stripe || !elements) {
-      console.log('Stripe.js n’a pas encore été chargé!');
+      console.log('Stripe.js has not yet loaded!');
       return;
     }
 
@@ -65,16 +58,16 @@ const CheckoutForm = ({ cartItems }) => {
       });
 
       if (result.error) {
-        setErrorMessage(`Erreur de paiement : ${result.error.message}`);
+        setErrorMessage(`Payment error: ${result.error.message}`);
         setIsProcessing(false);
       } else if (result.paymentIntent.status === 'succeeded') {
-        alert('Paiement réussi!');
+        alert('Payment successful!');
         setIsProcessing(false);
-        // TODO: Ajouter la logique de redirection ou de nettoyage du panier ici
+        // TODO: Add redirection or cart clearing logic here
       }
     } catch (error) {
-      console.error('Erreur lors du traitement du paiement :', error);
-      setErrorMessage('Erreur lors du traitement du paiement. Veuillez réessayer.');
+      console.error('Error processing payment:', error);
+      setErrorMessage('Error processing payment. Please try again.');
       setIsProcessing(false);
     }
   };
@@ -84,15 +77,15 @@ const CheckoutForm = ({ cartItems }) => {
       {errorMessage && <div className="error-message">{errorMessage}</div>}
       <CardElement />
       <button type="submit" disabled={!stripe || !clientSecret || isProcessing}>
-        {isProcessing ? 'Traitement...' : 'Payer'}
+        {isProcessing ? 'Processing...' : 'Pay'}
       </button>
     </form>
   );
 };
 
-const StripeCheckout = ({ cartItems }) => (
+const StripeCheckout = () => (
   <Elements stripe={stripePromise}>
-    <CheckoutForm cartItems={cartItems} />
+    <CheckoutForm />
   </Elements>
 );
 

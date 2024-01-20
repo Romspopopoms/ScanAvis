@@ -31,10 +31,9 @@ const CartSummary = ({ isCartOpen, toggleCart }) => {
           <div className="cart-items">
             {cartItems.map((item) => (
               <div className="cart-item" key={item.id}>
-                {/* L'image a été retirée */}
                 <div className="item-details">
                   <h4 className="item-name">{item.name}</h4>
-                  <p className="item-price">{item.price}$ - Quantité: {item.quantity}</p>
+                  <p className="item-price">{(item.price / 100).toFixed(2)}$ - Quantité: {item.quantity}</p>
                 </div>
                 <button
                   type="button"
@@ -47,7 +46,7 @@ const CartSummary = ({ isCartOpen, toggleCart }) => {
             ))}
           </div>
           <div className="cart-total">
-            <strong className="total-price">Total: {totalPrice}$</strong>
+            <strong className="total-price">Total: {(totalPrice / 100).toFixed(2)}$</strong>
             <button
               type="button"
               className="clear-cart-btn"
@@ -55,9 +54,13 @@ const CartSummary = ({ isCartOpen, toggleCart }) => {
             >
               Vider le Panier
             </button>
-            <Link href="/paiement" className="checkout-btn">
+            <button
+              type="button"
+              className="checkout-btn"
+            >
               Payer
-            </Link>
+              <Link href="/paiement" />
+            </button>
           </div>
         </div>
       ) : (

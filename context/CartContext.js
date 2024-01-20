@@ -30,14 +30,24 @@ export const CartProvider = ({ children }) => {
   const totalPrice = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
 
   // Fonction pour formater les cartItems pour le paiement
+  // Prépare les items du panier dans le format attendu par le backend pour le paiement
   const formatCartItemsForPayment = () => cartItems.map((item) => ({
     id: item.id,
     quantity: item.quantity,
   }));
 
   return (
-    <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, clearCart, totalPrice, formatCartItemsForPayment }}>
+    <CartContext.Provider value={{
+      cartItems,
+      addToCart,
+      removeFromCart,
+      clearCart,
+      totalPrice,
+      formatCartItemsForPayment, // Exposez cette fonction pour que les composants consommateurs puissent l'utiliser
+    }}
+    >
       {children}
     </CartContext.Provider>
   );
 };
+
