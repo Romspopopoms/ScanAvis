@@ -6,9 +6,7 @@ import SectionThree from '../sections/Silver';
 import SectionFour from '../sections/Gold';
 
 const PageTarifs = () => (
-  <div className="bg-primary-black overflow-hidden">
-    {/* Appliquer le gradient personnalisé comme fond */}
-    <div className="gradient-01 absolute inset-0 z-0" />
+  <div className="relative z-10 min-h-screen">
     <Navbar />
 
     {/* Chaque section doit avoir un id correspondant à celui utilisé dans ExploreCard */}

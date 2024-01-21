@@ -43,7 +43,7 @@ const PagePaiement = () => {
   }
 
   return (
-    <div className="bg-primary-black overflow-hidden">
+    <div className="relative z-10 min-h-screen">
       <Navbar />
       <Elements stripe={stripePromise}>
         <div className="page-container">
