@@ -28,6 +28,9 @@ const PaymentStatusPage = () => {
 
     fetchTransaction();
   }, [paymentStatus, paymentIntentId]);
+  if (!transaction && paymentStatus === 'succeeded') {
+    return <p>Chargement des détails de la transaction...</p>; // Afficher un message de chargement
+  }
 
   // Affichage en cas d'accès non autorisé ou de paramètre manquant
   if (!paymentStatus) {
