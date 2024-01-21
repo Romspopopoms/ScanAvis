@@ -614,7 +614,17 @@ outline: none;
   text-align: center;
   padding: 2rem;
   color: #c9c9c9; /* Gris clair pour le texte, pour contraste avec le bleu nuit et le violet */
-  background: linear-gradient(135deg, #0f0c29, #302b63, #24243e); /* Gradient de bleu nuit à violet */
+  background: linear-gradient(135deg, #0f0c29, #302b63, #24243e,); /* Gradient de bleu nuit à violet */
+  min-height: 100vh;
+  flex-direction: column;
+}
+
+.payment-status-main {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
 }
 
 .message-container {

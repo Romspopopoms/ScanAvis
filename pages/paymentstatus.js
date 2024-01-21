@@ -43,7 +43,7 @@ const PaymentStatusPage = () => {
   return (
     <div className="page-container">
       <Navbar />
-      <div className="payment-status-page">
+      <div className="payment-status-main">
         {error ? (
           <div className="message-container error-message">
             <h2>Oups !</h2>
