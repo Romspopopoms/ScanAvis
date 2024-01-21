@@ -10,7 +10,6 @@ const PageTarifs = () => (
     <Navbar />
 
     {/* Chaque section doit avoir un id correspondant à celui utilisé dans ExploreCard */}
-    <div className="gradient-03 z-0" />
     <div id="world-1">
       <SectionOne />
     </div>
