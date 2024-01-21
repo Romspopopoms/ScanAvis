@@ -6,33 +6,36 @@ import Footer from '../components/Footer';
 
 const PaymentStatusPage = () => {
   const router = useRouter();
-  const { paymentStatus, paymentIntentId } = router.query; // Assurez-vous que paymentIntentId est passé en tant que paramètre de requête
+  const { paymentStatus, paymentIntentId } = router.query;
   const [transaction, setTransaction] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchTransaction = async () => {
-      if (paymentStatus === 'succeeded' && paymentIntentId) {
-        try {
-          const response = await fetch(`/.netlify/functions/get-transaction?paymentIntentId=${paymentIntentId}`);
-          if (response.ok) {
-            const data = await response.json();
-            setTransaction(data.transaction);
-          } else {
-            throw new Error('Failed to fetch transaction data');
-          }
-        } catch (error) {
-          console.error('Error fetching transaction:', error);
-        }
-      }
-    };
-
-    fetchTransaction();
+    if (paymentStatus === 'succeeded' && paymentIntentId) {
+      setLoading(true);
+      fetch(`/.netlify/functions/get-transaction?paymentIntentId=${paymentIntentId}`)
+        .then((response) => response.json())
+        .then((data) => {
+          setTransaction(data.transaction);
+          setLoading(false);
+        })
+        .catch((err) => {
+          console.error('Error fetching transaction:', err);
+          setError('Failed to fetch transaction data');
+          setLoading(false);
+        });
+    }
   }, [paymentStatus, paymentIntentId]);
-  if (!transaction && paymentStatus === 'succeeded') {
-    return <p>Chargement des détails de la transaction...</p>; // Afficher un message de chargement
+
+  if (loading) {
+    return <p>Chargement des détails de la transaction...</p>;
   }
 
-  // Affichage en cas d'accès non autorisé ou de paramètre manquant
+  if (error) {
+    return <p>Erreur : {error}</p>;
+  }
+
   if (!paymentStatus) {
     return (
       <div className="gradient-01 fixed inset-0 z-0">
@@ -51,21 +54,26 @@ const PaymentStatusPage = () => {
     <div className="relative z-10 min-h-screen">
       <Navbar />
       <div className="payment-status-page">
-        {paymentStatus === 'succeeded' ? (
+        {paymentStatus === 'succeeded' && transaction ? (
           <div className="success-message">
             <h1>Merci pour votre achat !</h1>
             <p>Votre transaction a été réalisée avec succès. Nous apprécions votre confiance et nous espérons que vous serez satisfait de votre achat.</p>
-
-            {transaction && (
-              <div className="order-summary">
-                <h2>Récapitulatif de la commande</h2>
-                <p>Date de la commande: {new Date(transaction.createdAt).toLocaleString()}</p>
-                <p>ID de la transaction: {transaction.paymentIntentId}</p>
-                <p>Articles commandés: {JSON.stringify(transaction.items)}</p>
-                <p>Montant total: {transaction.totalAmount}€</p>
+            <div className="order-summary">
+              <h2>Récapitulatif de la commande</h2>
+              <p>Date de la commande: {new Date(transaction.createdAt).toLocaleString()}</p>
+              <p>ID de la transaction: {transaction.paymentIntentId}</p>
+              <div>
+                <h3>Articles commandés :</h3>
+                <ul>
+                  {transaction.items.map((item, index) => (
+                    <li key={index}>
+                      {item.name} - Quantité: {item.quantity} - Prix: {item.price}€
+                    </li>
+                  ))}
+                </ul>
               </div>
-            )}
-
+              <p>Montant total: {transaction.totalAmount}€</p>
+            </div>
             <Link href="/">
               <button type="button" className="btn btn-primary">
                 Retour à l'accueil
