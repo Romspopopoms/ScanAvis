@@ -1,12 +1,12 @@
+// db.js
 const { connect } = require('@planetscale/database');
 
 const config = {
-  host: process.env.DATABASE_HOST, // Assurez-vous que ceci est défini dans Netlify
-  username: process.env.DATABASE_USERNAME, // Assurez-vous que ceci est défini dans Netlify
-  password: process.env.DATABASE_PASSWORD, // Assurez-vous que ceci est défini dans Netlify
+  host: process.env.PLANETSCALE_HOST, // ou DATABASE_HOST selon la configuration de Netlify
+  username: process.env.PLANETSCALE_USERNAME, // ou DATABASE_USERNAME
+  password: process.env.PLANETSCALE_PASSWORD, // ou DATABASE_PASSWORD
 };
 
 const conn = connect(config);
 
 module.exports = { conn };
-
