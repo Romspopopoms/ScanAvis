@@ -8,7 +8,7 @@ import Footer from '../components/Footer';
 import { useCart } from '../context/CartContext';
 import Spinner from '../components/Spinner';
 
-const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY || 'pk_test_...');
+const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY || 'pk_test_51OPtGvDWmnYPaxs1gSpLL1WpDyU6gaxOBszqNCSu9iHVeEYuPcjUEvOpKzjwdbF6NUWquoEPf24Y3qMwIDLmeLvl00FwQkUSKx');
 
 const PagePaiement = () => {
   const [loading, setLoading] = useState(true);
