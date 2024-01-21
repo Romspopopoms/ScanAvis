@@ -28,6 +28,7 @@ exports.handler = async (event) => {
     console.log('Database response:', JSON.stringify(rows));
 
     if (rows.length === 0) {
+      console.log(`Transaction not found for paymentIntentId: ${paymentIntentId}`);
       return {
         statusCode: 404,
         headers: { 'Content-Type': 'application/json' },
@@ -54,7 +55,7 @@ exports.handler = async (event) => {
     return {
       statusCode: 500,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ error: 'An error occurred while retrieving the transaction.' }),
+      body: JSON.stringify({ error: `An error occurred while retrieving the transaction. ${error.message}` }),
     };
   }
 };
