@@ -1,12 +1,12 @@
-// db.js
 const { connect } = require('@planetscale/database');
 
 const config = {
-  host: 'aws.connect.psdb.cloud', // Vérifiez que c'est le bon hôte pour votre base de données
-  username: 'tguw58se95itlmrzv5aj', // Nom d'utilisateur
-  password: 'pscale_pw_mfVEFjFfNWTtLKy7m0Oxj2JSqWCdsR7fiSgNUprJeYx', // Mot de passe
+  host: process.env.DATABASE_HOST, // Assurez-vous que ceci est défini dans Netlify
+  username: process.env.DATABASE_USERNAME, // Assurez-vous que ceci est défini dans Netlify
+  password: process.env.DATABASE_PASSWORD, // Assurez-vous que ceci est défini dans Netlify
 };
 
 const conn = connect(config);
 
 module.exports = { conn };
+
