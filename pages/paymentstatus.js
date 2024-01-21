@@ -8,12 +8,12 @@ const PaymentStatusPage = () => {
   const router = useRouter();
   const { paymentStatus, paymentIntentId } = router.query;
   const [transaction, setTransaction] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true); // Commencez par charger jusqu'à ce que nous sachions autrement
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    // Ne faites la requête que si nous avons un statut de paiement et un ID d'intention de paiement
     if (paymentStatus === 'succeeded' && paymentIntentId) {
-      setLoading(true);
       fetch(`/.netlify/functions/get-transaction?paymentIntentId=${paymentIntentId}`)
         .then((response) => {
           if (!response.ok) {
@@ -26,13 +26,16 @@ const PaymentStatusPage = () => {
             throw new Error('No transaction data received');
           }
           setTransaction(data.transaction);
-          setLoading(false);
         })
         .catch((err) => {
           console.error('Error fetching transaction:', err);
           setError('Failed to fetch transaction data');
-          setLoading(false);
+        })
+        .finally(() => {
+          setLoading(false); // Assurez-vous de désactiver le chargement une fois que nous avons une réponse
         });
+    } else {
+      setLoading(false); // Si les conditions ne sont pas remplies, arrêtez de charger
     }
   }, [paymentStatus, paymentIntentId]);
 
