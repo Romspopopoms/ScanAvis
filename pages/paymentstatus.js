@@ -41,9 +41,9 @@ const PaymentStatusPage = () => {
   }
 
   return (
-    <div className="payment-status-page">
+    <div className="page-container">
       <Navbar />
-      <div className="content-container">
+      <div className="payment-status-page">
         {error ? (
           <div className="message-container error-message">
             <h2>Oups !</h2>
@@ -82,5 +82,4 @@ const PaymentStatusPage = () => {
     </div>
   );
 };
-
 export default PaymentStatusPage;
