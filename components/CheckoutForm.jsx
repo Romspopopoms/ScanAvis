@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
-import { useCart } from '../context/CartContext'; // Utilisation du hook personnalisé
+import { useCart } from '../context/CartContext';
 
-const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY || 'pk_test_51OPtGvDWmnYPaxs1gSpLL1WpDyU6gaxOBszqNCSu9iHVeEYuPcjUEvOpKzjwdbF6NUWquoEPf24Y3qMwIDLmeLvl00FwQkUSKx');
+// Assurez-vous que la clé publique de Stripe est correctement configurée.
+const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY || 'pk_test_...');
 
 const CheckoutForm = () => {
   const stripe = useStripe();
@@ -11,7 +12,7 @@ const CheckoutForm = () => {
   const [clientSecret, setClientSecret] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const { cartItems, formatCartItemsForPayment } = useCart(); // Utilisation de useCart
+  const { cartItems, formatCartItemsForPayment } = useCart();
 
   useEffect(() => {
     const fetchPaymentIntent = async () => {
@@ -59,7 +60,7 @@ const CheckoutForm = () => {
       } else if (result.paymentIntent.status === 'succeeded') {
         alert('Paiement réussi!');
         setIsProcessing(false);
-        // Logique supplémentaire en cas de succès
+        // Ajoutez ici la logique en cas de succès (par exemple, rediriger vers une page de succès ou mettre à jour l'état de l'application).
       }
     } catch (error) {
       console.error('Erreur lors du traitement du paiement:', error);

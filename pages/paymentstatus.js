@@ -3,48 +3,55 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import Spinner from '../components/Spinner'; // Assurez-vous d'avoir un composant Spinner pour le chargement
 
 const PaymentStatusPage = () => {
   const router = useRouter();
   const { paymentStatus, paymentIntentId } = router.query;
   const [transaction, setTransaction] = useState(null);
-  const [loading, setLoading] = useState(true); // Commencez par charger jusqu'à ce que nous sachions autrement
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Ne faites la requête que si nous avons un statut de paiement et un ID d'intention de paiement
+    // Requête pour les détails de la transaction uniquement si l'état de paiement est réussi et l'ID d'intention de paiement est présent
     if (paymentStatus === 'succeeded' && paymentIntentId) {
       fetch(`/.netlify/functions/get-transaction?paymentIntentId=${paymentIntentId}`)
         .then((response) => {
           if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            throw new Error(`Erreur HTTP ! Statut : ${response.status}`);
           }
           return response.json();
         })
         .then((data) => {
           if (!data.transaction) {
-            throw new Error('No transaction data received');
+            throw new Error('Aucune donnée de transaction reçue');
           }
           setTransaction(data.transaction);
         })
         .catch((err) => {
-          console.error('Error fetching transaction:', err);
-          setError('Failed to fetch transaction data');
+          console.error('Erreur lors de la récupération de la transaction:', err);
+          setError('Échec de la récupération des données de transaction');
         })
         .finally(() => {
-          setLoading(false); // Assurez-vous de désactiver le chargement une fois que nous avons une réponse
+          setLoading(false);
         });
     } else {
-      setLoading(false); // Si les conditions ne sont pas remplies, arrêtez de charger
+      setLoading(false);
     }
   }, [paymentStatus, paymentIntentId]);
 
   if (loading) {
-    return <p>Chargement des détails de la transaction...</p>;
+    return <Spinner />; // Utilisez le composant Spinner pour l'état de chargement
   }
 
   if (error) {
-    return <p>Erreur : {error}</p>;
+    return (
+      <div>
+        <Navbar />
+        <p>Erreur : {error}</p>
+        <Footer />
+      </div>
+    );
   }
 
   if (!paymentStatus) {
@@ -71,21 +78,21 @@ const PaymentStatusPage = () => {
             <p>Votre transaction a été réalisée avec succès. Nous apprécions votre confiance et nous espérons que vous serez satisfait de votre achat.</p>
             <div className="order-summary">
               <h2>Récapitulatif de la commande</h2>
-              <p>Date de la commande: {new Date(transaction.createdAt).toLocaleString()}</p>
-              <p>ID de la transaction: {transaction.paymentIntentId}</p>
+              <p>Date de la commande : {new Date(transaction.createdAt).toLocaleString()}</p>
+              <p>ID de la transaction : {transaction.paymentIntentId}</p>
               {transaction.items && (
                 <div>
                   <h3>Articles commandés :</h3>
                   <ul>
                     {transaction.items.map((item, index) => (
                       <li key={index}>
-                        {item.name} - Quantité: {item.quantity} - Prix: {item.price}€
+                        {item.name} - Quantité : {item.quantity} - Prix : {item.price}€
                       </li>
                     ))}
                   </ul>
                 </div>
               )}
-              <p>Montant total: {transaction.totalAmount}€</p>
+              <p>Montant total : {transaction.totalAmount}€</p>
             </div>
             <Link href="/">
               <button type="button" className="btn btn-primary">

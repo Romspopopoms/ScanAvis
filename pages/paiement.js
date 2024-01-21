@@ -8,7 +8,8 @@ import Footer from '../components/Footer';
 import { useCart } from '../context/CartContext';
 import Spinner from '../components/Spinner';
 
-const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY || 'pk_test_51OPtGvDWmnYPaxs1gSpLL1WpDyU6gaxOBszqNCSu9iHVeEYuPcjUEvOpKzjwdbF6NUWquoEPf24Y3qMwIDLmeLvl00FwQkUSKx');
+// Assurez-vous que votre clé publique Stripe est correctement configurée
+const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY || 'pk_test_...');
 
 const PagePaiement = () => {
   const [loading, setLoading] = useState(true);
@@ -26,12 +27,14 @@ const PagePaiement = () => {
 
   const handleSuccessfulPayment = () => {
     clearCart();
-    router.push('/paymentstatus?paymentStatus=succeeded'); // Notez que le tiret a été retiré
+    // Redirigez vers une page de succès avec les informations de paiement si nécessaire
+    router.push('/paymentstatus?paymentStatus=succeeded');
   };
 
   const handleFailedPayment = (message) => {
     console.error('Erreur de paiement:', message);
-    router.push('/paymentstatus?paymentStatus=failed'); // Notez que le tiret a été retiré
+    // Redirigez vers une page d'échec avec un message d'erreur si nécessaire
+    router.push('/paymentstatus?paymentStatus=failed');
   };
 
   if (loading) {

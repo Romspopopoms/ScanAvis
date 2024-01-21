@@ -9,8 +9,10 @@ const PaymentForm = ({ onSuccessfulPayment, onFailedPayment }) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
+  // Cette fonction calcule le total du panier
   const calculateTotal = () => cartItems.reduce((total, item) => total + item.quantity * item.price, 0) / 100;
 
+  // Cette fonction crée une intention de paiement en envoyant les articles du panier à votre fonction backend
   const createPaymentIntent = async () => {
     try {
       const formattedCartItems = formatCartItemsForPayment();
@@ -20,7 +22,10 @@ const PaymentForm = ({ onSuccessfulPayment, onFailedPayment }) => {
         body: JSON.stringify({ items: formattedCartItems }),
       });
       const data = await response.json();
-      return data.clientSecret;
+      if (response.ok) {
+        return data.clientSecret;
+      }
+      throw new Error(data.error || 'Erreur du serveur');
     } catch (error) {
       console.error('Erreur lors de la création de l’intention de paiement:', error);
       setErrorMessage(error.message);
@@ -28,6 +33,7 @@ const PaymentForm = ({ onSuccessfulPayment, onFailedPayment }) => {
     }
   };
 
+  // Cette fonction gère la soumission du formulaire de paiement
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (!stripe || !elements) {
