@@ -41,11 +41,11 @@ const PaymentStatusPage = () => {
   }
 
   return (
-    <div className="gradient-01 fixed inset-0 z-0">
+    <div className="payment-status-page">
       <Navbar />
       <div className="content-container">
         {error ? (
-          <div className="error-container">
+          <div className="message-container error-message">
             <h2>Oups !</h2>
             <p>Erreur : {error}</p>
             <Link href="/" passHref>
@@ -53,7 +53,7 @@ const PaymentStatusPage = () => {
             </Link>
           </div>
         ) : !paymentStatus || paymentStatus === 'failed' ? (
-          <div className="status-container">
+          <div className="message-container error-message">
             <h2>Statut de Paiement Inconnu</h2>
             <p>Accès non autorisé à cette page ou paramètre manquant.</p>
             <Link href="/" passHref>
@@ -61,7 +61,7 @@ const PaymentStatusPage = () => {
             </Link>
           </div>
         ) : (
-          <div className="success-container">
+          <div className="message-container success-message">
             <h1>Merci pour votre achat !</h1>
             <p>Votre transaction a été réalisée avec succès.</p>
             {transaction && (

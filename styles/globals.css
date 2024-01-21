@@ -613,17 +613,18 @@ outline: none;
   align-items: center;
   text-align: center;
   padding: 2rem;
+  color: #c9c9c9; /* Gris clair pour le texte, pour contraste avec le bleu nuit et le violet */
+  background: linear-gradient(135deg, #0f0c29, #302b63, #24243e); /* Gradient de bleu nuit à violet */
 }
 
-.success-message,
-.error-message {
+.message-container {
   max-width: 600px;
   padding: 2rem;
   margin: 1rem;
-  border-radius: 5px;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.1); /* Fond légèrement transparent pour un look futuriste */
+  backdrop-filter: blur(15px); /* Effet de flou pour la profondeur */
+  border: 2px solid rgba(255, 255, 255, 0.25); /* Bordure subtile */
 }
 
 .success-message {
@@ -634,34 +635,37 @@ outline: none;
   border-color: #f44336; /* Rouge pour erreur */
 }
 
-.success-message h1,
-.error-message h1 {
-  color: #ade8f4; /* Bleu ciel */
+.message-container h1 {
+  color: #ade8f4; /* Bleu ciel pour les titres */
+  margin-bottom: 0.5rem; /* Espace sous le titre */
 }
 
-.success-message p,
-.error-message p {
-  color: #c9c9c9; /* Gris clair pour le texte */
-  font-size: 1rem;
+.message-container p {
+  color: #e0e0e0; /* Gris plus clair pour le texte pour une meilleure lisibilité */
+  font-size: 1.1rem;
+  margin-bottom: 1rem; /* Espace sous le paragraphe */
 }
 
 .btn {
-  padding: 0.6rem 1.2rem;
+  padding: 0.75rem 1.5rem;
   margin-top: 1rem;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  font-size: 1rem;
-  transition: background-color 0.3s ease;
+  font-size: 1.1rem;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  text-transform: uppercase; /* Style de bouton futuriste */
+  letter-spacing: 1px; /* Espacement des lettres pour un effet plus moderne */
 }
 
 .btn-primary {
-  background-color: #0077b6; /* Bleu */
+  background-color: #27496d; /* Bleu nuit */
   color: #fff;
 }
 
 .btn-primary:hover {
-  background-color: #023e8a; /* Bleu foncé au survol */
+  background-color: #0c7b93; /* Bleu ciel plus vif au survol */
+  transform: scale(1.05); /* Effet de zoom au survol */
 }
 
 .btn-danger {
@@ -671,15 +675,17 @@ outline: none;
 
 .btn-danger:hover {
   background-color: #d32f2f; /* Rouge foncé au survol */
+  transform: scale(1.05); /* Effet de zoom au survol */
 }
 
 .btn-secondary {
-  background-color: #9c9c9c; /* Gris pour secondaire */
+  background-color: #464866; /* Gris-bleu pour secondaire */
   color: #fff;
 }
 
 .btn-secondary:hover {
-  background-color: #7a7a7a; /* Gris foncé au survol */
+  background-color: #25274d; /* Gris-bleu foncé au survol */
+  transform: scale(1.05); /* Effet de zoom au survol */
 }
 
 
