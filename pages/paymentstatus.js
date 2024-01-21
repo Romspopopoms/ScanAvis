@@ -15,8 +15,16 @@ const PaymentStatusPage = () => {
     if (paymentStatus === 'succeeded' && paymentIntentId) {
       setLoading(true);
       fetch(`/.netlify/functions/get-transaction?paymentIntentId=${paymentIntentId}`)
-        .then((response) => response.json())
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+        })
         .then((data) => {
+          if (!data.transaction) {
+            throw new Error('No transaction data received');
+          }
           setTransaction(data.transaction);
           setLoading(false);
         })
@@ -62,16 +70,18 @@ const PaymentStatusPage = () => {
               <h2>Récapitulatif de la commande</h2>
               <p>Date de la commande: {new Date(transaction.createdAt).toLocaleString()}</p>
               <p>ID de la transaction: {transaction.paymentIntentId}</p>
-              <div>
-                <h3>Articles commandés :</h3>
-                <ul>
-                  {transaction.items.map((item, index) => (
-                    <li key={index}>
-                      {item.name} - Quantité: {item.quantity} - Prix: {item.price}€
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              {transaction.items && (
+                <div>
+                  <h3>Articles commandés :</h3>
+                  <ul>
+                    {transaction.items.map((item, index) => (
+                      <li key={index}>
+                        {item.name} - Quantité: {item.quantity} - Prix: {item.price}€
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
               <p>Montant total: {transaction.totalAmount}€</p>
             </div>
             <Link href="/">
