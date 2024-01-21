@@ -9,10 +9,8 @@ const PaymentForm = ({ onSuccessfulPayment, onFailedPayment }) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  // Cette fonction calcule le total du panier
   const calculateTotal = () => cartItems.reduce((total, item) => total + item.quantity * item.price, 0) / 100;
 
-  // Cette fonction crée une intention de paiement en envoyant les articles du panier à votre fonction backend
   const createPaymentIntent = async () => {
     try {
       const formattedCartItems = formatCartItemsForPayment();
@@ -21,11 +19,10 @@ const PaymentForm = ({ onSuccessfulPayment, onFailedPayment }) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ items: formattedCartItems }),
       });
+
       const data = await response.json();
-      if (response.ok) {
-        return data.clientSecret;
-      }
-      throw new Error(data.error || 'Erreur du serveur');
+      if (!response.ok) throw new Error(data.error || 'Erreur du serveur');
+      return data.clientSecret;
     } catch (error) {
       console.error('Erreur lors de la création de l’intention de paiement:', error);
       setErrorMessage(error.message);
@@ -33,11 +30,10 @@ const PaymentForm = ({ onSuccessfulPayment, onFailedPayment }) => {
     }
   };
 
-  // Cette fonction gère la soumission du formulaire de paiement
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (!stripe || !elements) {
-      console.log('Stripe.js n’a pas encore été chargé!');
+      setErrorMessage('Stripe.js n’a pas encore été chargé!');
       return;
     }
 
@@ -47,19 +43,20 @@ const PaymentForm = ({ onSuccessfulPayment, onFailedPayment }) => {
     try {
       const clientSecret = await createPaymentIntent();
       const cardElement = elements.getElement(CardNumberElement);
+
       const paymentResult = await stripe.confirmCardPayment(clientSecret, {
-        payment_method: {
-          card: cardElement,
-        },
+        payment_method: { card: cardElement },
       });
 
       if (paymentResult.error) {
-        setErrorMessage(paymentResult.error.message);
-        onFailedPayment(paymentResult.error.message);
+        throw new Error(paymentResult.error.message);
       } else if (paymentResult.paymentIntent.status === 'succeeded') {
         onSuccessfulPayment();
+      } else {
+        throw new Error('Le paiement a échoué pour une raison inconnue.');
       }
     } catch (error) {
+      console.error('Erreur de paiement:', error);
       setErrorMessage(error.message);
       onFailedPayment(error.message);
     } finally {
@@ -73,9 +70,7 @@ const PaymentForm = ({ onSuccessfulPayment, onFailedPayment }) => {
         <h2>Mon Panier</h2>
         <ul>
           {cartItems.map((item) => (
-            <li key={item.id}>
-              {item.name} - {item.quantity} x {(item.price / 100).toFixed(2)}$
-            </li>
+            <li key={item.id}>{item.name} - {item.quantity} x {(item.price / 100).toFixed(2)}$</li>
           ))}
         </ul>
         <p className="cart-total">Total à payer: {calculateTotal().toFixed(2)}$</p>

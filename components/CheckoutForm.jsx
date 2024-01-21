@@ -3,33 +3,32 @@ import { loadStripe } from '@stripe/stripe-js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { useCart } from '../context/CartContext';
 
-// Assurez-vous que la clé publique de Stripe est correctement configurée.
 const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY || 'pk_test_...');
 
 const CheckoutForm = () => {
   const stripe = useStripe();
   const elements = useElements();
+  const { cartItems, formatCartItemsForPayment } = useCart();
   const [clientSecret, setClientSecret] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const { cartItems, formatCartItemsForPayment } = useCart();
 
   useEffect(() => {
     const fetchPaymentIntent = async () => {
-      if (cartItems.length > 0) {
-        const formattedCartItems = formatCartItemsForPayment();
-        try {
-          const response = await fetch('/.netlify/functions/create-payment-intent', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ items: formattedCartItems }),
-          });
-          const data = await response.json();
-          setClientSecret(data.clientSecret);
-        } catch (error) {
-          console.error('Erreur lors de la création de l’intention de paiement:', error);
-          setErrorMessage(error.message);
-        }
+      if (cartItems.length === 0) return;
+      const formattedCartItems = formatCartItemsForPayment();
+      try {
+        const response = await fetch('/.netlify/functions/create-payment-intent', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ items: formattedCartItems }),
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Erreur du serveur');
+        setClientSecret(data.clientSecret);
+      } catch (error) {
+        console.error('Erreur lors de la création de l’intention de paiement:', error);
+        setErrorMessage(error.message);
       }
     };
 
@@ -39,32 +38,29 @@ const CheckoutForm = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (!stripe || !elements) {
-      console.log('Stripe.js n’a pas encore été chargé!');
+      setErrorMessage('Stripe.js n’a pas encore été chargé!');
       return;
     }
 
     setIsProcessing(true);
     setErrorMessage('');
 
-    const cardElement = elements.getElement(CardElement);
     try {
-      const result = await stripe.confirmCardPayment(clientSecret, {
-        payment_method: {
-          card: cardElement,
-        },
+      const cardElement = elements.getElement(CardElement);
+      const paymentResult = await stripe.confirmCardPayment(clientSecret, {
+        payment_method: { card: cardElement },
       });
 
-      if (result.error) {
-        setErrorMessage(`Erreur de paiement: ${result.error.message}`);
-        setIsProcessing(false);
-      } else if (result.paymentIntent.status === 'succeeded') {
-        alert('Paiement réussi!');
-        setIsProcessing(false);
-        // Ajoutez ici la logique en cas de succès (par exemple, rediriger vers une page de succès ou mettre à jour l'état de l'application).
+      if (paymentResult.error) throw new Error(`Erreur de paiement: ${paymentResult.error.message}`);
+
+      if (paymentResult.paymentIntent.status === 'succeeded') {
+        // Redirection ou mise à jour de l'état ici pour le succès
+        console.log('Paiement réussi!');
       }
     } catch (error) {
       console.error('Erreur lors du traitement du paiement:', error);
-      setErrorMessage('Erreur lors du traitement du paiement. Veuillez réessayer.');
+      setErrorMessage(error.message);
+    } finally {
       setIsProcessing(false);
     }
   };

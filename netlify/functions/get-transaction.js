@@ -1,10 +1,8 @@
-// netlify/functions/get-transaction.js
-const { conn } = require('../../utils/db'); // Assurez-vous que le chemin est correct.
+const { conn } = require('../../utils/db');
 
 exports.handler = async (event) => {
   console.log('Received event:', JSON.stringify(event));
 
-  // Autoriser uniquement la méthode GET.
   if (event.httpMethod !== 'GET') {
     return {
       statusCode: 405,
