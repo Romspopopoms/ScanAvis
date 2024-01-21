@@ -1,6 +1,6 @@
 // Import Stripe and PlanetScale DB
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-const { conn } = require('../../utils/db');
+const stripe = require('stripe')('sk_test_51OPtGvDWmnYPaxs1DJZliUMMDttrNP1a4usU0uBgZgjnfe4Ho3WuCzFivSpwXhqL0YgVl9c41lbsuHI1O4nHAUhz00ibE6rzPX');
+const { conn } = require('../../utils/db'); // Ajustez le chemin en fonction de la structure de votre fichier
 
 exports.handler = async (event) => {
   // Only allow POST method

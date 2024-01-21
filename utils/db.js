@@ -1,6 +1,5 @@
 // db.js
-import 'dotenv/config';
-import { connect } from '@planetscale/database';
+const { connect } = require('@planetscale/database');
 
 const config = {
   host: process.env.DATABASE_HOST,
@@ -8,4 +7,6 @@ const config = {
   password: process.env.DATABASE_PASSWORD,
 };
 
-export const conn = connect(config);
+const conn = connect(config);
+
+module.exports = { conn }; // Utilisez module.exports pour exporter
