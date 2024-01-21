@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
-import { Elements, useStripe } from '@stripe/react-stripe-js';
+import { Elements } from '@stripe/react-stripe-js';
 import { useRouter } from 'next/router';
 import PaymentForm from '../components/tableauStripe';
 import Navbar from '../components/Navbar';
@@ -12,7 +12,6 @@ const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY || 'pk_
 
 const PagePaiement = () => {
   const [loading, setLoading] = useState(true);
-  const stripe = useStripe(); // Utilisation de useStripe pour accéder à l'objet stripe
   const { clearCart } = useCart();
   const router = useRouter();
 
@@ -25,7 +24,7 @@ const PagePaiement = () => {
     });
   }, []);
 
-  const handlePayment = async () => {
+  const handlePayment = async (stripe) => {
     if (!stripe) {
       console.error("Stripe n'est pas initialisé");
       return;
@@ -33,7 +32,6 @@ const PagePaiement = () => {
 
     setLoading(true);
     try {
-      // Remplacez ceci par votre logique d'appel API pour traiter le paiement
       const paymentResult = await stripe.confirmCardPayment(/* ... */);
 
       if (paymentResult.error) {
