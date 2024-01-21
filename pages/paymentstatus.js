@@ -10,14 +10,15 @@ const PaymentStatusPage = () => {
   const { paymentStatus, paymentIntentId } = router.query;
   const [transaction, setTransaction] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const fetchTransactionDetails = async () => {
-      if (!paymentStatus || !paymentIntentId) {
+      if (paymentStatus !== 'succeeded' || !paymentIntentId) {
         setLoading(false);
         return;
       }
+
       try {
         const response = await fetch(`/.netlify/functions/get-transaction?paymentIntentId=${paymentIntentId}`);
         if (!response.ok) throw new Error(`Erreur HTTP ! Statut : ${response.status}`);
@@ -47,36 +48,32 @@ const PaymentStatusPage = () => {
           <div className="error-container">
             <h2>Oups !</h2>
             <p>Erreur : {error}</p>
-            <Link href="/">
+            <Link href="/" passHref>
               <button type="button" className="btn btn-primary">Retour à l'accueil</button>
             </Link>
           </div>
-        ) : !paymentStatus ? (
+        ) : !paymentStatus || paymentStatus === 'failed' ? (
           <div className="status-container">
             <h2>Statut de Paiement Inconnu</h2>
             <p>Accès non autorisé à cette page ou paramètre manquant.</p>
-            <Link href="/">
+            <Link href="/" passHref>
               <button type="button" className="btn btn-secondary">Retour à l'accueil</button>
-            </Link>
-          </div>
-        ) : paymentStatus === 'succeeded' && transaction ? (
-          <div className="success-container">
-            <h1>Merci pour votre achat !</h1>
-            <p>Votre transaction a été réalisée avec succès.</p>
-            {/* Ici, vous pouvez ajouter des détails sur la transaction si nécessaire */}
-            <Link href="/">
-              <button type="button" className="btn btn-success">Retour à l'accueil</button>
             </Link>
           </div>
         ) : (
-          <div className="failure-container">
-            <h1>Oups, quelque chose s'est mal passé !</h1>
-            <p>Malheureusement, une erreur est survenue lors du traitement de votre paiement.</p>
-            <Link href="/retry-payment">
-              <button type="button" className="btn btn-danger">Réessayer le Paiement</button>
-            </Link>
-            <Link href="/">
-              <button type="button" className="btn btn-secondary">Retour à l'accueil</button>
+          <div className="success-container">
+            <h1>Merci pour votre achat !</h1>
+            <p>Votre transaction a été réalisée avec succès.</p>
+            {transaction && (
+              <div>
+                {/* Affichage des détails de la transaction ici */}
+                <p>ID de transaction : {transaction.id}</p>
+                <p>Montant : {transaction.amount}</p>
+                {/* Ajoutez d'autres détails de transaction si nécessaire */}
+              </div>
+            )}
+            <Link href="/" passHref>
+              <button type="button" className="btn btn-success">Retour à l'accueil</button>
             </Link>
           </div>
         )}

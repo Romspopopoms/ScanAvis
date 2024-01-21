@@ -8,7 +8,7 @@ import Footer from '../components/Footer';
 import { useCart } from '../context/CartContext';
 import Spinner from '../components/Spinner';
 
-const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY || 'pk_test_51OPtGvDWmnYPaxs1gSpLL1WpDyU6gaxOBszqNCSu9iHVeEYuPcjUEvOpKzjwdbF6NUWquoEPf24Y3qMwIDLmeLvl00FwQkUSKx');
+const stripePromise = loadStripe('pk_test_51OPtGvDWmnYPaxs1gSpLL1WpDyU6gaxOBszqNCSu9iHVeEYuPcjUEvOpKzjwdbF6NUWquoEPf24Y3qMwIDLmeLvl00FwQkUSKx');
 
 const PagePaiement = () => {
   const [loading, setLoading] = useState(true);
@@ -24,31 +24,19 @@ const PagePaiement = () => {
     });
   }, []);
 
-  const handlePayment = async (stripe) => {
-    if (!stripe) {
-      console.error("Stripe n'est pas initialisé");
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const paymentResult = await stripe.confirmCardPayment(/* ... */);
-
-      if (paymentResult.error) {
-        throw new Error(paymentResult.error.message);
-      } else if (paymentResult.paymentIntent.status === 'succeeded') {
-        clearCart();
-        router.push('/paymentstatus?paymentStatus=succeeded');
-      } else {
-        throw new Error('Le paiement a échoué pour une raison inconnue.');
-      }
-    } catch (error) {
-      console.error('Erreur de paiement:', error.message);
-      router.push(`/paymentstatus?paymentStatus=failed&message=${encodeURIComponent(error.message)}`);
-    } finally {
-      setLoading(false);
-    }
+  // Fonction appelée lorsque le paiement est réussi
+  const onSuccessfulPayment = () => {
+    clearCart();
+    router.push('/paymentstatus?paymentStatus=succeeded');
   };
+
+  // Fonction appelée en cas d'échec du paiement
+  const onFailedPayment = (message) => {
+    console.error('Erreur de paiement:', message);
+    router.push(`/paymentstatus?paymentStatus=failed&message=${encodeURIComponent(message)}`);
+  };
+
+  // La fonction handlePayment n'est plus nécessaire ici et doit être déplacée dans PaymentForm
 
   if (loading) {
     return <Spinner />;
@@ -59,7 +47,8 @@ const PagePaiement = () => {
       <Navbar />
       <Elements stripe={stripePromise}>
         <div className="page-container">
-          <PaymentForm onProcessPayment={handlePayment} />
+          {/* Passons les fonctions de gestion de paiement au composant PaymentForm */}
+          <PaymentForm onSuccessfulPayment={onSuccessfulPayment} onFailedPayment={onFailedPayment} />
         </div>
       </Elements>
       <Footer />

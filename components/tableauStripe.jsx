@@ -3,13 +3,14 @@ import { useStripe, useElements, CardNumberElement, CardExpiryElement, CardCvcEl
 import { useCart } from '../context/CartContext';
 
 const PaymentForm = ({ onSuccessfulPayment, onFailedPayment }) => {
-  const { cartItems, formatCartItemsForPayment } = useCart();
   const stripe = useStripe();
   const elements = useElements();
   const [isProcessing, setIsProcessing] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const { cartItems, formatCartItemsForPayment } = useCart();
 
-  const calculateTotal = () => cartItems.reduce((total, item) => total + item.quantity * item.price, 0) / 100;
+  // Assurez-vous que la fonction calculateTotal renvoie le montant en centimes.
+  const calculateTotal = () => cartItems.reduce((total, item) => total + item.quantity * item.price, 0);
 
   const createPaymentIntent = async () => {
     try {
@@ -26,6 +27,7 @@ const PaymentForm = ({ onSuccessfulPayment, onFailedPayment }) => {
     } catch (error) {
       console.error('Erreur lors de la création de l’intention de paiement:', error);
       setErrorMessage(error.message);
+      if (onFailedPayment) onFailedPayment(error.message);
       throw error;
     }
   };
@@ -49,16 +51,17 @@ const PaymentForm = ({ onSuccessfulPayment, onFailedPayment }) => {
       });
 
       if (paymentResult.error) {
-        throw new Error(paymentResult.error.message);
+        setErrorMessage(paymentResult.error.message);
+        if (onFailedPayment) onFailedPayment(paymentResult.error.message);
       } else if (paymentResult.paymentIntent.status === 'succeeded') {
-        onSuccessfulPayment();
+        if (onSuccessfulPayment) onSuccessfulPayment();
       } else {
         throw new Error('Le paiement a échoué pour une raison inconnue.');
       }
     } catch (error) {
       console.error('Erreur de paiement:', error);
       setErrorMessage(error.message);
-      onFailedPayment(error.message);
+      if (onFailedPayment) onFailedPayment(error.message);
     } finally {
       setIsProcessing(false);
     }

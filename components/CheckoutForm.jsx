@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { useRouter } from 'next/router'; // Utilisé pour la redirection en cas de succès ou d'échec du paiement
 import { useCart } from '../context/CartContext';
 
-const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY || 'pk_test_51OPtGvDWmnYPaxs1gSpLL1WpDyU6gaxOBszqNCSu9iHVeEYuPcjUEvOpKzjwdbF6NUWquoEPf24Y3qMwIDLmeLvl00FwQkUSKx');
+const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY);
 
 const CheckoutForm = () => {
   const stripe = useStripe();
   const elements = useElements();
-  const { cartItems, formatCartItemsForPayment } = useCart();
+  const { cartItems, formatCartItemsForPayment, clearCart } = useCart();
   const [clientSecret, setClientSecret] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const router = useRouter(); // Pour la redirection
 
   useEffect(() => {
     const fetchPaymentIntent = async () => {
@@ -35,6 +37,15 @@ const CheckoutForm = () => {
     fetchPaymentIntent();
   }, [cartItems, formatCartItemsForPayment]);
 
+  const onSuccessfulPayment = () => {
+    clearCart();
+    router.push('/paymentstatus?paymentStatus=succeeded');
+  };
+
+  const onFailedPayment = (message) => {
+    router.push(`/paymentstatus?paymentStatus=failed&message=${encodeURIComponent(message)}`);
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (!stripe || !elements) {
@@ -51,15 +62,17 @@ const CheckoutForm = () => {
         payment_method: { card: cardElement },
       });
 
-      if (paymentResult.error) throw new Error(`Erreur de paiement: ${paymentResult.error.message}`);
-
-      if (paymentResult.paymentIntent.status === 'succeeded') {
-        // Redirection ou mise à jour de l'état ici pour le succès
-        console.log('Paiement réussi!');
+      if (paymentResult.error) {
+        throw new Error(`Erreur de paiement: ${paymentResult.error.message}`);
+      } else if (paymentResult.paymentIntent.status === 'succeeded') {
+        onSuccessfulPayment();
+      } else {
+        throw new Error('Le paiement a échoué pour une raison inconnue.');
       }
     } catch (error) {
       console.error('Erreur lors du traitement du paiement:', error);
       setErrorMessage(error.message);
+      onFailedPayment(error.message);
     } finally {
       setIsProcessing(false);
     }
