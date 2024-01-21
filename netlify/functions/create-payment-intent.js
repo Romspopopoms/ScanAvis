@@ -1,9 +1,9 @@
 // Import Stripe and PlanetScale DB
-const stripe = require('stripe')('sk_test_51OPtGvDWmnYPaxs1DJZliUMMDttrNP1a4usU0uBgZgjnfe4Ho3WuCzFivSpwXhqL0YgVl9c41lbsuHI1O4nHAUhz00ibE6rzPX');
-const { conn } = require('../../utils/db'); // Ajustez le chemin en fonction de la structure de votre fichier
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY); // Utilisez des variables d'environnement pour les clés API
+const { conn } = require('../../utils/db'); // Assurez-vous que le chemin est correct
 
 exports.handler = async (event) => {
-  // Only allow POST method
+  // Allow only POST method
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: JSON.stringify({ message: 'Method Not Allowed' }) };
   }
@@ -28,14 +28,19 @@ exports.handler = async (event) => {
       amount: totalAmount,
       currency: 'eur',
     });
-    console.log(`PaymentIntent created: ${paymentIntent.id}`);
 
     // Execute the database insertion using PlanetScale
-    const [rows] = await conn.execute(
+    const result = await conn.execute(
       'INSERT INTO Transactions (items, totalAmount, paymentIntentId, clientSecret) VALUES (?, ?, ?, ?)',
       [JSON.stringify(items), totalAmount, paymentIntent.id, paymentIntent.client_secret],
     );
-    console.log('Insertion into database successful', rows);
+
+    // Check if the result object is as expected
+    if (!result || !result.insertId) {
+      throw new Error('Database insertion failed');
+    }
+
+    console.log(`Insertion into database successful, insertId: ${result.insertId}`);
 
     // Return success response
     return {
@@ -46,11 +51,6 @@ exports.handler = async (event) => {
   } catch (error) {
     // Log the detailed error
     console.error('Error:', error);
-
-    // Log SQL specific errors if any
-    if (error.sqlMessage) {
-      console.error('SQL Error:', error.sqlMessage);
-    }
 
     // Return error response
     return {
