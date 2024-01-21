@@ -2,9 +2,10 @@
 const { connect } = require('@planetscale/database');
 
 const config = {
-  host: 'aws.connect.psdb.cloud', // Assurez-vous que ceci est défini dans Netlify
-  username: '4oawdjztq94gyl2cmu58', // Assurez-vous que ceci est défini dans Netlify
-  password: 'pscale_pw_nnoQlMtmc2aVdVItG9Jz0COYdvRD6ghmmfvBQjmvZai', // Assurez-vous que ceci est défini dans Netlify
+  database: 'scanavis',
+  username: 'lbb88a4ezq8w8g33i76t',
+  host: 'aws.connect.psdb.cloud',
+  password: 'pscale_pw_Xtndz1g3aIuU7X4imw3bkphOXPKUlQdUe3USgP7xCr1',
 };
 
 const conn = connect(config);
