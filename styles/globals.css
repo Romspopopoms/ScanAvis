@@ -12,6 +12,14 @@ html {
   box-sizing: border-box;
   font-family: "Eudoxus Sans", sans-serif;
   scroll-behavior: smooth;
+
+  
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
 }
 
 .gradient-01 {
@@ -702,6 +710,8 @@ outline: none;
   display: flex;
   flex-direction: column;
   min-height: 100vh; /* Utilisez 100vh pour que le conteneur prenne toute la hauteur de la page */
+  background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+  background-attachment: fixed;
 }
 
 
