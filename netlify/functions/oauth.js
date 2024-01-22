@@ -10,7 +10,7 @@ async function getUserData(accessToken) {
     throw new Error(`HTTP error! status: ${response.status}`);
   }
   const data = await response.json();
-  console.log('Données utilisateur récupérées:', data);
+  console.log('Données utilisateur récupérées pour: ', data.email); // Ne loggez que l'email pour éviter d'exposer des informations sensibles
   return data;
 }
 
@@ -21,7 +21,9 @@ async function verifyIdToken(idToken) {
     idToken,
     audience: process.env.CLIENT_ID,
   });
-  return ticket.getPayload();
+  const payload = ticket.getPayload();
+  console.log('Token vérifié pour: ', payload.email); // Ne loggez que l'email
+  return payload;
 }
 
 exports.handler = async (event) => {
@@ -29,22 +31,19 @@ exports.handler = async (event) => {
 
   if (event.httpMethod !== 'POST') {
     console.error('Méthode non autorisée:', event.httpMethod);
-    return { statusCode: 405, body: 'Method Not Allowed' };
+    return { statusCode: 405, body: JSON.stringify({ error: 'Method Not Allowed' }) };
   }
 
   try {
-    console.log('Traitement de la requête:', event.body);
+    console.log('Traitement de la requête');
     const body = JSON.parse(event.body);
-    const redirectURL = `${process.env.URLL}/oauth`;
-    console.log('URL de redirection:', redirectURL);
-    const oAuth2Client = new OAuth2Client(process.env.CLIENT_ID, process.env.CLIENT_SECRET, redirectURL);
+    const oAuth2Client = new OAuth2Client(process.env.CLIENT_ID, process.env.CLIENT_SECRET);
     console.log('Client OAuth2 initialisé');
     let userData;
 
     if (body.code) {
       console.log('Traitement avec le code d\'authentification');
-      const code = decodeURIComponent(body.code);
-      const { tokens } = await oAuth2Client.getToken(code);
+      const { tokens } = await oAuth2Client.getToken(decodeURIComponent(body.code));
       oAuth2Client.setCredentials(tokens);
       userData = await getUserData(tokens.access_token);
     } else if (body.idToken) {
@@ -52,25 +51,24 @@ exports.handler = async (event) => {
       userData = await verifyIdToken(body.idToken);
     } else {
       console.error('Ni code ni ID Token fourni');
-      return { statusCode: 400, body: 'Code or ID Token is required' };
+      return { statusCode: 400, body: JSON.stringify({ error: 'Code or ID Token is required' }) };
     }
 
-    const { email, name } = userData;
     const insertQuery = `
       INSERT INTO users (email, name, access_token)
       VALUES (?, ?, ?)
       ON DUPLICATE KEY UPDATE name = VALUES(name), access_token = VALUES(access_token)
     `;
-    console.log('Exécution de la requête SQL');
-    await conn.execute(insertQuery, [email, name, body.code || body.idToken]);
-    console.log('Utilisateur inséré/mis à jour dans la base de données');
+    console.log('Exécution de la requête SQL pour: ', userData.email); // Ne loggez que l'email
+    await conn.execute(insertQuery, [userData.email, userData.name, body.code || body.idToken]);
+    console.log('Utilisateur inséré/mis à jour dans la base de données pour: ', userData.email); // Ne loggez que l'email
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ user: userData }),
+      body: JSON.stringify({ user: { email: userData.email, name: userData.name } }), // Ne renvoyez pas le access_token au client
     };
   } catch (err) {
-    console.error('Erreur lors du traitement de l\'authentification:', err);
+    console.error('Erreur lors du traitement de l\'authentification:', err.message);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: 'Authentication failed', details: err.message }),

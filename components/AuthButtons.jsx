@@ -1,7 +1,6 @@
 import React, { useContext } from 'react';
-import { AuthContext } from '../context/AuthContext'; // Assurez-vous d'avoir le bon chemin d'accès
+import { AuthContext } from '../context/AuthContext';
 
-// Composant pour le bouton de connexion
 export const LoginButton = () => {
   const { getAuthUrl } = useContext(AuthContext);
 
@@ -12,7 +11,6 @@ export const LoginButton = () => {
   );
 };
 
-// Composant pour le bouton de déconnexion
 export const LogoutButton = () => {
   const { logout } = useContext(AuthContext);
 

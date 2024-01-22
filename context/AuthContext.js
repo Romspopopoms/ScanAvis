@@ -20,6 +20,7 @@ export const AuthProvider = ({ children }) => {
       window.location.href = url;
     } catch (error) {
       console.error('Erreur lors de la récupération de l\'URL d\'authentification:', error);
+      // TODO: Gérer l'affichage d'erreur pour l'utilisateur
     }
   };
 
@@ -36,9 +37,11 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem('authToken', data.user.access_token); // Stocker le token dans le stockage local
       } else {
         console.error('Erreur lors du traitement de la réponse:', data.message);
+        // TODO: Gérer l'affichage d'erreur pour l'utilisateur
       }
     } catch (error) {
       console.error('Erreur lors du traitement de la réponse:', error);
+      // TODO: Gérer l'affichage d'erreur pour l'utilisateur
     }
   };
 
@@ -56,6 +59,7 @@ export const AuthProvider = ({ children }) => {
       handleAuthResponse(response);
     } catch (error) {
       console.error('Erreur lors de l\'envoi du code:', error);
+      // TODO: Gérer l'affichage d'erreur pour l'utilisateur
     }
   };
 
@@ -68,6 +72,7 @@ export const AuthProvider = ({ children }) => {
       setUser(null);
     } catch (error) {
       console.error('Erreur lors de la déconnexion:', error);
+      // TODO: Gérer l'affichage d'erreur pour l'utilisateur
     }
   };
 
@@ -92,9 +97,11 @@ export const AuthProvider = ({ children }) => {
           body: JSON.stringify({ idToken: token }),
         }).then(handleAuthResponse).catch((error) => {
           console.error('Erreur lors de la vérification du token:', error);
+          // TODO: Gérer l'affichage d'erreur pour l'utilisateur
         });
       } else {
         console.log('Aucun token trouvé dans le stockage local.');
+        // Vous pouvez choisir de gérer cela différemment, par exemple en redirigeant l'utilisateur vers la page de login
       }
     };
 

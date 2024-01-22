@@ -27,7 +27,7 @@ exports.loginHandler = async (event) => {
 
   if (event.httpMethod !== 'POST') {
     console.error('Méthode non autorisée:', event.httpMethod);
-    return { statusCode: 405, body: 'Method Not Allowed' };
+    return { statusCode: 405, body: JSON.stringify({ error: 'Method Not Allowed' }) };
   }
 
   try {
@@ -36,12 +36,12 @@ exports.loginHandler = async (event) => {
 
     if (!email || !password) {
       console.error('E-mail et mot de passe sont requis');
-      return { statusCode: 400, body: 'Email and password are required' };
+      return { statusCode: 400, body: JSON.stringify({ error: 'Email and password are required' }) };
     }
 
     const user = await verifyCredentials(email, password);
     if (!user) {
-      return { statusCode: 401, body: 'Invalid credentials' };
+      return { statusCode: 401, body: JSON.stringify({ error: 'Invalid credentials' }) };
     }
 
     console.log('Identifiants validés');
@@ -49,7 +49,7 @@ exports.loginHandler = async (event) => {
     // Utilisateur authentifié avec succès, renvoyer les données utilisateur
     return {
       statusCode: 200,
-      body: JSON.stringify({ user: { email: user.email, name: user.name, access_token: user.access_token } }),
+      body: JSON.stringify({ user: { email: user.email, name: user.name, access_token: user.access_token } }), // Ne renvoyez pas le access_token si vous ne l'utilisez pas côté client pour des raisons de sécurité.
     };
   } catch (err) {
     console.error('Erreur lors de la connexion:', err);

@@ -5,13 +5,14 @@ import { Navbar, Footer } from '../components';
 const LoginPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState(''); // Ajout pour gérer les messages d'erreur
   const { getAuthUrl } = useContext(AuthContext);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    // Vérifiez que username et password ne sont pas vides
+    setErrorMessage(''); // Réinitialiser le message d'erreur
     if (!username || !password) {
-      console.log('Le nom d\'utilisateur et le mot de passe sont requis');
+      setErrorMessage('Le nom d\'utilisateur et le mot de passe sont requis');
       return;
     }
 
@@ -28,13 +29,14 @@ const LoginPage = () => {
       if (response.ok) {
         console.log('Connexion réussie:', data);
         // Gérer la réussite de la connexion, par exemple en enregistrant le token et en redirigeant l'utilisateur
+        // TODO: Rediriger l'utilisateur vers la page d'accueil ou le tableau de bord
       } else {
         console.error('Erreur lors de la connexion:', data.message);
-        // Gérer les erreurs, par exemple en affichant un message à l'utilisateur
+        setErrorMessage(data.message || 'Erreur lors de la connexion'); // Afficher le message d'erreur provenant du serveur
       }
     } catch (error) {
       console.error('Erreur de réseau:', error);
-      // Gérer les erreurs de réseau, par exemple en affichant un message à l'utilisateur
+      setErrorMessage('Problème de connexion réseau'); // Informer l'utilisateur d'un problème réseau
     }
   };
 
@@ -44,6 +46,8 @@ const LoginPage = () => {
       <div className="flex-grow flex items-center justify-center px-4 py-6">
         <form className="w-full max-w-lg bg-linear-gradient(135deg, #0f0c29, #302b63, #24243e p-8 space-y-6 shadow-xl rounded-lg" onSubmit={handleSubmit}>
           <h1 className="text-3xl font-bold text-center text-violet mb-8">Login</h1>
+
+          {errorMessage && <div className="text-red-500 mb-2">{errorMessage}</div>} {/* Afficher le message d'erreur */}
 
           <div className="space-y-4">
             <label htmlFor="username" className="block text-lg font-semibold text-night">Nom de compte</label>
