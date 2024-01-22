@@ -18,7 +18,8 @@ exports.handler = async (event) => {
   console.log(code);
 
   try {
-    const redirectURL = `${process.env.URLL}/oauth`;
+    const redirectURL = process.env.URLL ? `${process.env.URLL}/oauth` : 'Votre URL de redirection manquante';
+
     const oAuth2Client = new OAuth2Client(
       process.env.CLIENT_ID,
       process.env.CLIENT_SECRET,
@@ -32,20 +33,15 @@ exports.handler = async (event) => {
     const userData = await getUserData(tokens.access_token);
 
     const { email, name } = userData;
-    const insertQuery = 'INSERT INTO users (email, name, access_token) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE name = ?, access_token = ?';
+    const insertQuery = `
+      INSERT INTO users (email, name, access_token)
+      VALUES (?, ?, ?)
+      ON DUPLICATE KEY UPDATE name = VALUES(name), access_token = VALUES(access_token)
+    `;
 
-    // Utilisation de promesses pour gérer la requête
-    await new Promise((resolve, reject) => {
-      conn.query(insertQuery, [email, name, tokens.access_token, name, tokens.access_token], (error, results) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve(results);
-        }
-      });
-    });
-
-    console.log('User data inserted/updated successfully');
+    // Ajustement de la requête pour utiliser async/await
+    const result = await conn.execute(insertQuery, [email, name, tokens.access_token, name, tokens.access_token]);
+    console.log('User data inserted/updated successfully', result);
 
     return {
       statusCode: 200,
