@@ -16,7 +16,7 @@ const LoginPage = () => {
     }
 
     try {
-      const response = await fetch('/api/login', {
+      const response = await fetch('/.netlify/functions/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
