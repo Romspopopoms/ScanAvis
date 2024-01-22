@@ -17,6 +17,7 @@ export const AuthProvider = ({ children }) => {
       const { url } = await response.json();
       console.log('URL d\'authentification récupérée:', url);
       // window.location.href = url;
+      console.log('Redirection bloquée pour le débogage, URL récupérée:', url);
     } catch (error) {
       console.error('Erreur lors de la récupération de l\'URL d\'authentification:', error);
     }
