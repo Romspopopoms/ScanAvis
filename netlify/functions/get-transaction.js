@@ -12,19 +12,20 @@ exports.handler = async (event) => {
   }
 
   const paymentIntentId = event.queryStringParameters?.paymentIntentId;
+  console.log('Received queryStringParameters:', JSON.stringify(event.queryStringParameters));
   console.log('Received paymentIntentId:', paymentIntentId);
 
-  if (!paymentIntentId) {
+  if (!paymentIntentId || paymentIntentId.trim() === '') {
     return {
       statusCode: 400,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: 'PaymentIntentId is required' }),
+      body: JSON.stringify({ message: 'PaymentIntentId is required and cannot be empty' }),
     };
   }
 
   try {
     const query = 'SELECT * FROM Transactions WHERE paymentIntentId = ?';
-    const [rows] = await conn.execute(query, [paymentIntentId]);
+    const [rows] = await conn.execute(query, [paymentIntentId.trim()]);
     console.log('Database response:', JSON.stringify(rows));
 
     if (rows.length === 0) {
