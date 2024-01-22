@@ -5,7 +5,12 @@ const { conn } = require('../../utils/db');
 async function getUserData(accessToken) {
   console.log('Récupération des données utilisateur depuis Google API');
   const response = await fetch(`https://www.googleapis.com/oauth2/v3/userinfo?access_token=${accessToken}`);
+  if (!response.ok) {
+    console.error('Erreur lors de la récupération des données utilisateur:', response.statusText);
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
   const data = await response.json();
+  console.log('Données utilisateur récupérées:', data);
   return data;
 }
 
@@ -27,16 +32,14 @@ exports.handler = async (event) => {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
 
-  let userData;
   try {
     console.log('Traitement de la requête:', event.body);
     const body = JSON.parse(event.body);
-
     const redirectURL = `${process.env.URLL}/oauth`;
     console.log('URL de redirection:', redirectURL);
-
     const oAuth2Client = new OAuth2Client(process.env.CLIENT_ID, process.env.CLIENT_SECRET, redirectURL);
     console.log('Client OAuth2 initialisé');
+    let userData;
 
     if (body.code) {
       console.log('Traitement avec le code d\'authentification');
@@ -52,9 +55,7 @@ exports.handler = async (event) => {
       return { statusCode: 400, body: 'Code or ID Token is required' };
     }
 
-    console.log('Données utilisateur obtenues:', userData);
     const { email, name } = userData;
-
     const insertQuery = `
       INSERT INTO users (email, name, access_token)
       VALUES (?, ?, ?)
@@ -62,8 +63,8 @@ exports.handler = async (event) => {
     `;
     console.log('Exécution de la requête SQL');
     await conn.execute(insertQuery, [email, name, body.code || body.idToken]);
-
     console.log('Utilisateur inséré/mis à jour dans la base de données');
+
     return {
       statusCode: 200,
       body: JSON.stringify({ user: userData }),
@@ -72,7 +73,7 @@ exports.handler = async (event) => {
     console.error('Erreur lors du traitement de l\'authentification:', err);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: 'Authentication failed' }),
+      body: JSON.stringify({ error: 'Authentication failed', details: err.message }),
     };
   }
 };
