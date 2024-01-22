@@ -67,16 +67,14 @@ const PaymentStatusPage = () => {
             {transaction && (
               <div>
                 <p>ID de transaction : {transaction.transactionId}</p>
-                <p>Montant : {transaction.totalAmount}</p>
+                <p>Montant : ${(transaction.totalAmount / 100).toFixed(2)}</p>
                 <p>Date de création : {new Date(transaction.createdAt).toLocaleString()}</p>
-                {/* Afficher les articles de la transaction si vous le souhaitez */}
                 <p>Articles :</p>
                 <ul>
                   {transaction.items.map((item, index) => (
-                    <li key={index}>{item.name} - Quantité : {item.quantity} - Prix : {item.price}</li>
+                    <li key={index}>{item.name} - Quantité : {item.quantity} - Prix : ${(item.price / 100).toFixed(2)}</li>
                   ))}
                 </ul>
-                {/* Ajoutez d'autres détails de transaction si nécessaire */}
               </div>
             )}
             <Link href="/" passHref>
