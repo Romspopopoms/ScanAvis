@@ -37,9 +37,19 @@ exports.handler = async (event) => {
       };
     }
 
+    // S'assurer que la colonne 'items' contient bien une chaîne JSON avant de tenter de la parser
+    let items;
+    try {
+      items = JSON.parse(rows[0].items || '[]');
+    } catch (parseError) {
+      console.error('Error parsing items:', parseError);
+      // Continue with an empty array if parsing fails
+      items = [];
+    }
+
     const transaction = {
       transactionId: rows[0].transactionId,
-      items: JSON.parse(rows[0].items),
+      items,
       totalAmount: rows[0].totalAmount,
       paymentIntentId: rows[0].paymentIntentId,
       createdAt: rows[0].createdAt,
