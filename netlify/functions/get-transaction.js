@@ -20,18 +20,35 @@ exports.handler = async (event) => {
     return {
       statusCode: 400,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: 'L\'ID de l\'intention de paiement est requis et ne peut pas être vide' }),
+      body: JSON.stringify({
+        message:
+          "L'ID de l'intention de paiement est requis et ne peut pas être vide",
+      }),
     };
   }
 
   try {
     // Exécutez la requête SQL
     const query = 'SELECT * FROM Transactions WHERE paymentIntentId = ?';
-    const [rows] = await conn.execute(query, [paymentIntentId]);
+    const result = await conn.execute(query, [paymentIntentId]);
+
+    // Vérifiez le format du résultat et log pour le débogage
+    console.log('Résultat de la requête:', result);
+    if (!result || !Array.isArray(result) || result.length < 1) {
+      console.error(
+        'Le format du résultat de la requête est invalide:',
+        result,
+      );
+      throw new Error('Le format du résultat de la requête est invalide.');
+    }
+
+    const [rows] = result;
 
     // Vérifiez si des transactions sont trouvées
     if (rows.length === 0) {
-      console.log(`Transaction non trouvée pour paymentIntentId: ${paymentIntentId}`);
+      console.log(
+        `Transaction non trouvée pour paymentIntentId: ${paymentIntentId}`,
+      );
       return {
         statusCode: 404,
         headers: { 'Content-Type': 'application/json' },
@@ -60,7 +77,9 @@ exports.handler = async (event) => {
     return {
       statusCode: 500,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ error: `Une erreur est survenue lors de la récupération de la transaction: ${error.message}` }),
+      body: JSON.stringify({
+        error: `Une erreur est survenue lors de la récupération de la transaction: ${error.message}`,
+      }),
     };
   }
 };
