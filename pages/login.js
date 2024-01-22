@@ -90,7 +90,7 @@ const LoginPage = () => {
           </div>
         </form>
       </div>
-      <Footer />
+      <Footer className="w-full mt-auto bg-night text-white p-4 text-center" />
     </div>
   );
 };
