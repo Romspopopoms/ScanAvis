@@ -1,4 +1,5 @@
-const { conn } = require('../../utils/db');
+// Assurez-vous que le fichier `db.js` est dans le même répertoire que votre fichier de fonction Netlify ou ajustez le chemin d'accès en conséquence.
+const { conn } = require('../../utils/db'); // ou le chemin correct vers votre fichier db.js
 
 exports.handler = async (event) => {
   console.log('Événement reçu:', JSON.stringify(event));
@@ -24,10 +25,10 @@ exports.handler = async (event) => {
 
   try {
     const query = 'SELECT * FROM Transactions WHERE paymentIntentId = ?';
-    const results = await conn.execute(query, [paymentIntentId]);
-    const rows = results[0];
+    // Utiliser `conn.query` si `conn.execute` n'est pas disponible dans la librairie PlanetScale que vous utilisez
+    const [rows] = await conn.query(query, [paymentIntentId]);
 
-    if (!rows || rows.length === 0) {
+    if (rows.length === 0) {
       console.log(`Transaction non trouvée pour paymentIntentId: ${paymentIntentId}`);
       return {
         statusCode: 404,
@@ -36,19 +37,19 @@ exports.handler = async (event) => {
       };
     }
 
-    const transaction = rows.map((row) => ({
-      transactionId: row.transactionId,
-      items: JSON.parse(row.items || '[]'),
-      totalAmount: row.totalAmount,
-      paymentIntentId: row.paymentIntentId,
-      createdAt: row.createdAt,
-      // Assurez-vous de ne pas renvoyer le clientSecret ici.
-    }));
+    const transaction = {
+      transactionId: rows[0].transactionId,
+      items: JSON.parse(rows[0].items || '[]'),
+      totalAmount: rows[0].totalAmount,
+      paymentIntentId: rows[0].paymentIntentId,
+      createdAt: rows[0].createdAt,
+      // Exclure les données sensibles comme clientSecret
+    };
 
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(transaction),
+      body: JSON.stringify({ transaction }),
     };
   } catch (error) {
     console.error('Erreur de la base de données:', error);
