@@ -1,5 +1,4 @@
-// Assurez-vous que le fichier `db.js` est dans le même répertoire que votre fichier de fonction Netlify ou ajustez le chemin d'accès en conséquence.
-const { conn } = require('../../utils/db'); // ou le chemin correct vers votre fichier db.js
+const { conn } = require('../../utils/db'); // Vérifiez que le chemin d'accès est correct
 
 exports.handler = async (event) => {
   console.log('Événement reçu:', JSON.stringify(event));
@@ -25,8 +24,7 @@ exports.handler = async (event) => {
 
   try {
     const query = 'SELECT * FROM Transactions WHERE paymentIntentId = ?';
-    // Utiliser `conn.query` si `conn.execute` n'est pas disponible dans la librairie PlanetScale que vous utilisez
-    const [rows] = await conn.query(query, [paymentIntentId]);
+    const [rows] = await conn.execute(query, [paymentIntentId]);
 
     if (rows.length === 0) {
       console.log(`Transaction non trouvée pour paymentIntentId: ${paymentIntentId}`);
