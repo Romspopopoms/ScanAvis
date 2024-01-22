@@ -11,7 +11,9 @@ exports.handler = async (event) => {
     };
   }
 
-  const paymentIntentId = event.queryStringParameters?.paymentIntentId.replace(/\s+/g, '');
+  // Nettoyer le paymentIntentId pour enlever les espaces blancs et les caractères d'échappement
+  const paymentIntentId = event.queryStringParameters?.paymentIntentId.replace(/\s/g, '');
+
   console.log('paymentIntentId nettoyé:', paymentIntentId);
 
   if (!paymentIntentId) {
@@ -24,12 +26,9 @@ exports.handler = async (event) => {
 
   try {
     const query = 'SELECT * FROM Transactions WHERE paymentIntentId = ?';
-    const results = await conn.execute(query, [paymentIntentId]);
-    const rows = results?.[0];
+    const [rows] = await conn.execute(query, [paymentIntentId]);
 
-    console.log('Réponse de la base de données:', JSON.stringify(rows));
-
-    if (!rows || rows.length === 0) {
+    if (!rows.length) {
       console.log(`Transaction non trouvée pour paymentIntentId: ${paymentIntentId}`);
       return {
         statusCode: 404,
@@ -38,12 +37,26 @@ exports.handler = async (event) => {
       };
     }
 
+    // Assurez-vous que les données de l'article peuvent être analysées correctement
+    let items;
+    try {
+      items = JSON.parse(rows[0].items || '[]');
+    } catch (e) {
+      console.error('Erreur lors de l\'analyse des articles:', e);
+      return {
+        statusCode: 500,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ error: 'Erreur lors de l\'analyse des données de l\'article' }),
+      };
+    }
+
     const transaction = {
       transactionId: rows[0].transactionId,
-      items: JSON.parse(rows[0].items || '[]'),
+      items,
       totalAmount: rows[0].totalAmount,
       paymentIntentId: rows[0].paymentIntentId,
       createdAt: rows[0].createdAt,
+      // Assurez-vous de ne pas renvoyer le clientSecret
     };
 
     return {
