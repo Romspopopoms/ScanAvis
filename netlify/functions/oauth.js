@@ -3,12 +3,14 @@ const fetch = require('node-fetch');
 const { conn } = require('../../utils/db');
 
 async function getUserData(accessToken) {
+  console.log('Récupération des données utilisateur depuis Google API');
   const response = await fetch(`https://www.googleapis.com/oauth2/v3/userinfo?access_token=${accessToken}`);
   const data = await response.json();
   return data;
 }
 
 async function verifyIdToken(idToken) {
+  console.log('Vérification du ID Token');
   const client = new OAuth2Client(process.env.CLIENT_ID);
   const ticket = await client.verifyIdToken({
     idToken,
@@ -18,27 +20,39 @@ async function verifyIdToken(idToken) {
 }
 
 exports.handler = async (event) => {
+  console.log('Début de la fonction handler, méthode HTTP:', event.httpMethod);
+
   if (event.httpMethod !== 'POST') {
+    console.error('Méthode non autorisée:', event.httpMethod);
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
 
   let userData;
   try {
+    console.log('Traitement de la requête:', event.body);
     const body = JSON.parse(event.body);
+
     const redirectURL = `${process.env.URLL}/oauth`;
+    console.log('URL de redirection:', redirectURL);
+
     const oAuth2Client = new OAuth2Client(process.env.CLIENT_ID, process.env.CLIENT_SECRET, redirectURL);
+    console.log('Client OAuth2 initialisé');
 
     if (body.code) {
+      console.log('Traitement avec le code d\'authentification');
       const code = decodeURIComponent(body.code);
       const { tokens } = await oAuth2Client.getToken(code);
       oAuth2Client.setCredentials(tokens);
       userData = await getUserData(tokens.access_token);
     } else if (body.idToken) {
+      console.log('Traitement avec le ID Token');
       userData = await verifyIdToken(body.idToken);
     } else {
+      console.error('Ni code ni ID Token fourni');
       return { statusCode: 400, body: 'Code or ID Token is required' };
     }
 
+    console.log('Données utilisateur obtenues:', userData);
     const { email, name } = userData;
 
     const insertQuery = `
@@ -46,15 +60,16 @@ exports.handler = async (event) => {
       VALUES (?, ?, ?)
       ON DUPLICATE KEY UPDATE name = VALUES(name), access_token = VALUES(access_token)
     `;
-
+    console.log('Exécution de la requête SQL');
     await conn.execute(insertQuery, [email, name, body.code || body.idToken]);
 
+    console.log('Utilisateur inséré/mis à jour dans la base de données');
     return {
       statusCode: 200,
       body: JSON.stringify({ user: userData }),
     };
   } catch (err) {
-    console.error('Error processing authentication:', err);
+    console.error('Erreur lors du traitement de l\'authentification:', err);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: 'Authentication failed' }),
