@@ -66,9 +66,16 @@ const PaymentStatusPage = () => {
             <p>Votre transaction a été réalisée avec succès.</p>
             {transaction && (
               <div>
-                {/* Affichage des détails de la transaction ici */}
-                <p>ID de transaction : {transaction.id}</p>
-                <p>Montant : {transaction.amount}</p>
+                <p>ID de transaction : {transaction.transactionId}</p>
+                <p>Montant : {transaction.totalAmount}</p>
+                <p>Date de création : {new Date(transaction.createdAt).toLocaleString()}</p>
+                {/* Afficher les articles de la transaction si vous le souhaitez */}
+                <p>Articles :</p>
+                <ul>
+                  {transaction.items.map((item, index) => (
+                    <li key={index}>{item.name} - Quantité : {item.quantity} - Prix : {item.price}</li>
+                  ))}
+                </ul>
                 {/* Ajoutez d'autres détails de transaction si nécessaire */}
               </div>
             )}
@@ -82,4 +89,5 @@ const PaymentStatusPage = () => {
     </div>
   );
 };
+
 export default PaymentStatusPage;
