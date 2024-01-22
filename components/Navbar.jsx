@@ -3,12 +3,11 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import CartSummary from './CartSummary';
 import { AuthContext } from '../context/AuthContext';
-import { LoginButton, LogoutButton } from './AuthButtons';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const { isAuthenticated, getAuthUrl, logout } = useContext(AuthContext);
+  const { isAuthenticated, logout } = useContext(AuthContext);
 
   const handleToggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const toggleCart = () => setIsCartOpen(!isCartOpen);
@@ -26,16 +25,44 @@ const Navbar = () => {
         </h2>
         <div className="flex items-center">
           {isAuthenticated ? (
-            <LogoutButton onClick={logout} />
+            // Bouton de déconnexion
+            <button
+              type="button"
+              onClick={logout}
+              style={{ cursor: 'pointer' }}
+              aria-label="Déconnexion"
+            >
+              Déconnexion
+            </button>
           ) : (
-            <LoginButton onClick={getAuthUrl} />
+            <>
+              <button
+                type="button"
+                style={{ cursor: 'pointer' }}
+                aria-label="Se connecter"
+              />
+              <Link href="/login">Se connecter</Link>
+            </>
           )}
           <div onClick={toggleCart} className="relative cursor-pointer ml-4">
-            <img src="/cart-icon.svg" alt="Cart" style={{ width: '24px', height: '24px' }} />
+            <img
+              src="/cart-icon.svg"
+              alt="Cart"
+              style={{ width: '24px', height: '24px' }}
+            />
             {/* Afficher le nombre d'articles ici si nécessaire */}
           </div>
-          <button type="button" onClick={handleToggleMenu} className="ml-4">
-            <img src="/menu.svg" alt="Menu" style={{ width: '24px', height: '24px' }} />
+          <button
+            type="button"
+            onClick={handleToggleMenu}
+            className="ml-4"
+            aria-label="Menu"
+          >
+            <img
+              src="/menu.svg"
+              alt="Menu"
+              style={{ width: '24px', height: '24px' }}
+            />
           </button>
         </div>
         <motion.div
@@ -44,14 +71,18 @@ const Navbar = () => {
           variants={menuVariants}
           className="fixed top-0 left-0 w-[250px] h-full bg-gray-800 shadow-lg z-40"
         >
-          <button type="button" onClick={handleToggleMenu}>Fermer</button>
+          <button type="button" onClick={handleToggleMenu} aria-label="Fermer">
+            Fermer
+          </button>
           {isAuthenticated && <Link href="/mon-profil">Mon Profil</Link>}
           <Link href="/">Accueil</Link>
           <Link href="/tarifs">Nos offres</Link>
         </motion.div>
       </nav>
 
-      {isCartOpen && <CartSummary isCartOpen={isCartOpen} toggleCart={toggleCart} />}
+      {isCartOpen && (
+        <CartSummary isCartOpen={isCartOpen} toggleCart={toggleCart} />
+      )}
     </>
   );
 };
