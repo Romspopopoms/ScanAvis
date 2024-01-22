@@ -9,7 +9,7 @@ export const AuthProvider = ({ children }) => {
   // Obtention de l'URL d'authentification OAuth2
   const getAuthUrl = async () => {
     try {
-      const response = await fetch('/.netlify/functions/get-oauth-url'); // Modifié pour correspondre à votre nouvelle fonction
+      const response = await fetch('/.netlify/functions/request'); // Modifié pour correspondre à votre nouvelle fonction
       const { url } = await response.json();
       window.location.href = url;
     } catch (error) {
