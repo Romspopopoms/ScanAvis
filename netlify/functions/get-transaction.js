@@ -24,10 +24,9 @@ exports.handler = async (event) => {
 
   try {
     const query = 'SELECT * FROM Transactions WHERE paymentIntentId = ?';
-    const results = await conn.query(query, [paymentIntentId]);
-    console.log('Résultats de la base de données:', JSON.stringify(results));
+    const [rows] = await conn.execute(query, [paymentIntentId]);
 
-    if (!results || results.length === 0 || !results[0].rows || results[0].rows.length === 0) {
+    if (rows.length === 0) {
       console.log(`Transaction non trouvée pour paymentIntentId: ${paymentIntentId}`);
       return {
         statusCode: 404,
@@ -36,7 +35,6 @@ exports.handler = async (event) => {
       };
     }
 
-    const { rows } = results[0];
     const transaction = {
       transactionId: rows[0].transactionId,
       items: JSON.parse(rows[0].items || '[]'),
