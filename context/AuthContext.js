@@ -16,8 +16,8 @@ export const AuthProvider = ({ children }) => {
       }
       const { url } = await response.json();
       console.log('URL d\'authentification récupérée:', url);
-      // window.location.href = url;
-      console.log('Redirection bloquée pour le débogage, URL récupérée:', url);
+      // Redirection vers l'URL d'authentification
+      window.location.href = url;
     } catch (error) {
       console.error('Erreur lors de la récupération de l\'URL d\'authentification:', error);
     }
@@ -34,12 +34,28 @@ export const AuthProvider = ({ children }) => {
         setIsAuthenticated(true);
         setUser({ email: data.user.email, name: data.user.name, access_token: data.user.access_token });
         localStorage.setItem('authToken', data.user.access_token); // Stocker le token dans le stockage local
-        console.log('Token stocké dans le stockage local:', data.user.access_token);
       } else {
         console.error('Erreur lors du traitement de la réponse:', data.message);
       }
     } catch (error) {
       console.error('Erreur lors du traitement de la réponse:', error);
+    }
+  };
+
+  // Fonction pour traiter le code d'autorisation
+  const handleAuthCode = async (code) => {
+    try {
+      console.log('Envoi du code pour vérification...');
+      const response = await fetch('/.netlify/functions/oauth', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ code }), // Envoyer le code pour vérification
+      });
+      handleAuthResponse(response);
+    } catch (error) {
+      console.error('Erreur lors de l\'envoi du code:', error);
     }
   };
 
@@ -50,31 +66,33 @@ export const AuthProvider = ({ children }) => {
       localStorage.removeItem('authToken'); // Effacer le token du stockage local
       setIsAuthenticated(false);
       setUser(null);
-      console.log('Utilisateur déconnecté et token supprimé du stockage local');
     } catch (error) {
       console.error('Erreur lors de la déconnexion:', error);
     }
   };
 
-  // Vérification de l'état d'authentification initial
+  // Vérification de l'état d'authentification initial et capture du code d'autorisation
   useEffect(() => {
-    const verifyToken = async () => {
-      const token = localStorage.getItem('authToken'); // Récupérer le token du stockage local
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+    if (code) {
+      handleAuthCode(code);
+    }
+
+    const verifyToken = () => {
+      const token = localStorage.getItem('authToken');
       console.log('Vérification du token:', token);
       if (token) {
-        try {
-          console.log('Envoi du token pour vérification...');
-          const response = await fetch('/.netlify/functions/oauth', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ idToken: token }), // Envoyer le token pour vérification
-          });
-          handleAuthResponse(response);
-        } catch (error) {
+        console.log('Envoi du token pour vérification...');
+        fetch('/.netlify/functions/oauth', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ idToken: token }),
+        }).then(handleAuthResponse).catch((error) => {
           console.error('Erreur lors de la vérification du token:', error);
-        }
+        });
       } else {
         console.log('Aucun token trouvé dans le stockage local.');
       }
@@ -84,7 +102,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, getAuthUrl, handleAuthCode: handleAuthResponse, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, getAuthUrl, handleAuthCode, logout }}>
       {children}
     </AuthContext.Provider>
   );
