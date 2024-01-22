@@ -18,7 +18,7 @@ exports.handler = async (event) => {
   console.log(code);
 
   try {
-    const redirectURL = `${process.env.URL}/oauth`;
+    const redirectURL = `${process.env.URLL}/oauth`;
     const oAuth2Client = new OAuth2Client(
       process.env.CLIENT_ID,
       process.env.CLIENT_SECRET,
