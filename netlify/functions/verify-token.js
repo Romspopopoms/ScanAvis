@@ -27,7 +27,7 @@ exports.handler = async (event) => {
 
     const insertQuery = 'INSERT INTO users (email, name, access_token) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE name = ?, access_token = ?';
     await new Promise((resolve, reject) => {
-      conn.query(insertQuery, [email, name, credential, name, credential], (error, results) => {
+      conn.execute(insertQuery, [email, name, credential, name, credential], (error, results) => {
         if (error) {
           reject(error);
         } else {
