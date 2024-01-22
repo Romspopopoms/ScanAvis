@@ -1,25 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useContext } from 'react';
 import { motion } from 'framer-motion';
-import netlifyIdentity from 'netlify-identity-widget';
 import Link from 'next/link';
 import CartSummary from './CartSummary'; // Assurez-vous que le chemin d'importation est correct
+import { AuthContext } from '../context/AuthContext'; // Importez AuthContext
+import { LoginButton, LogoutButton } from './AuthButtons'; // Importez LoginButton et LogoutButton
 
 const Navbar = () => {
-  // États pour gérer l'ouverture du menu et du panier
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
-
-  // Récupération de l'utilisateur actuel (si connecté)
-  const user = netlifyIdentity.currentUser();
-
-  useEffect(() => {
-    // Initialisation de Netlify Identity pour l'authentification
-    netlifyIdentity.init();
-  }, []);
-
-  // Gestion des actions de connexion et déconnexion
-  const handleLogin = () => netlifyIdentity.open('login');
-  const handleLogout = () => netlifyIdentity.logout();
+  const { isAuthenticated } = useContext(AuthContext); // Utilisez AuthContext
 
   // Fonctions pour basculer les états du menu et du panier
   const handleToggleMenu = () => setIsMenuOpen(!isMenuOpen);
@@ -38,14 +27,10 @@ const Navbar = () => {
           <Link href="/">SCAN'AVIS</Link>
         </h2>
         <div className="flex items-center">
-          {user ? (
-            <button type="button" onClick={handleLogout} className="mr-4">
-              Déconnexion
-            </button>
+          {isAuthenticated ? (
+            <LogoutButton /> // Utilisez LogoutButton pour la déconnexion
           ) : (
-            <button type="button" onClick={handleLogin}>
-              <img src="/user.svg" alt="User" style={{ width: '24px', height: '24px' }} />
-            </button>
+            <LoginButton /> // Utilisez LoginButton pour la connexion
           )}
           <div onClick={toggleCart} className="relative cursor-pointer ml-4">
             <img src="/cart-icon.svg" alt="Cart" style={{ width: '24px', height: '24px' }} />
@@ -65,7 +50,7 @@ const Navbar = () => {
         >
           {/* Contenu du menu */}
           <button type="button" onClick={handleToggleMenu}>Fermer</button>
-          {user && <Link href="/mon-profil">Mon Profil</Link>}
+          {isAuthenticated && <Link href="/mon-profil">Mon Profil</Link>}
           <Link href="/">Accueil</Link>
           <Link href="/tarifs">Nos offres</Link>
         </motion.div>
