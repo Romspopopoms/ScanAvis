@@ -1,5 +1,5 @@
 const { OAuth2Client } = require('google-auth-library');
-const { conn } = require('../../utils/db'); // Assurez-vous d'avoir le bon chemin d'accès
+const { conn } = require('../../utils/db');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
@@ -8,12 +8,11 @@ exports.handler = async (event) => {
 
   const verify = async (credential) => {
     const client = new OAuth2Client(process.env.CLIENT_ID);
-
     const ticket = await client.verifyIdToken({
       idToken: credential,
       audience: process.env.CLIENT_ID,
     });
-    return ticket.getPayload(); // Renvoyer le payload directement
+    return ticket.getPayload();
   };
 
   try {
@@ -25,16 +24,14 @@ exports.handler = async (event) => {
     console.log('payload', payload);
     console.log('userid', userid);
 
-    const insertQuery = 'INSERT INTO users (email, name, access_token) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE name = ?, access_token = ?';
-    await new Promise((resolve, reject) => {
-      conn.execute(insertQuery, [email, name, credential, name, credential], (error, results) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve(results);
-        }
-      });
-    });
+    const insertQuery = `
+      INSERT INTO users (email, name, access_token)
+      VALUES (?, ?, ?)
+      ON DUPLICATE KEY UPDATE name = ?, access_token = ?
+    `;
+
+    // Utilisez conn.execute avec async/await pour la cohérence
+    await conn.execute(insertQuery, [email, name, credential, name, credential]);
 
     console.log('User data inserted/updated successfully');
 
