@@ -3,7 +3,6 @@ const { conn } = require('../../utils/db');
 exports.handler = async (event) => {
   console.log('Événement reçu:', JSON.stringify(event));
 
-  // Vérifier si la méthode HTTP est GET
   if (event.httpMethod !== 'GET') {
     return {
       statusCode: 405,
@@ -12,7 +11,6 @@ exports.handler = async (event) => {
     };
   }
 
-  // Nettoyer et valider le paymentIntentId
   const paymentIntentId = event.queryStringParameters?.paymentIntentId?.trim();
   console.log('paymentIntentId nettoyé:', paymentIntentId);
 
@@ -25,12 +23,10 @@ exports.handler = async (event) => {
   }
 
   try {
-    // Exécuter la requête SQL
     const query = 'SELECT * FROM Transactions WHERE paymentIntentId = ?';
     const result = await conn.execute(query, [paymentIntentId]);
     console.log('Résultat de la requête:', result);
 
-    // Vérifier que le résultat contient les lignes
     if (!result || typeof result !== 'object' || !Array.isArray(result.rows) || result.rows.length === 0) {
       console.log(`Transaction non trouvée pour paymentIntentId: ${paymentIntentId}`);
       return {
@@ -42,7 +38,6 @@ exports.handler = async (event) => {
 
     const transaction = result.rows[0];
 
-    // Construire l'objet transaction
     const response = {
       transactionId: transaction.transactionId,
       items: JSON.parse(transaction.items || '[]'),
@@ -52,7 +47,6 @@ exports.handler = async (event) => {
       // Exclure les données sensibles comme clientSecret
     };
 
-    // Retourner les détails de la transaction
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
