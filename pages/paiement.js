@@ -8,6 +8,7 @@ import Footer from '../components/Footer';
 import { useCart } from '../context/CartContext';
 import Spinner from '../components/Spinner';
 
+// Initialiser Stripe avec la clé publique
 const stripePromise = loadStripe('pk_test_51OPtGvDWmnYPaxs1gSpLL1WpDyU6gaxOBszqNCSu9iHVeEYuPcjUEvOpKzjwdbF6NUWquoEPf24Y3qMwIDLmeLvl00FwQkUSKx');
 
 const PagePaiement = () => {
@@ -16,6 +17,7 @@ const PagePaiement = () => {
   const router = useRouter();
 
   useEffect(() => {
+    // Vérifier que Stripe est chargé avant de retirer l'indicateur de chargement
     stripePromise.then(() => {
       setLoading(false);
     }).catch((error) => {
@@ -25,9 +27,10 @@ const PagePaiement = () => {
   }, []);
 
   // Fonction appelée lorsque le paiement est réussi
-  const onSuccessfulPayment = () => {
+  const onSuccessfulPayment = (paymentIntentId) => {
     clearCart();
-    router.push('/paymentstatus?paymentStatus=succeeded');
+    // Rediriger vers la page de statut de paiement avec l'intentID
+    router.push(`/paymentstatus?paymentStatus=succeeded&paymentIntentId=${paymentIntentId}`);
   };
 
   // Fonction appelée en cas d'échec du paiement
@@ -35,8 +38,6 @@ const PagePaiement = () => {
     console.error('Erreur de paiement:', message);
     router.push(`/paymentstatus?paymentStatus=failed&message=${encodeURIComponent(message)}`);
   };
-
-  // La fonction handlePayment n'est plus nécessaire ici et doit être déplacée dans PaymentForm
 
   if (loading) {
     return <Spinner />;

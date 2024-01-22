@@ -9,7 +9,6 @@ const PaymentForm = ({ onSuccessfulPayment, onFailedPayment }) => {
   const [errorMessage, setErrorMessage] = useState('');
   const { cartItems, formatCartItemsForPayment } = useCart();
 
-  // Assurez-vous que la fonction calculateTotal renvoie le montant en centimes.
   const calculateTotal = () => cartItems.reduce((total, item) => total + item.quantity * item.price, 0);
 
   const createPaymentIntent = async () => {
@@ -53,8 +52,8 @@ const PaymentForm = ({ onSuccessfulPayment, onFailedPayment }) => {
       if (paymentResult.error) {
         setErrorMessage(paymentResult.error.message);
         if (onFailedPayment) onFailedPayment(paymentResult.error.message);
-      } else if (paymentResult.paymentIntent.status === 'succeeded') {
-        if (onSuccessfulPayment) onSuccessfulPayment();
+      } else if (paymentResult.paymentIntent && paymentResult.paymentIntent.status === 'succeeded') {
+        if (onSuccessfulPayment) onSuccessfulPayment(paymentResult.paymentIntent.id);
       } else {
         throw new Error('Le paiement a échoué pour une raison inconnue.');
       }
@@ -73,10 +72,10 @@ const PaymentForm = ({ onSuccessfulPayment, onFailedPayment }) => {
         <h2>Mon Panier</h2>
         <ul>
           {cartItems.map((item) => (
-            <li key={item.id}>{item.name} - {item.quantity} x {(item.price / 100).toFixed(2)}$</li>
+            <li key={item.id}>{item.name} - {item.quantity} x ${(item.price / 100).toFixed(2)}</li>
           ))}
         </ul>
-        <p className="cart-total">Total à payer: {calculateTotal().toFixed(2)}$</p>
+        <p className="cart-total">Total à payer: ${(calculateTotal() / 100).toFixed(2)}</p>
       </div>
       <form onSubmit={handleSubmit}>
         {errorMessage && <div className="error-message">{errorMessage}</div>}

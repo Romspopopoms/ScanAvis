@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
-import { useRouter } from 'next/router'; // Utilisé pour la redirection en cas de succès ou d'échec du paiement
+import { useRouter } from 'next/router';
 import { useCart } from '../context/CartContext';
 
-const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY);
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY); // Utilisez NEXT_PUBLIC_ pour les variables d'environnement côté client
 
 const CheckoutForm = () => {
   const stripe = useStripe();
@@ -13,7 +13,7 @@ const CheckoutForm = () => {
   const [clientSecret, setClientSecret] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const router = useRouter(); // Pour la redirection
+  const router = useRouter();
 
   useEffect(() => {
     const fetchPaymentIntent = async () => {
@@ -37,9 +37,9 @@ const CheckoutForm = () => {
     fetchPaymentIntent();
   }, [cartItems, formatCartItemsForPayment]);
 
-  const onSuccessfulPayment = () => {
+  const onSuccessfulPayment = (paymentIntentId) => {
     clearCart();
-    router.push('/paymentstatus?paymentStatus=succeeded');
+    router.push(`/paymentstatus?paymentStatus=succeeded&paymentIntentId=${paymentIntentId}`);
   };
 
   const onFailedPayment = (message) => {
@@ -64,8 +64,8 @@ const CheckoutForm = () => {
 
       if (paymentResult.error) {
         throw new Error(`Erreur de paiement: ${paymentResult.error.message}`);
-      } else if (paymentResult.paymentIntent.status === 'succeeded') {
-        onSuccessfulPayment();
+      } else if (paymentResult.paymentIntent && paymentResult.paymentIntent.status === 'succeeded') {
+        onSuccessfulPayment(paymentResult.paymentIntent.id);
       } else {
         throw new Error('Le paiement a échoué pour une raison inconnue.');
       }
@@ -79,20 +79,16 @@ const CheckoutForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      {errorMessage && <div className="error-message">{errorMessage}</div>}
-      <CardElement />
-      <button type="submit" disabled={!stripe || !clientSecret || isProcessing}>
-        {isProcessing ? 'Traitement...' : 'Payer'}
-      </button>
-    </form>
+    <Elements stripe={stripePromise}>
+      <form onSubmit={handleSubmit}>
+        {errorMessage && <div className="error-message">{errorMessage}</div>}
+        <CardElement />
+        <button type="submit" disabled={!stripe || !clientSecret || isProcessing}>
+          {isProcessing ? 'Traitement...' : 'Payer'}
+        </button>
+      </form>
+    </Elements>
   );
 };
 
-const StripeCheckout = () => (
-  <Elements stripe={stripePromise}>
-    <CheckoutForm />
-  </Elements>
-);
-
-export default StripeCheckout;
+export default CheckoutForm;
