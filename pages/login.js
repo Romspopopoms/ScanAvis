@@ -39,59 +39,58 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-night text-white">
+    <div className="flex flex-col min-h-screen bg-night text-gray-300">
       <Navbar />
-      <div className="flex-grow flex items-center justify-center">
-        <form className="w-full max-w-md bg-white p-8 space-y-6 shadow-xl rounded-lg border border-opacity-10 border-lightblue" onSubmit={handleSubmit}>
-          <h1 className="text-3xl font-bold text-center text-violet">Login</h1>
+      <div className="flex-grow flex items-center justify-center px-4 py-6">
+        <form className="w-full max-w-lg bg-linear-gradient(135deg, #0f0c29, #302b63, #24243e p-8 space-y-6 shadow-xl rounded-lg" onSubmit={handleSubmit}>
+          <h1 className="text-3xl font-bold text-center text-violet mb-8">Login</h1>
 
-          <div className="input-group space-y-4">
-            <label htmlFor="username" className="block text-lg text-violet font-semibold">Nom de compte</label>
+          <div className="space-y-4">
+            <label htmlFor="username" className="block text-lg font-semibold text-night">Nom de compte</label>
             <input
               id="username"
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full px-4 py-2 border rounded-md text-night bg-night bg-opacity-10 border-violet focus:border-lightblue focus:bg-white focus:ring-1 focus:ring-lightblue"
+              className="w-full px-4 py-3 border rounded-md bg-night bg-opacity-10 border-violet focus:border-lightblue focus:bg-opacity-100 text-white"
             />
           </div>
 
-          <div className="input-group space-y-4">
-            <label htmlFor="password" className="block text-lg text-violet font-semibold">Mot de passe</label>
+          <div className="space-y-4">
+            <label htmlFor="password" className="block text-lg font-semibold text-night">Mot de passe</label>
             <input
               id="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2 border rounded-md text-night bg-night bg-opacity-10 border-violet focus:border-lightblue focus:bg-white focus:ring-1 focus:ring-lightblue"
+              className="w-full px-4 py-3 border rounded-md bg-night bg-opacity-10 border-violet focus:border-lightblue focus:bg-opacity-100 text-white"
             />
           </div>
 
-          <button type="submit" className="w-full text-white bg-blue py-3 rounded-md hover:bg-lightblue focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition duration-200 ease-in-out">
+          <button type="submit" className="w-full bg-blue-600 py-3 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition duration-200 ease-in-out text-white">
             Se connecter
           </button>
 
-          <button type="button" className="w-full text-white bg-violet py-3 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 transition duration-200 ease-in-out" onClick={getAuthUrl}>
+          <button type="button" className="w-full bg-purple-600 py-3 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 transition duration-200 ease-in-out text-white" onClick={getAuthUrl}>
             S'identifier avec Google
           </button>
 
-          <div className="form-footer">
-            <div className="flex items-center justify-between">
-              <label htmlFor="remember-me" className="flex items-center text-sm text-violet">
-                <input id="remember-me" type="checkbox" className="form-checkbox rounded text-blue-600 focus:ring-blue-500" />
-                <span className="ml-2">Se souvenir de moi</span>
-              </label>
-              <a href="/forgot-password" className="text-sm text-blue-600 hover:text-blue-800">Vous avez perdu votre mot de passe?</a>
-            </div>
-
-            <p className="mt-6 text-center text-sm text-violet">
-              Vous n'avez pas de compte? <a href="/register" className="text-blue-600 hover:text-blue-800">Inscrivez-vous</a>
-            </p>
+          <div className="flex items-center justify-between mt-4">
+            <label htmlFor="remember-me" className="flex items-center">
+              <input id="remember-me" type="checkbox" className="rounded text-blue-500 focus:ring-blue-500" />
+              <span className="ml-2 text-sm text-night">Se souvenir de moi</span>
+            </label>
+            <a href="/forgot-password" className="text-sm hover:text-blue-500">Vous avez perdu votre mot de passe?</a>
           </div>
+
+          <p className="mt-6 text-center text-sm">
+            Vous n'avez pas de compte? <a href="/register" className="hover:text-blue-500">Inscrivez-vous</a>
+          </p>
         </form>
       </div>
-      <Footer className="w-full mt-auto bg-night text-white p-4 text-center" />
+      <Footer className="w-full mt-auto bg-night p-4 text-center text-white" />
     </div>
   );
 };
+
 export default LoginPage;
