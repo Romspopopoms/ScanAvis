@@ -1,4 +1,4 @@
-const { conn } = require('../../utils/db'); // Assurez-vous que le chemin vers db.js est correct
+const { conn } = require('../../utils/db');
 
 exports.handler = async (event) => {
   console.log('Événement reçu:', JSON.stringify(event));
@@ -24,11 +24,10 @@ exports.handler = async (event) => {
 
   try {
     const query = 'SELECT * FROM Transactions WHERE paymentIntentId = ?';
-    const results = await conn.execute(query, [paymentIntentId]);
+    const results = await conn.query(query, [paymentIntentId]);
     console.log('Résultats de la base de données:', JSON.stringify(results));
 
-    // Vérifier si les résultats sont dans un format attendu
-    if (!results || results.length === 0 || !results[0] || results[0].length === 0) {
+    if (!results || results.length === 0 || !results[0].rows || results[0].rows.length === 0) {
       console.log(`Transaction non trouvée pour paymentIntentId: ${paymentIntentId}`);
       return {
         statusCode: 404,
@@ -37,8 +36,7 @@ exports.handler = async (event) => {
       };
     }
 
-    // Si la structure des résultats est correcte, procéder au traitement
-    const rows = results[0];
+    const { rows } = results[0];
     const transaction = {
       transactionId: rows[0].transactionId,
       items: JSON.parse(rows[0].items || '[]'),
