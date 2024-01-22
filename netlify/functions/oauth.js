@@ -9,11 +9,19 @@ async function getUserData(accessToken) {
 }
 
 exports.handler = async (event) => {
-  if (event.httpMethod !== 'GET') {
+  if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
 
-  const { code } = event.queryStringParameters;
+  let code;
+  if (event.body) {
+    const body = JSON.parse(event.body);
+    code = body.code;
+  }
+
+  if (!code) {
+    return { statusCode: 400, body: 'Code is required' };
+  }
 
   try {
     const redirectURL = `${process.env.URLL}/oauth`;
