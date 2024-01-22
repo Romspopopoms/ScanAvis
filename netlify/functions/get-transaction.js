@@ -11,9 +11,7 @@ exports.handler = async (event) => {
     };
   }
 
-  // Supprimez tous les espaces blancs, y compris les tabulations, du paymentIntentId
   const paymentIntentId = event.queryStringParameters?.paymentIntentId.replace(/\s+/g, '');
-
   console.log('paymentIntentId nettoyé:', paymentIntentId);
 
   if (!paymentIntentId) {
@@ -27,11 +25,11 @@ exports.handler = async (event) => {
   try {
     const query = 'SELECT * FROM Transactions WHERE paymentIntentId = ?';
     const results = await conn.execute(query, [paymentIntentId]);
-    const rows = results[0];
+    const rows = results?.[0];
 
     console.log('Réponse de la base de données:', JSON.stringify(rows));
 
-    if (!rows.length) {
+    if (!rows || rows.length === 0) {
       console.log(`Transaction non trouvée pour paymentIntentId: ${paymentIntentId}`);
       return {
         statusCode: 404,
