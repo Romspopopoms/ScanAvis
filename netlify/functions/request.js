@@ -2,7 +2,7 @@ const { OAuth2Client } = require('google-auth-library');
 
 exports.handler = async (event) => {
   if (event.httpMethod === 'GET') { // Changez ici pour autoriser GET
-    const redirectURL = `${process.env.URL}/oauth`;
+    const redirectURL = `${process.env.URLL}/oauth`;
 
     const oAuth2Client = new OAuth2Client(
       process.env.CLIENT_ID,
