@@ -5,12 +5,12 @@ import { Navbar, Footer } from '../components';
 const LoginPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [errorMessage, setErrorMessage] = useState(''); // Ajout pour gérer les messages d'erreur
-  const { getAuthUrl } = useContext(AuthContext);
+  const [errorMessage, setErrorMessage] = useState(''); // Gestion des messages d'erreur
+  const { getAuthUrl } = useContext(AuthContext); // Utilisation du contexte d'authentification
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setErrorMessage(''); // Réinitialiser le message d'erreur
+    setErrorMessage(''); // Réinitialisation du message d'erreur
     if (!username || !password) {
       setErrorMessage('Le nom d\'utilisateur et le mot de passe sont requis');
       return;
@@ -44,10 +44,10 @@ const LoginPage = () => {
     <div className="flex flex-col min-h-screen bg-night text-gray-300">
       <Navbar />
       <div className="flex-grow flex items-center justify-center px-4 py-6">
-        <form className="w-full max-w-lg bg-linear-gradient(135deg, #0f0c29, #302b63, #24243e p-8 space-y-6 shadow-xl rounded-lg" onSubmit={handleSubmit}>
+        <form className="w-full max-w-lg bg-linear-gradient(135deg, #0f0c29, #302b63, #24243e) p-8 space-y-6 shadow-xl rounded-lg" onSubmit={handleSubmit}>
           <h1 className="text-3xl font-bold text-center text-violet mb-8">Login</h1>
 
-          {errorMessage && <div className="text-red-500 mb-2">{errorMessage}</div>} {/* Afficher le message d'erreur */}
+          {errorMessage && <div className="text-red-500 mb-2">{errorMessage}</div>} {/* Affichage du message d'erreur */}
 
           <div className="space-y-4">
             <label htmlFor="username" className="block text-lg font-semibold text-night">Nom de compte</label>
