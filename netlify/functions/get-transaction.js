@@ -11,10 +11,8 @@ exports.handler = async (event) => {
     };
   }
 
-  // Nettoyer l'ID pour retirer les espaces blancs ou les caractères de contrôle
-  const paymentIntentId = event.queryStringParameters?.paymentIntentId.trim().replace(/\t/g, '');
-  console.log('Paramètres de requête reçus:', JSON.stringify(event.queryStringParameters));
-  console.log('paymentIntentId reçu:', paymentIntentId);
+  // Supprimer tous les espaces blancs et les caractères de tabulation
+  const paymentIntentId = event.queryStringParameters?.paymentIntentId.replace(/\s/g, '');
 
   if (!paymentIntentId) {
     return {
@@ -26,16 +24,21 @@ exports.handler = async (event) => {
 
   try {
     const query = 'SELECT * FROM Transactions WHERE paymentIntentId = ?';
-    const [rows] = await conn.execute(query, [paymentIntentId]);
-    console.log('Réponse de la base de données:', JSON.stringify(rows));
+    const results = await conn.execute(query, [paymentIntentId]);
+    const rows = results[0];
 
-    if (rows.length === 0) {
+    if (!rows || rows.length === 0) {
       console.log(`Transaction non trouvée pour paymentIntentId: ${paymentIntentId}`);
       return {
         statusCode: 404,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: 'Transaction non trouvée' }),
       };
+    }
+
+    // Vérifier que le premier élément de rows est un objet
+    if (typeof rows[0] !== 'object') {
+      throw new TypeError('Le premier élément de rows n\'est pas un objet.');
     }
 
     const transaction = {
@@ -56,7 +59,7 @@ exports.handler = async (event) => {
     return {
       statusCode: 500,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ error: `Une erreur est survenue lors de la récupération de la transaction : ${error.message}` }),
+      body: JSON.stringify({ error: `Une erreur est survenue lors de la récupération de la transaction: ${error.message}` }),
     };
   }
 };
