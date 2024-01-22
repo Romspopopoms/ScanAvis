@@ -8,28 +8,37 @@ async function getUserData(accessToken) {
   return data;
 }
 
+async function verifyIdToken(idToken) {
+  const client = new OAuth2Client(process.env.CLIENT_ID);
+  const ticket = await client.verifyIdToken({
+    idToken,
+    audience: process.env.CLIENT_ID,
+  });
+  return ticket.getPayload();
+}
+
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
 
-  let code;
-  if (event.body) {
-    const body = JSON.parse(event.body);
-    code = body.code;
-  }
-
-  if (!code) {
-    return { statusCode: 400, body: 'Code is required' };
-  }
-
+  let userData;
   try {
+    const body = JSON.parse(event.body);
     const redirectURL = `${process.env.URLL}/oauth`;
     const oAuth2Client = new OAuth2Client(process.env.CLIENT_ID, process.env.CLIENT_SECRET, redirectURL);
-    const { tokens } = await oAuth2Client.getToken(code);
-    oAuth2Client.setCredentials(tokens);
 
-    const userData = await getUserData(tokens.access_token);
+    if (body.code) {
+      const code = decodeURIComponent(body.code);
+      const { tokens } = await oAuth2Client.getToken(code);
+      oAuth2Client.setCredentials(tokens);
+      userData = await getUserData(tokens.access_token);
+    } else if (body.idToken) {
+      userData = await verifyIdToken(body.idToken);
+    } else {
+      return { statusCode: 400, body: 'Code or ID Token is required' };
+    }
+
     const { email, name } = userData;
 
     const insertQuery = `
@@ -38,16 +47,17 @@ exports.handler = async (event) => {
       ON DUPLICATE KEY UPDATE name = VALUES(name), access_token = VALUES(access_token)
     `;
 
-    // Run the promisified query without assigning it to 'result'
-    await conn.execute(insertQuery, [email, name, tokens.access_token]);
+    await conn.execute(insertQuery, [email, name, body.code || body.idToken]);
+
     return {
       statusCode: 200,
       body: JSON.stringify({ user: userData }),
     };
   } catch (err) {
+    console.error('Error processing authentication:', err);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: err.message }),
+      body: JSON.stringify({ error: 'Authentication failed' }),
     };
   }
 };

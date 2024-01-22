@@ -1,20 +1,18 @@
 import React, { useState, useContext } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import CartSummary from './CartSummary'; // Assurez-vous que le chemin d'importation est correct
-import { AuthContext } from '../context/AuthContext'; // Importez AuthContext
-import { LoginButton, LogoutButton } from './AuthButtons'; // Importez LoginButton et LogoutButton
+import CartSummary from './CartSummary';
+import { AuthContext } from '../context/AuthContext';
+import { LoginButton, LogoutButton } from './AuthButtons';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const { isAuthenticated } = useContext(AuthContext); // Utilisez AuthContext
+  const { isAuthenticated, getAuthUrl, logout } = useContext(AuthContext);
 
-  // Fonctions pour basculer les états du menu et du panier
   const handleToggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const toggleCart = () => setIsCartOpen(!isCartOpen);
 
-  // Variants pour l'animation de framer-motion
   const menuVariants = {
     open: { x: 0 },
     closed: { x: '-100%' },
@@ -28,15 +26,13 @@ const Navbar = () => {
         </h2>
         <div className="flex items-center">
           {isAuthenticated ? (
-            <LogoutButton /> // Utilisez LogoutButton pour la déconnexion
+            <LogoutButton onClick={logout} />
           ) : (
-            <LoginButton /> // Utilisez LoginButton pour la connexion
+            <LoginButton onClick={getAuthUrl} />
           )}
           <div onClick={toggleCart} className="relative cursor-pointer ml-4">
             <img src="/cart-icon.svg" alt="Cart" style={{ width: '24px', height: '24px' }} />
-            <span className="absolute top-0 right-0 bg-red-600 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center">
-              {/* Afficher le nombre d'articles ici si nécessaire */}
-            </span>
+            {/* Afficher le nombre d'articles ici si nécessaire */}
           </div>
           <button type="button" onClick={handleToggleMenu} className="ml-4">
             <img src="/menu.svg" alt="Menu" style={{ width: '24px', height: '24px' }} />
@@ -48,7 +44,6 @@ const Navbar = () => {
           variants={menuVariants}
           className="fixed top-0 left-0 w-[250px] h-full bg-gray-800 shadow-lg z-40"
         >
-          {/* Contenu du menu */}
           <button type="button" onClick={handleToggleMenu}>Fermer</button>
           {isAuthenticated && <Link href="/mon-profil">Mon Profil</Link>}
           <Link href="/">Accueil</Link>
@@ -56,7 +51,6 @@ const Navbar = () => {
         </motion.div>
       </nav>
 
-      {/* Affichage conditionnel de CartSummary basé sur isCartOpen */}
       {isCartOpen && <CartSummary isCartOpen={isCartOpen} toggleCart={toggleCart} />}
     </>
   );
