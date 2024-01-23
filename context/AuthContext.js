@@ -1,4 +1,6 @@
 import React, { createContext, useState, useEffect } from 'react';
+import { OAuth2Client } from 'google-auth-library';
+import fetch from 'node-fetch';
 
 export const AuthContext = createContext();
 
@@ -17,6 +19,34 @@ export const AuthProvider = ({ children }) => {
     setErrorMessage(message);
   };
 
+  const logout = () => {
+    console.log('Logging out');
+    localStorage.removeItem('authToken'); // Supprime le token du stockage local
+    setIsAuthenticated(false);
+    setUser(null);
+  };
+
+  const verifyToken = async (token) => {
+    try {
+      console.log('Verifying token:', token);
+      const oAuth2Client = new OAuth2Client(process.env.CLIENT_ID, process.env.CLIENT_SECRET);
+      const ticket = await oAuth2Client.verifyIdToken({
+        idToken: token,
+        audience: process.env.CLIENT_ID,
+      });
+      const payload = ticket.getPayload();
+      console.log('Token verified, payload:', payload);
+
+      // Si le token est valide, mettez à jour l'état d'authentification ici
+      setIsAuthenticated(true);
+      setUser({ email: payload.email, name: payload.name, access_token: token });
+    } catch (error) {
+      console.error('Token verification failed:', error.message);
+      logout(); // Déconnexion si le token n'est pas valide
+    }
+  };
+
+  // Fonction pour obtenir l'URL d'authentification
   const getAuthUrl = async () => {
     clearError();
     try {
@@ -33,6 +63,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Fonction pour traiter la réponse d'authentification
   const handleAuthResponse = async (response) => {
     clearError();
     try {
@@ -51,6 +82,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Fonction pour envoyer le code pour l'authentification
   const handleAuthCode = async (code) => {
     clearError();
     try {
@@ -66,14 +98,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = () => {
-    clearError();
-    console.log('Logging out');
-    localStorage.removeItem('authToken');
-    setIsAuthenticated(false);
-    setUser(null);
-  };
-
   useEffect(() => {
     clearError();
     const urlParams = new URLSearchParams(window.location.search);
@@ -81,11 +105,12 @@ export const AuthProvider = ({ children }) => {
     if (code) {
       console.log('Code found in URL, handling authentication:', code);
       handleAuthCode(code);
-    }
-    const token = localStorage.getItem('authToken');
-    if (token) {
-      console.log('Token found in local storage, verifying');
-      handleAuthCode(token); // Envoyer le token pour vérification si disponible
+    } else {
+      const token = localStorage.getItem('authToken');
+      if (token) {
+        console.log('Token found in local storage, verifying');
+        verifyToken(token); // Vérifier le token pour validation
+      }
     }
   }, []);
 
