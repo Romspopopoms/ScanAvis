@@ -13,10 +13,13 @@ export const AuthProvider = ({ children }) => {
   const getAuthUrl = async () => {
     clearError();
     try {
-      const response = await fetch('/.netlify/functions/request');
+      // Utilisez la méthode GET pour demander l'URL d'authentification
+      const response = await fetch('/.netlify/functions/request', {
+        method: 'GET',
+      });
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const { url } = await response.json();
-      window.location.href = url;
+      window.location.href = url; // Redirection vers l'URL d'authentification
     } catch (error) {
       handleError(`Erreur lors de la récupération de l'URL d'authentification: ${error.message}`);
     }
