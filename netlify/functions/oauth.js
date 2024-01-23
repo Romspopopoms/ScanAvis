@@ -57,12 +57,19 @@ exports.handler = async (event) => {
 
     console.log('Inserting user data into database');
     const insertQuery = `
-      INSERT INTO users (email, name, access_token)
-      VALUES (?, ?, ?)
-      ON DUPLICATE KEY UPDATE name = VALUES(name), access_token = VALUES(access_token)
-    `;
+  INSERT INTO users (email, name, access_token)
+  VALUES (?, ?, ?)
+  ON DUPLICATE KEY UPDATE
+    name = VALUES(name),
+    access_token = VALUES(access_token);
+`;
     await conn.execute(insertQuery, [userData.email, userData.name, body.code || body.idToken]);
-    console.log('User data inserted/updated in database');
+
+    // Récupérer l'user_id de l'utilisateur
+    const [userRows] = await conn.execute('SELECT user_id FROM users WHERE email = ?', [userData.email]);
+    const userId = userRows[0]?.user_id;
+
+    console.log('User data inserted/updated in database. User ID:', userId);
 
     return {
       statusCode: 200,
