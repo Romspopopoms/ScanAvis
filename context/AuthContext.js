@@ -7,18 +7,26 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const clearError = () => setErrorMessage('');
-  const handleError = (message) => setErrorMessage(message);
+  const clearError = () => {
+    console.log('Clearing errors');
+    setErrorMessage('');
+  };
+
+  const handleError = (message) => {
+    console.error('Error:', message);
+    setErrorMessage(message);
+  };
 
   const getAuthUrl = async () => {
     clearError();
     try {
-      // Utilisez la méthode GET pour demander l'URL d'authentification
+      console.log('Requesting authentication URL');
       const response = await fetch('/.netlify/functions/request', {
         method: 'GET',
       });
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const { url } = await response.json();
+      console.log('Received authentication URL:', url);
       window.location.href = url; // Redirection vers l'URL d'authentification
     } catch (error) {
       handleError(`Erreur lors de la récupération de l'URL d'authentification: ${error.message}`);
@@ -28,8 +36,10 @@ export const AuthProvider = ({ children }) => {
   const handleAuthResponse = async (response) => {
     clearError();
     try {
+      console.log('Processing authentication response');
       const data = await response.json();
       if (response.ok) {
+        console.log('Authentication successful:', data);
         setIsAuthenticated(true);
         setUser({ email: data.user.email, name: data.user.name, access_token: data.user.access_token });
         localStorage.setItem('authToken', data.user.access_token);
@@ -44,6 +54,7 @@ export const AuthProvider = ({ children }) => {
   const handleAuthCode = async (code) => {
     clearError();
     try {
+      console.log('Sending code for authentication:', code);
       const response = await fetch('/.netlify/functions/oauth', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -57,6 +68,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     clearError();
+    console.log('Logging out');
     localStorage.removeItem('authToken');
     setIsAuthenticated(false);
     setUser(null);
@@ -66,9 +78,15 @@ export const AuthProvider = ({ children }) => {
     clearError();
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get('code');
-    if (code) handleAuthCode(code);
+    if (code) {
+      console.log('Code found in URL, handling authentication:', code);
+      handleAuthCode(code);
+    }
     const token = localStorage.getItem('authToken');
-    if (token) handleAuthCode(token); // Envoyer le token pour vérification si disponible
+    if (token) {
+      console.log('Token found in local storage, verifying');
+      handleAuthCode(token); // Envoyer le token pour vérification si disponible
+    }
   }, []);
 
   return (

@@ -5,18 +5,22 @@ import { Navbar, Footer } from '../components';
 const LoginPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [errorMessage, setErrorMessage] = useState(''); // Gestion des messages d'erreur
-  const { getAuthUrl } = useContext(AuthContext); // Utilisation du contexte d'authentification
+  const [errorMessage, setErrorMessage] = useState('');
+  const { getAuthUrl } = useContext(AuthContext);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setErrorMessage(''); // Réinitialisation du message d'erreur
+    console.log('Submit button clicked');
+    setErrorMessage('');
+
     if (!username || !password) {
+      console.error('Username or password missing');
       setErrorMessage('Le nom d\'utilisateur et le mot de passe sont requis');
       return;
     }
 
     try {
+      console.log('Sending login request');
       const response = await fetch('/.netlify/functions/login', {
         method: 'POST',
         headers: {
@@ -27,16 +31,15 @@ const LoginPage = () => {
 
       const data = await response.json();
       if (response.ok) {
-        console.log('Connexion réussie:', data);
-        // Gérer la réussite de la connexion, par exemple en enregistrant le token et en redirigeant l'utilisateur
-        // TODO: Rediriger l'utilisateur vers la page d'accueil ou le tableau de bord
+        console.log('Login successful:', data);
+        // Gérer la réussite de la connexion ici
       } else {
-        console.error('Erreur lors de la connexion:', data.message);
-        setErrorMessage(data.message || 'Erreur lors de la connexion'); // Afficher le message d'erreur provenant du serveur
+        console.error('Login error:', data.message);
+        setErrorMessage(data.message || 'Erreur lors de la connexion');
       }
     } catch (error) {
-      console.error('Erreur de réseau:', error);
-      setErrorMessage('Problème de connexion réseau'); // Informer l'utilisateur d'un problème réseau
+      console.error('Network error:', error);
+      setErrorMessage('Problème de connexion réseau');
     }
   };
 
