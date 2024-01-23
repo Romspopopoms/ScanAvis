@@ -36,18 +36,14 @@ exports.handler = async (event) => {
     console.log('Parsing request body');
     const body = JSON.parse(event.body);
     console.log('Request body parsed:', body);
-    const oAuth2Client = new OAuth2Client(process.env.CLIENT_ID, process.env.CLIENT_SECRET);
+    const oAuth2Client = new OAuth2Client(process.env.CLIENT_ID, process.env.CLIENT_SECRET, `${process.env.URLL}/oauth`);
     let userData;
-
-    // Define the redirect URI
-    const redirectUri = `${process.env.URLL}/oauth`;
 
     if (body.code) {
       console.log('Exchanging code for tokens');
-      const { tokens } = await oAuth2Client.getToken({
-        code: decodeURIComponent(body.code),
-        redirect_uri: redirectUri, // Add the redirect URI here
-      });
+      const decodedCode = decodeURIComponent(body.code);
+      console.log('Decoded code:', decodedCode);
+      const { tokens } = await oAuth2Client.getToken(decodedCode);
       oAuth2Client.setCredentials(tokens);
       console.log('Tokens received:', tokens);
       userData = await getUserData(tokens.access_token);
