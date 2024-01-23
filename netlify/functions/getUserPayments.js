@@ -5,9 +5,9 @@ async function getUserPayments(userId) {
   try {
     // Query to fetch transactions for the given user
     const query = `
-            SELECT * FROM Transactions
-            WHERE user_id = ?
-        `;
+      SELECT * FROM Transactions
+      WHERE user_id = ?
+    `;
 
     // Execute the query
     const [transactions] = await conn.execute(query, [userId]);

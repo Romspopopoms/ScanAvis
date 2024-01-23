@@ -56,17 +56,27 @@ exports.handler = async (event) => {
     }
 
     console.log('Inserting user data into database');
-    const insertQuery = `
+    const insertUserQuery = `
       INSERT INTO users (email, name, access_token)
       VALUES (?, ?, ?)
-      ON DUPLICATE KEY UPDATE name = VALUES(name), access_token = VALUES(access_token)
+      ON DUPLICATE KEY UPDATE name = VALUES(name), access_token = VALUES(access_token);
     `;
-    await conn.execute(insertQuery, [userData.email, userData.name, body.code || body.idToken]);
-    console.log('User data inserted/updated in database');
+    const [userResult] = await conn.execute(insertUserQuery, [userData.email, userData.name, body.code || body.idToken]);
+
+    // Récupérer l'ID de l'utilisateur (soit nouvellement inséré, soit existant)
+    let userId;
+    if (userResult.insertId) {
+      userId = userResult.insertId; // Nouvel utilisateur, utiliser l'ID inséré
+    } else {
+      // Utilisateur existant, récupérer son ID
+      const [rows] = await conn.execute('SELECT user_id FROM users WHERE email = ?', [userData.email]);
+      userId = rows[0].user_id;
+    }
+    console.log('User data inserted/updated in database with user_id:', userId);
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ user: { email: userData.email, name: userData.name } }),
+      body: JSON.stringify({ user: { email: userData.email, name: userData.name, user_id: userId } }),
     };
   } catch (err) {
     console.error('Error during authentication:', err);
