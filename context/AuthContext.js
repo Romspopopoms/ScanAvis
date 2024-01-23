@@ -1,5 +1,4 @@
 import React, { createContext, useState, useEffect } from 'react';
-import { OAuth2Client } from 'google-auth-library';
 import fetch from 'node-fetch';
 
 export const AuthContext = createContext();
@@ -29,20 +28,30 @@ export const AuthProvider = ({ children }) => {
   const verifyToken = async (token) => {
     try {
       console.log('Verifying token:', token);
-      const oAuth2Client = new OAuth2Client(process.env.CLIENT_ID, process.env.CLIENT_SECRET);
-      const ticket = await oAuth2Client.verifyIdToken({
-        idToken: token,
-        audience: process.env.CLIENT_ID,
+      const response = await fetch('/.netlify/functions/verifyToken', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ token }),
       });
-      const payload = ticket.getPayload();
-      console.log('Token verified, payload:', payload);
 
-      // Si le token est valide, mettez à jour l'état d'authentification ici
-      setIsAuthenticated(true);
-      setUser({ email: payload.email, name: payload.name, access_token: token });
+      if (!response.ok) {
+        throw new Error(`Token verification failed with status: ${response.status}`);
+      }
+
+      const { isValid, payload } = await response.json();
+      if (isValid) {
+        console.log('Token is valid, setting user data');
+        setIsAuthenticated(true);
+        setUser({ email: payload.email, name: payload.name, access_token: token });
+      } else {
+        console.log('Token is invalid, logging out');
+        throw new Error('Invalid token');
+      }
     } catch (error) {
       console.error('Token verification failed:', error.message);
-      logout(); // Déconnexion si le token n'est pas valide
+      logout(); // Call logout function to clean up state and local storage
     }
   };
 
