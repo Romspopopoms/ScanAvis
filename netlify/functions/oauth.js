@@ -39,9 +39,15 @@ exports.handler = async (event) => {
     const oAuth2Client = new OAuth2Client(process.env.CLIENT_ID, process.env.CLIENT_SECRET);
     let userData;
 
+    // Define the redirect URI
+    const redirectUri = `${process.env.URLL}/oauth`;
+
     if (body.code) {
       console.log('Exchanging code for tokens');
-      const { tokens } = await oAuth2Client.getToken(decodeURIComponent(body.code));
+      const { tokens } = await oAuth2Client.getToken({
+        code: decodeURIComponent(body.code),
+        redirect_uri: redirectUri, // Add the redirect URI here
+      });
       oAuth2Client.setCredentials(tokens);
       console.log('Tokens received:', tokens);
       userData = await getUserData(tokens.access_token);
