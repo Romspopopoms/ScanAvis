@@ -1,52 +1,73 @@
-import React, { useEffect, useState } from 'react';
-import netlifyIdentity from 'netlify-identity-widget';
+import React, { useContext, useState, useEffect } from 'react';
+import { AuthContext } from '../context/AuthContext'; // Make sure the path is correct
 
 const MonProfil = () => {
-  const [userProfile, setUserProfile] = useState(null);
+  const { user, logout } = useContext(AuthContext);
+  const [userPayments, setUserPayments] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Initialisation de Netlify Identity si ce n'est pas déjà fait
-    if (!netlifyIdentity.currentUser()) {
-      netlifyIdentity.init();
-    }
-    // Écouter l'événement de connexion pour mettre à jour l'utilisateur
-    netlifyIdentity.on('login', (user) => {
-      setUserProfile(user);
-    });
+    const fetchPayments = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch('/.netlify/functions/getUserPayments', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ userId: user.id }), // Make sure user ID is correctly passed
+        });
 
-    // Récupérer l'utilisateur actuellement connecté
-    const currentUser = netlifyIdentity.currentUser();
-    if (currentUser) {
-      setUserProfile(currentUser);
-    }
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
 
-    // Nettoyer l'écouteur d'événements lors du démontage
-    return () => {
-      netlifyIdentity.off('login');
+        const data = await response.json();
+        setUserPayments(data.transactions); // Adjust according to the actual key in the response
+      } catch (error) {
+        console.error('Error fetching user payments:', error);
+      } finally {
+        setLoading(false);
+      }
     };
-  }, []);
 
-  if (!userProfile) {
-    // Si l'utilisateur n'est pas connecté ou en cours de récupération, afficher un chargement ou retourner null
-    return <div>Chargement de votre profil...</div>;
+    if (user) {
+      fetchPayments();
+    }
+  }, [user]);
+
+  if (!user || loading) {
+    return <div>Loading your profile...</div>;
   }
 
-  // Contenu de la page Mon Profil
-  // Contenu de la page Mon Profil
   return (
-    <div className="profil-container">
-      <h1>Mon Profil</h1>
-      <table className="profil-table">
+    <div className="profile-container">
+      <h1>My Profile</h1>
+      <button type="button" onClick={logout}>Log Out</button>
+      <table className="profile-table">
         <tbody>
           <tr>
-            <th>Nom</th>
-            <td>{userProfile.user_metadata.full_name}</td>
+            <th>Name</th>
+            <td>{user.name}</td>
           </tr>
           <tr>
             <th>Email</th>
-            <td>{userProfile.email}</td>
+            <td>{user.email}</td>
           </tr>
-          {/* Ajoutez d'autres informations ici, chaque paire clé-valeur comme une ligne du tableau */}
+          {/* You can add more information here */}
+          {userPayments && userPayments.length > 0 && (
+            <tr>
+              <th>Payments</th>
+              <td>
+                {/* You can format and display the payment information as you wish */}
+                {userPayments.map((payment, index) => (
+                  <div key={index}>
+                    {payment.items} - {payment.totalAmount} - {new Date(payment.createdAt).toLocaleDateString()}
+                  </div>
+                ))}
+              </td>
+            </tr>
+          )}
         </tbody>
       </table>
     </div>
