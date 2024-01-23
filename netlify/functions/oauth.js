@@ -36,14 +36,18 @@ exports.handler = async (event) => {
     console.log('Parsing request body');
     const body = JSON.parse(event.body);
     console.log('Request body parsed:', body);
-    const oAuth2Client = new OAuth2Client(process.env.CLIENT_ID, process.env.CLIENT_SECRET, `${process.env.URLL}/oauth`);
+    const oAuth2Client = new OAuth2Client(process.env.CLIENT_ID, process.env.CLIENT_SECRET);
     let userData;
+
+    // Define the redirect URI
+    const redirectUri = `${process.env.URLL}/oauth`;
 
     if (body.code) {
       console.log('Exchanging code for tokens');
-      const decodedCode = decodeURIComponent(body.code);
-      console.log('Decoded code:', decodedCode);
-      const { tokens } = await oAuth2Client.getToken(decodedCode);
+      const { tokens } = await oAuth2Client.getToken({
+        code: decodeURIComponent(body.code),
+        redirect_uri: redirectUri, // Add the redirect URI here
+      });
       oAuth2Client.setCredentials(tokens);
       console.log('Tokens received:', tokens);
       userData = await getUserData(tokens.access_token);
@@ -57,19 +61,12 @@ exports.handler = async (event) => {
 
     console.log('Inserting user data into database');
     const insertQuery = `
-  INSERT INTO users (email, name, access_token)
-  VALUES (?, ?, ?)
-  ON DUPLICATE KEY UPDATE
-    name = VALUES(name),
-    access_token = VALUES(access_token);
-`;
+      INSERT INTO users (email, name, access_token)
+      VALUES (?, ?, ?)
+      ON DUPLICATE KEY UPDATE name = VALUES(name), access_token = VALUES(access_token)
+    `;
     await conn.execute(insertQuery, [userData.email, userData.name, body.code || body.idToken]);
-
-    // Récupérer l'user_id de l'utilisateur
-    const [userRows] = await conn.execute('SELECT user_id FROM users WHERE email = ?', [userData.email]);
-    const userId = userRows[0]?.user_id;
-
-    console.log('User data inserted/updated in database. User ID:', userId);
+    console.log('User data inserted/updated in database');
 
     return {
       statusCode: 200,
