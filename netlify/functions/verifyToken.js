@@ -3,17 +3,25 @@ const { v4: uuidv4 } = require('uuid');
 const { conn } = require('../../utils/db');
 
 // Cette fonction vérifie la validité du token ID, récupère/insère l'utilisateur dans la base de données, et renvoie les données de l'utilisateur
-async function verifyToken(idToken) {
+async function verifyToken(idToken, userData = null, accessToken = null) {
   try {
-    console.log('Verifying ID token:', idToken);
-    const client = new OAuth2Client(process.env.CLIENT_ID);
-    const ticket = await client.verifyIdToken({
-      idToken,
-      audience: process.env.CLIENT_ID,
-    });
-
-    const payload = ticket.getPayload();
-    console.log('ID token verified, payload:', payload);
+    let payload;
+    if (idToken) {
+      console.log('Verifying ID token:', idToken);
+      const client = new OAuth2Client(process.env.CLIENT_ID);
+      const ticket = await client.verifyIdToken({
+        idToken,
+        audience: process.env.CLIENT_ID,
+      });
+      payload = ticket.getPayload();
+      console.log('ID token verified, payload:', payload);
+    } else if (userData && accessToken) {
+      // Si l'ID token n'est pas fourni, utilisez les données de l'utilisateur et l'access token fournis
+      payload = userData;
+      payload.access_token = accessToken;
+    } else {
+      throw new Error('No ID token or user data provided');
+    }
 
     // Vérifier si l'utilisateur existe dans la base de données
     const checkUserQuery = 'SELECT uuid FROM users WHERE email = ?';
@@ -24,8 +32,8 @@ async function verifyToken(idToken) {
       // L'utilisateur n'existe pas, créer un nouveau UUID et insérer l'utilisateur
       console.log('User does not exist, creating new user');
       userUuid = uuidv4();
-      const insertUserQuery = 'INSERT INTO users (uuid, email, name) VALUES (?, ?, ?)';
-      await conn.execute(insertUserQuery, [userUuid, payload.email, payload.name]);
+      const insertUserQuery = 'INSERT INTO users (uuid, email, name, access_token) VALUES (?, ?, ?, ?)';
+      await conn.execute(insertUserQuery, [userUuid, payload.email, payload.name, payload.access_token]);
     }
 
     // Renvoyer les données de l'utilisateur en tant que réponse
@@ -36,6 +44,7 @@ async function verifyToken(idToken) {
           uuid: userUuid,
           email: payload.email,
           name: payload.name,
+          access_token: payload.access_token,
         },
       }),
     };
@@ -48,29 +57,4 @@ async function verifyToken(idToken) {
   }
 }
 
-exports.handler = async (event) => {
-  console.log('Received event:', event);
-  if (event.httpMethod !== 'POST') {
-    console.error('Non-POST method attempted');
-    return { statusCode: 405, body: JSON.stringify({ error: 'Method Not Allowed' }) };
-  }
-
-  try {
-    console.log('Parsing request body');
-    const body = JSON.parse(event.body);
-
-    // Ici, nous supposons que le corps de la requête contient l'idToken
-    if (body.idToken) {
-      console.log('ID token provided');
-      return await verifyToken(body.idToken);
-    }
-    console.error('No ID token provided');
-    return { statusCode: 400, body: JSON.stringify({ error: 'ID Token is required' }) };
-  } catch (err) {
-    console.error('Error during the request processing:', err);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: 'Server error', details: err.message }),
-    };
-  }
-};
+module.exports = verifyToken;
