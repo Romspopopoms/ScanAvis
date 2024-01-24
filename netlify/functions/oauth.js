@@ -1,7 +1,7 @@
 const { OAuth2Client } = require('google-auth-library');
 const fetch = require('node-fetch');
-const { v4: uuidv4 } = require('uuid'); // Assurez-vous d'ajouter 'uuid' à vos dépendances
 const { conn } = require('../../utils/db');
+const { v4: uuidv4 } = require('uuid');
 
 async function getUserData(accessToken) {
   console.log('Getting user data with access token:', accessToken);
@@ -60,26 +60,34 @@ exports.handler = async (event) => {
       return { statusCode: 400, body: JSON.stringify({ error: 'Code or ID Token is required' }) };
     }
 
+    // Check if user exists and get UUID
     console.log('Checking if user exists and getting UUID');
     const checkUserQuery = `
       SELECT uuid FROM users WHERE email = ?
     `;
-    const [userResult] = await conn.execute(checkUserQuery, [userData.email]);
-    let userUuid = userResult[0] ? userResult[0].uuid : null;
+    const [userResults,] = await conn.execute(checkUserQuery, [userData.email]);
+    let userUuid = userResults.length > 0 ? userResults[0].uuid : null;
 
     if (!userUuid) {
+      // User does not exist, create new UUID
       console.log('User does not exist, creating new UUID');
       userUuid = uuidv4();
+      
+      // Insert new user with new UUID
+      console.log('Inserting new user data into database');
+      const insertUserQuery = `
+        INSERT INTO users (uuid, email, name, access_token)
+        VALUES (?, ?, ?, ?)
+      `;
+      await conn.execute(insertUserQuery, [userUuid, userData.email, userData.name, body.code || body.idToken]);
+      console.log('New user inserted with UUID:', userUuid);
+    } else {
+      console.log('User exists, UUID:', userUuid);
+      // Here you can update user data if necessary
     }
 
-    console.log('Inserting or updating user data in database with UUID:', userUuid);
-    const insertQuery = `
-      INSERT INTO users (uuid, email, name, access_token)
-      VALUES (?, ?, ?, ?)
-      ON DUPLICATE KEY UPDATE name = VALUES(name), access_token = VALUES(access_token)
-    `;
-    await conn.execute(insertQuery, [userUuid, userData.email, userData.name, body.code || body.idToken]);
-    console.log('User data inserted/updated in database');
+    // Continue with your logic, now you have userUuid which you can use to associate transactions or any other operations
+    // ...
 
     return {
       statusCode: 200,
