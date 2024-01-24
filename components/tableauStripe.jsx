@@ -13,15 +13,13 @@ const PaymentForm = ({ onSuccessfulPayment, onFailedPayment }) => {
 
   const calculateTotal = () => cartItems.reduce((total, item) => total + item.quantity * item.price, 0);
 
-  const userId = user?.userId;
-
   const createPaymentIntent = async () => {
     try {
       const formattedCartItems = formatCartItemsForPayment();
       const response = await fetch('/.netlify/functions/create-payment-intent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items: formattedCartItems, userId }),
+        body: JSON.stringify({ items: formattedCartItems, userId: user.userId }),
       });
 
       const data = await response.json();
