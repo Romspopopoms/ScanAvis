@@ -1,7 +1,7 @@
 const { OAuth2Client } = require('google-auth-library');
 const fetch = require('node-fetch');
-const { conn } = require('../../utils/db');
 const { v4: uuidv4 } = require('uuid');
+const { conn } = require('../../utils/db');
 
 async function getUserData(accessToken) {
   console.log('Getting user data with access token:', accessToken);
@@ -65,14 +65,14 @@ exports.handler = async (event) => {
     const checkUserQuery = `
       SELECT uuid FROM users WHERE email = ?
     `;
-    const [userResults,] = await conn.execute(checkUserQuery, [userData.email]);
+    const [userResults] = await conn.execute(checkUserQuery, [userData.email]);
     let userUuid = userResults.length > 0 ? userResults[0].uuid : null;
 
     if (!userUuid) {
       // User does not exist, create new UUID
       console.log('User does not exist, creating new UUID');
       userUuid = uuidv4();
-      
+
       // Insert new user with new UUID
       console.log('Inserting new user data into database');
       const insertUserQuery = `
