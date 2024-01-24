@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useStripe, useElements, CardNumberElement, CardExpiryElement, CardCvcElement } from '@stripe/react-stripe-js';
 import { useCart } from '../context/CartContext';
+import { AuthContext } from '../context/AuthContext';
 
 const PaymentForm = ({ onSuccessfulPayment, onFailedPayment }) => {
   const stripe = useStripe();
@@ -8,8 +9,11 @@ const PaymentForm = ({ onSuccessfulPayment, onFailedPayment }) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const { cartItems, formatCartItemsForPayment } = useCart();
+  const { user } = useContext(AuthContext);
 
   const calculateTotal = () => cartItems.reduce((total, item) => total + item.quantity * item.price, 0);
+
+  const userId = user?.userId;
 
   const createPaymentIntent = async () => {
     try {
@@ -17,7 +21,7 @@ const PaymentForm = ({ onSuccessfulPayment, onFailedPayment }) => {
       const response = await fetch('/.netlify/functions/create-payment-intent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items: formattedCartItems }),
+        body: JSON.stringify({ items: formattedCartItems, userId }),
       });
 
       const data = await response.json();

@@ -68,9 +68,13 @@ exports.handler = async (event) => {
     await conn.execute(insertQuery, [userData.email, userData.name, body.code || body.idToken]);
     console.log('User data inserted/updated in database');
 
+    const [rows] = await conn.execute('SELECT LAST_INSERT_ID() as userId');
+    const { userId } = rows[0];
+
+    // Inclure l'ID de l'utilisateur dans la réponse
     return {
       statusCode: 200,
-      body: JSON.stringify({ user: { email: userData.email, name: userData.name } }),
+      body: JSON.stringify({ user: { email: userData.email, name: userData.name, userId } }),
     };
   } catch (err) {
     console.error('Error during authentication:', err);
