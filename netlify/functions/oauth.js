@@ -60,7 +60,6 @@ exports.handler = async (event) => {
       return { statusCode: 400, body: JSON.stringify({ error: 'Code or ID Token is required' }) };
     }
 
-    // Check if user exists and get UUID
     console.log('Checking if user exists and getting UUID');
     const checkUserQuery = `
       SELECT uuid FROM users WHERE email = ?
@@ -69,11 +68,9 @@ exports.handler = async (event) => {
     let userUuid = userResults.length > 0 ? userResults[0].uuid : null;
 
     if (!userUuid) {
-      // User does not exist, create new UUID
       console.log('User does not exist, creating new UUID');
       userUuid = uuidv4();
 
-      // Insert new user with new UUID
       console.log('Inserting new user data into database');
       const insertUserQuery = `
         INSERT INTO users (uuid, email, name, access_token)
@@ -86,12 +83,16 @@ exports.handler = async (event) => {
       // Here you can update user data if necessary
     }
 
-    // Continue with your logic, now you have userUuid which you can use to associate transactions or any other operations
-    // ...
-
     return {
       statusCode: 200,
-      body: JSON.stringify({ user: { uuid: userUuid, email: userData.email, name: userData.name } }),
+      body: JSON.stringify({
+        user: {
+          uuid: userUuid,
+          email: userData.email,
+          name: userData.name,
+          access_token: body.code || body.idToken, // Include the access_token if needed
+        },
+      }),
     };
   } catch (err) {
     console.error('Error during authentication:', err);
