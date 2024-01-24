@@ -6,7 +6,7 @@ export const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
-  const [userId, setUserId] = useState(null); // Ajouter un état pour stocker userId
+  const [userUuid, setUserUuid] = useState(null); // Utilisation de userUuid au lieu de userId
   const [errorMessage, setErrorMessage] = useState('');
 
   const clearError = () => {
@@ -24,7 +24,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('authToken'); // Supprime le token du stockage local
     setIsAuthenticated(false);
     setUser(null);
-    setUserId(null); // Réinitialiser également userId lors de la déconnexion
+    setUserUuid(null); // Réinitialiser également userUuid lors de la déconnexion
   };
 
   const verifyToken = async (token) => {
@@ -47,7 +47,7 @@ export const AuthProvider = ({ children }) => {
         console.log('Token is valid, setting user data');
         setIsAuthenticated(true);
         setUser({ email: payload.email, name: payload.name, access_token: token });
-        setUserId(payload.userId); // Mise à jour de l'état avec userId
+        setUserUuid(payload.uuid); // Mise à jour de l'état avec userUuid
       } else {
         console.log('Token is invalid, logging out');
         throw new Error('Invalid token');
@@ -58,7 +58,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Fonction pour obtenir l'URL d'authentification
   const getAuthUrl = async () => {
     clearError();
     try {
@@ -75,7 +74,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Fonction pour traiter la réponse d'authentification
   const handleAuthResponse = async (response) => {
     clearError();
     try {
@@ -85,6 +83,7 @@ export const AuthProvider = ({ children }) => {
         console.log('Authentication successful:', data);
         setIsAuthenticated(true);
         setUser({ email: data.user.email, name: data.user.name, access_token: data.user.access_token });
+        setUserUuid(data.user.uuid); // Enregistrez l'UUID de l'utilisateur
         localStorage.setItem('authToken', data.user.access_token);
       } else {
         handleError(data.message || 'Erreur lors du traitement de la réponse.');
@@ -94,7 +93,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Fonction pour envoyer le code pour l'authentification
   const handleAuthCode = async (code) => {
     clearError();
     try {
@@ -130,7 +128,7 @@ export const AuthProvider = ({ children }) => {
     <AuthContext.Provider value={{
       isAuthenticated,
       user,
-      userId, // Fournir userId à travers le contexte
+      userUuid, // Fournir userUuid à travers le contexte
       getAuthUrl,
       handleAuthCode,
       logout,

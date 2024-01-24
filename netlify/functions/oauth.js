@@ -1,5 +1,6 @@
 const { OAuth2Client } = require('google-auth-library');
 const fetch = require('node-fetch');
+const { v4: uuidv4 } = require('uuid'); // Assurez-vous d'ajouter 'uuid' à vos dépendances
 const { conn } = require('../../utils/db');
 
 async function getUserData(accessToken) {
@@ -59,34 +60,30 @@ exports.handler = async (event) => {
       return { statusCode: 400, body: JSON.stringify({ error: 'Code or ID Token is required' }) };
     }
 
-    console.log('Inserting user data into database');
+    console.log('Checking if user exists and getting UUID');
+    const checkUserQuery = `
+      SELECT uuid FROM users WHERE email = ?
+    `;
+    const [userResult] = await conn.execute(checkUserQuery, [userData.email]);
+    let userUuid = userResult[0] ? userResult[0].uuid : null;
+
+    if (!userUuid) {
+      console.log('User does not exist, creating new UUID');
+      userUuid = uuidv4();
+    }
+
+    console.log('Inserting or updating user data in database with UUID:', userUuid);
     const insertQuery = `
-      INSERT INTO users (email, name, access_token)
-      VALUES (?, ?, ?)
+      INSERT INTO users (uuid, email, name, access_token)
+      VALUES (?, ?, ?, ?)
       ON DUPLICATE KEY UPDATE name = VALUES(name), access_token = VALUES(access_token)
     `;
-    const insertResult = await conn.execute(insertQuery, [userData.email, userData.name, body.code || body.idToken]);
-    console.log('User data inserted/updated in database:', insertResult);
+    await conn.execute(insertQuery, [userUuid, userData.email, userData.name, body.code || body.idToken]);
+    console.log('User data inserted/updated in database');
 
-    // New query to get user_id using email
-    const selectQuery = 'SELECT user_id FROM users WHERE email = ?';
-    const [rows] = await conn.execute(selectQuery, [userData.email]);
-
-    // Check if the user was found before trying to access `user_id`
-    if (rows.length > 0) {
-      const userId = rows[0].user_id;
-      console.log('User ID retrieved:', userId);
-
-      // Include the user's ID in the response
-      return {
-        statusCode: 200,
-        body: JSON.stringify({ user: { email: userData.email, name: userData.name, userId } }),
-      };
-    }
-    console.error('User not found after insert/update');
     return {
-      statusCode: 500,
-      body: JSON.stringify({ error: 'User not found after insert/update' }),
+      statusCode: 200,
+      body: JSON.stringify({ user: { uuid: userUuid, email: userData.email, name: userData.name } }),
     };
   } catch (err) {
     console.error('Error during authentication:', err);
