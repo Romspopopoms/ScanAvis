@@ -1,7 +1,6 @@
 const { OAuth2Client } = require('google-auth-library');
 const fetch = require('node-fetch');
-const { v4: uuidv4 } = require('uuid');
-const { conn } = require('../../utils/db');
+const { verifyToken } = require('./verifyToken'); // Assurez-vous que le chemin d'accès est correct
 
 async function getUserData(accessToken) {
   console.log('Getting user data with access token:', accessToken);
@@ -12,18 +11,6 @@ async function getUserData(accessToken) {
   const data = await response.json();
   console.log('User data retrieved:', data);
   return data;
-}
-
-async function verifyIdToken(idToken) {
-  console.log('Verifying ID token:', idToken);
-  const client = new OAuth2Client(process.env.CLIENT_ID);
-  const ticket = await client.verifyIdToken({
-    idToken,
-    audience: process.env.CLIENT_ID,
-  });
-  const payload = ticket.getPayload();
-  console.log('ID token verified, payload:', payload);
-  return payload;
 }
 
 exports.handler = async (event) => {
@@ -38,62 +25,25 @@ exports.handler = async (event) => {
     const body = JSON.parse(event.body);
     console.log('Request body parsed:', body);
     const oAuth2Client = new OAuth2Client(process.env.CLIENT_ID, process.env.CLIENT_SECRET);
-    let userData;
-
-    // Define the redirect URI
-    const redirectUri = `${process.env.URLL}/oauth`;
 
     if (body.code) {
       console.log('Exchanging code for tokens');
       const { tokens } = await oAuth2Client.getToken({
         code: decodeURIComponent(body.code),
-        redirect_uri: redirectUri, // Add the redirect URI here
+        redirect_uri: `${process.env.URLL}/oauth`,
       });
       oAuth2Client.setCredentials(tokens);
       console.log('Tokens received:', tokens);
-      userData = await getUserData(tokens.access_token);
-    } else if (body.idToken) {
+      const userData = await getUserData(tokens.access_token);
+      // Utilisez verifyToken pour vérifier si l'utilisateur existe et obtenir ou créer un UUID
+      return await verifyToken(null, userData, tokens.access_token); // Assurez-vous que verifyToken peut gérer ces paramètres
+    } if (body.idToken) {
       console.log('Processing ID token');
-      userData = await verifyIdToken(body.idToken);
-    } else {
-      console.error('No code or ID token provided');
-      return { statusCode: 400, body: JSON.stringify({ error: 'Code or ID Token is required' }) };
+      // Utilisez verifyToken pour traiter l'ID token
+      return await verifyToken(body.idToken);
     }
-
-    console.log('Checking if user exists and getting UUID');
-    const checkUserQuery = `
-      SELECT uuid FROM users WHERE email = ?
-    `;
-    const [userResults] = await conn.execute(checkUserQuery, [userData.email]);
-    let userUuid = userResults.length > 0 ? userResults[0].uuid : null;
-
-    if (!userUuid) {
-      console.log('User does not exist, creating new UUID');
-      userUuid = uuidv4();
-
-      console.log('Inserting new user data into database');
-      const insertUserQuery = `
-        INSERT INTO users (uuid, email, name, access_token)
-        VALUES (?, ?, ?, ?)
-      `;
-      await conn.execute(insertUserQuery, [userUuid, userData.email, userData.name, body.code || body.idToken]);
-      console.log('New user inserted with UUID:', userUuid);
-    } else {
-      console.log('User exists, UUID:', userUuid);
-      // Here you can update user data if necessary
-    }
-
-    return {
-      statusCode: 200,
-      body: JSON.stringify({
-        user: {
-          uuid: userUuid,
-          email: userData.email,
-          name: userData.name,
-          access_token: body.code || body.idToken, // Include the access_token if needed
-        },
-      }),
-    };
+    console.error('No code or ID token provided');
+    return { statusCode: 400, body: JSON.stringify({ error: 'Code or ID Token is required' }) };
   } catch (err) {
     console.error('Error during authentication:', err);
     return {
