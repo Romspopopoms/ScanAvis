@@ -68,9 +68,25 @@ exports.handler = async (event) => {
     await conn.execute(insertQuery, [userData.email, userData.name, body.code || body.idToken]);
     console.log('User data inserted/updated in database');
 
+    // Nouvelle requête pour obtenir user_id en utilisant email
+    const selectQuery = 'SELECT user_id FROM users WHERE email = ?';
+    const [rows] = await conn.execute(selectQuery, [userData.email]);
+
+    // Vérifiez que l'utilisateur a été trouvé avant d'essayer d'accéder à `user_id`
+    if (rows.length > 0) {
+      const userId = rows[0].user_id;
+      console.log('User ID retrieved:', userId);
+
+      // Inclure l'ID de l'utilisateur dans la réponse
+      return {
+        statusCode: 200,
+        body: JSON.stringify({ user: { email: userData.email, name: userData.name, userId } }),
+      };
+    }
+    console.error('User not found after insert/update');
     return {
-      statusCode: 200,
-      body: JSON.stringify({ user: { email: userData.email, name: userData.name } }),
+      statusCode: 500,
+      body: JSON.stringify({ error: 'User not found after insert/update' }),
     };
   } catch (err) {
     console.error('Error during authentication:', err);
