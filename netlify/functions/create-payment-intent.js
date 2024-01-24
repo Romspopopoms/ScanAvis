@@ -12,7 +12,7 @@ exports.handler = async (event) => {
   }
 
   try {
-    const { items } = JSON.parse(event.body);
+    const { items, userId } = JSON.parse(event.body);
     if (!Array.isArray(items) || items.some((item) => !item.id || typeof item.quantity !== 'number' || typeof item.price !== 'number')) {
       throw new Error('Invalid items format');
     }
@@ -25,8 +25,8 @@ exports.handler = async (event) => {
     });
 
     const result = await conn.execute(
-      'INSERT INTO Transactions (items, totalAmount, paymentIntentId, clientSecret) VALUES (?, ?, ?, ?)',
-      [JSON.stringify(items), totalAmount, paymentIntent.id, paymentIntent.client_secret],
+      'INSERT INTO Transactions (items, totalAmount, paymentIntentId, clientSecret, user_id) VALUES (?, ?, ?, ?, ?)',
+      [JSON.stringify(items), totalAmount, paymentIntent.id, paymentIntent.client_secret, userId],
     );
 
     if (!result || !result.insertId) {
