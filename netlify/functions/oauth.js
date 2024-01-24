@@ -66,7 +66,7 @@ exports.handler = async (event) => {
   ON DUPLICATE KEY UPDATE name = VALUES(name), access_token = VALUES(access_token)
 `;
     const [insertResult] = await conn.execute(insertQuery, [userData.email, userData.name, body.code || body.idToken]);
-    console.log('User data inserted/updated in database');
+    console.log(insertResult);
 
     const userId = insertResult.insertId;
 
