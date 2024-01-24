@@ -61,14 +61,14 @@ exports.handler = async (event) => {
 
     console.log('Inserting user data into database');
     const insertQuery = `
-      INSERT INTO users (email, name, access_token)
-      VALUES (?, ?, ?)
-      ON DUPLICATE KEY UPDATE name = VALUES(name), access_token = VALUES(access_token)
-    `;
+  INSERT INTO users (email, name, access_token)
+  VALUES (?, ?, ?)
+  ON DUPLICATE KEY UPDATE name = VALUES(name), access_token = VALUES(access_token)
+`;
     const [insertResult] = await conn.execute(insertQuery, [userData.email, userData.name, body.code || body.idToken]);
     console.log('User data inserted/updated in database');
 
-    const userId = insertResult.insertId; // Obtenez l'ID de l'utilisateur inséré/mis à jour
+    const userId = insertResult.insertId;
 
     // Inclure l'ID de l'utilisateur dans la réponse
     return {
