@@ -46,7 +46,7 @@ exports.handler = async (event) => {
       console.log('Exchanging code for tokens');
       const { tokens } = await oAuth2Client.getToken({
         code: decodeURIComponent(body.code),
-        redirect_uri: redirectUri, // Add the redirect URI here
+        redirect_uri: redirectUri,
       });
       oAuth2Client.setCredentials(tokens);
       console.log('Tokens received:', tokens);
@@ -61,14 +61,16 @@ exports.handler = async (event) => {
 
     console.log('Inserting user data into database');
     const insertQuery = `
-  INSERT INTO users (email, name, access_token)
-  VALUES (?, ?, ?)
-  ON DUPLICATE KEY UPDATE name = VALUES(name), access_token = VALUES(access_token)
-`;
+      INSERT INTO users (email, name, access_token)
+      VALUES (?, ?, ?)
+      ON DUPLICATE KEY UPDATE name = VALUES(name), access_token = VALUES(access_token)
+    `;
     const [insertResult] = await conn.execute(insertQuery, [userData.email, userData.name, body.code || body.idToken]);
-    console.log(insertResult);
+    console.log('Insert result:', insertResult);
 
-    const userId = insertResult.insertId;
+    // Assurez-vous que vous accédez correctement à insertId.
+    // La structure exacte de insertResult dépend de votre bibliothèque SQL.
+    const userId = insertResult.insertId || insertResult[0]?.insertId;
 
     // Inclure l'ID de l'utilisateur dans la réponse
     return {
