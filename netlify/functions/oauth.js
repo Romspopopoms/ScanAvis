@@ -71,6 +71,7 @@ exports.handler = async (event) => {
     // Nouvelle requête pour obtenir user_id en utilisant email
     const selectQuery = 'SELECT user_id FROM users WHERE email = ?';
     const [rows] = await conn.execute(selectQuery, [userData.email]);
+    console.log('UserData:', userData);
 
     // Vérifiez que l'utilisateur a été trouvé avant d'essayer d'accéder à `user_id`
     if (rows.length > 0) {
