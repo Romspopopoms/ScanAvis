@@ -46,7 +46,7 @@ exports.handler = async (event) => {
       console.log('Exchanging code for tokens');
       const { tokens } = await oAuth2Client.getToken({
         code: decodeURIComponent(body.code),
-        redirect_uri: redirectUri,
+        redirect_uri: redirectUri, // Add the redirect URI here
       });
       oAuth2Client.setCredentials(tokens);
       console.log('Tokens received:', tokens);
@@ -65,17 +65,12 @@ exports.handler = async (event) => {
       VALUES (?, ?, ?)
       ON DUPLICATE KEY UPDATE name = VALUES(name), access_token = VALUES(access_token)
     `;
-    const [insertResult] = await conn.execute(insertQuery, [userData.email, userData.name, body.code || body.idToken]);
-    console.log('Insert result:', insertResult);
+    await conn.execute(insertQuery, [userData.email, userData.name, body.code || body.idToken]);
+    console.log('User data inserted/updated in database');
 
-    // Assurez-vous que vous accédez correctement à insertId.
-    // La structure exacte de insertResult dépend de votre bibliothèque SQL.
-    const userId = insertResult.insertId || insertResult[0]?.insertId;
-
-    // Inclure l'ID de l'utilisateur dans la réponse
     return {
       statusCode: 200,
-      body: JSON.stringify({ user: { email: userData.email, name: userData.name, userId } }),
+      body: JSON.stringify({ user: { email: userData.email, name: userData.name } }),
     };
   } catch (err) {
     console.error('Error during authentication:', err);
