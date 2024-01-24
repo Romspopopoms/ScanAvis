@@ -4,8 +4,19 @@ import { AuthContext } from '../context/AuthContext';
 export const LoginButton = () => {
   const { getAuthUrl } = useContext(AuthContext);
 
+  const handleLogin = async () => {
+    try {
+      const authUrl = await getAuthUrl(); // getAuthUrl devrait être une fonction async renvoyant l'URL
+      if (authUrl) {
+        window.location.href = authUrl; // Redirection vers l'URL d'authentification
+      }
+    } catch (error) {
+      console.error('Error during login:', error);
+    }
+  };
+
   return (
-    <button type="button" onClick={getAuthUrl} style={{ cursor: 'pointer' }}>
+    <button type="button" onClick={handleLogin} style={{ cursor: 'pointer' }}>
       Se connecter avec Google
     </button>
   );
