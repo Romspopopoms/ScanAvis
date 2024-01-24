@@ -65,20 +65,19 @@ exports.handler = async (event) => {
       VALUES (?, ?, ?)
       ON DUPLICATE KEY UPDATE name = VALUES(name), access_token = VALUES(access_token)
     `;
-    await conn.execute(insertQuery, [userData.email, userData.name, body.code || body.idToken]);
-    console.log('User data inserted/updated in database');
+    const insertResult = await conn.execute(insertQuery, [userData.email, userData.name, body.code || body.idToken]);
+    console.log('User data inserted/updated in database:', insertResult);
 
-    // Nouvelle requête pour obtenir user_id en utilisant email
+    // New query to get user_id using email
     const selectQuery = 'SELECT user_id FROM users WHERE email = ?';
     const [rows] = await conn.execute(selectQuery, [userData.email]);
-    console.log('UserData:', userData);
 
-    // Vérifiez que l'utilisateur a été trouvé avant d'essayer d'accéder à `user_id`
+    // Check if the user was found before trying to access `user_id`
     if (rows.length > 0) {
       const userId = rows[0].user_id;
       console.log('User ID retrieved:', userId);
 
-      // Inclure l'ID de l'utilisateur dans la réponse
+      // Include the user's ID in the response
       return {
         statusCode: 200,
         body: JSON.stringify({ user: { email: userData.email, name: userData.name, userId } }),
