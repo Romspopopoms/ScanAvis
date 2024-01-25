@@ -9,13 +9,9 @@ export const AuthProvider = ({ children }) => {
   const [userUuid, setUserUuid] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const clearError = () => {
-    setErrorMessage('');
-  };
+  const clearError = () => setErrorMessage('');
 
-  const handleError = (message) => {
-    setErrorMessage(message);
-  };
+  const handleError = (message) => setErrorMessage(message);
 
   const logout = () => {
     localStorage.removeItem('authToken');
@@ -80,11 +76,12 @@ export const AuthProvider = ({ children }) => {
         setUser({ email: data.user.email, name: data.user.name, access_token: data.user.access_token });
         setUserUuid(data.user.uuid);
       } else {
-        throw new Error(data.error || 'Erreur lors de la vérification du token');
+        logout();
+        handleError(data.error || 'Erreur lors de la vérification du token');
       }
     } catch (error) {
-      handleError(`Erreur lors de la vérification du token: ${error.message}`);
       logout();
+      handleError(`Erreur lors de la vérification du token: ${error.message}`);
     }
   };
 
