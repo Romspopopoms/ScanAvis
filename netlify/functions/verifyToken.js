@@ -7,7 +7,6 @@ async function verifyToken(idToken, userData = null, accessToken = null) {
     let payload;
     const client = new OAuth2Client(process.env.CLIENT_ID);
 
-    // Log pour voir si on entre dans les différentes branches
     console.log('verifyToken called', { idToken, userData, accessToken });
 
     if (idToken) {
@@ -23,16 +22,15 @@ async function verifyToken(idToken, userData = null, accessToken = null) {
     }
 
     const checkUserQuery = 'SELECT uuid FROM users WHERE email = ?';
-    const queryResult = await conn.execute(checkUserQuery, [payload.email]);
+    const [queryResult] = await conn.execute(checkUserQuery, [payload.email]);
 
-    // Log pour inspecter la structure des résultats
     console.log('Query result:', queryResult);
 
-    if (!Array.isArray(queryResult) || queryResult.length === 0 || !Array.isArray(queryResult[0])) {
+    if (!queryResult || !Array.isArray(queryResult) || queryResult.length === 0) {
       throw new Error('Unexpected structure of database query results');
     }
 
-    const userResults = queryResult[0];
+    const userResults = queryResult;
     let userUuid;
     if (userResults.length > 0 && userResults[0].uuid) {
       userUuid = userResults[0].uuid;

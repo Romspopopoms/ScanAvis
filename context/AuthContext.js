@@ -42,7 +42,7 @@ export const AuthProvider = ({ children }) => {
         setUserUuid(data.user.uuid);
         localStorage.setItem('authToken', data.user.access_token);
       } else {
-        handleError(data.message || 'Erreur lors du traitement de la réponse.');
+        handleError(data.error || 'Erreur lors du traitement de la réponse.');
       }
     } catch (error) {
       handleError(`Erreur lors du traitement de la réponse: ${error.message}`);
@@ -72,7 +72,7 @@ export const AuthProvider = ({ children }) => {
         body: JSON.stringify({ token }),
       });
       const data = await response.json();
-      if (response.ok) {
+      if (response.ok && data.user) {
         setIsAuthenticated(true);
         setUser({ email: data.user.email, name: data.user.name, access_token: data.user.access_token });
         setUserUuid(data.user.uuid);
