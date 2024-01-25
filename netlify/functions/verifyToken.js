@@ -5,7 +5,6 @@ const { conn } = require('../../utils/db');
 async function verifyToken(idToken, userData = null, accessToken = null) {
   try {
     let payload;
-
     const client = new OAuth2Client(process.env.CLIENT_ID);
 
     if (idToken) {
@@ -31,13 +30,8 @@ async function verifyToken(idToken, userData = null, accessToken = null) {
     }
 
     const checkUserQuery = 'SELECT uuid FROM users WHERE email = ?';
-    const results = await conn.execute(checkUserQuery, [payload.email]);
+    const [userResults] = await conn.execute(checkUserQuery, [payload.email]);
 
-    if (!Array.isArray(results) || results.length === 0 || !Array.isArray(results[0])) {
-      throw new Error('Unexpected structure of database query results');
-    }
-
-    const userResults = results[0];
     let userUuid;
     if (userResults.length > 0 && userResults[0].uuid) {
       userUuid = userResults[0].uuid;
