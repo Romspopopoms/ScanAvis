@@ -1,6 +1,6 @@
 const { OAuth2Client } = require('google-auth-library');
 const fetch = require('node-fetch');
-const { verifyToken } = require('./verifyToken'); // Assurez-vous que le chemin d'accès est correct
+const verifyToken = require('./verifyToken'); // Assurez-vous que le chemin d'accès est correct
 
 async function getUserData(accessToken) {
   console.log('Getting user data with access token:', accessToken);
@@ -35,12 +35,10 @@ exports.handler = async (event) => {
       oAuth2Client.setCredentials(tokens);
       console.log('Tokens received:', tokens);
       const userData = await getUserData(tokens.access_token);
-      // Utilisez verifyToken pour vérifier si l'utilisateur existe et obtenir ou créer un UUID
-      return await verifyToken(null, userData, tokens.access_token); // Assurez-vous que verifyToken peut gérer ces paramètres
+      return await verifyToken(null, userData, tokens.access_token); // Pass userData and accessToken to verifyToken
     } if (body.idToken) {
       console.log('Processing ID token');
-      // Utilisez verifyToken pour traiter l'ID token
-      return await verifyToken(body.idToken);
+      return await verifyToken(body.idToken); // Pass idToken to verifyToken
     }
     console.error('No code or ID token provided');
     return { statusCode: 400, body: JSON.stringify({ error: 'Code or ID Token is required' }) };
