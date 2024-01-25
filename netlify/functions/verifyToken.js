@@ -27,7 +27,7 @@ async function verifyToken(idToken, userData = null, accessToken = null) {
     const checkUserQuery = 'SELECT uuid FROM users WHERE email = ?';
     const [userResults] = await conn.execute(checkUserQuery, [payload.email]);
     let userUuid = userResults.length > 0 ? userResults[0].uuid : null;
-
+    console.log('User results:', userResults);
     if (!userUuid) {
       // L'utilisateur n'existe pas, créer un nouveau UUID et insérer l'utilisateur
       console.log('User does not exist, creating new user');
