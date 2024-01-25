@@ -30,7 +30,9 @@ async function verifyToken(idToken, userData = null, accessToken = null) {
     }
 
     const checkUserQuery = 'SELECT uuid FROM users WHERE email = ?';
-    const [userResults] = await conn.execute(checkUserQuery, [payload.email]);
+    const results = await conn.execute(checkUserQuery, [payload.email]);
+    console.log(results);
+    const [userResults] = results;
 
     let userUuid;
     if (userResults.length > 0 && userResults[0].uuid) {
