@@ -6,7 +6,6 @@ async function verifyToken(idToken, userData = null, accessToken = null) {
   try {
     let payload;
 
-    // Création d'une instance du client OAuth2
     const client = new OAuth2Client(process.env.CLIENT_ID);
 
     if (idToken) {
@@ -18,18 +17,24 @@ async function verifyToken(idToken, userData = null, accessToken = null) {
       payload = ticket.getPayload();
       console.log('ID token verified, payload:', payload);
     } else if (userData && accessToken) {
-      payload = { ...userData, access_token: accessToken };
+      if (typeof userData === 'object' && !Array.isArray(userData) && userData !== null) {
+        payload = { ...userData, access_token: accessToken };
+      } else {
+        throw new Error('Invalid user data structure');
+      }
     } else {
       throw new Error('No ID token or user data provided');
     }
 
-    // Vérification de l'existence de l'utilisateur dans la base de données
+    if (!payload || !payload.email) {
+      throw new Error('Payload is invalid or email is missing');
+    }
+
     const checkUserQuery = 'SELECT uuid FROM users WHERE email = ?';
     const [userResults] = await conn.execute(checkUserQuery, [payload.email]);
 
-    // Création ou récupération de l'UUID de l'utilisateur
     let userUuid;
-    if (userResults.length > 0) {
+    if (userResults && Array.isArray(userResults) && userResults.length > 0 && userResults[0].uuid) {
       userUuid = userResults[0].uuid;
     } else {
       console.log('User does not exist, creating new user');
