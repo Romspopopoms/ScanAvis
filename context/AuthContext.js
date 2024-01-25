@@ -36,10 +36,11 @@ export const AuthProvider = ({ children }) => {
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const { url } = await response.json();
       console.log('Received authentication URL:', url);
-      return url; // Retourner l'URL pour une utilisation ultérieure
+
+      // Effectuez la redirection ici
+      window.location.href = url;
     } catch (error) {
       handleError(`Erreur lors de la récupération de l'URL d'authentification: ${error.message}`);
-      return null; // Retourner null en cas d'erreur
     }
   };
 
