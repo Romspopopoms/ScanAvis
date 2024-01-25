@@ -1,57 +1,66 @@
 const { OAuth2Client } = require('google-auth-library');
 const fetch = require('node-fetch');
-const verifyToken = require('./verifyToken'); // Assurez-vous que le chemin est correct
+const verifyToken = require('./verifyToken'); // Vérifiez le chemin d'accès
 
 async function getUserData(accessToken) {
-  console.log('Récupération des données utilisateur avec le token:', accessToken);
+  console.log('Getting user data with access token:', accessToken);
   const response = await fetch(`https://www.googleapis.com/oauth2/v3/userinfo?access_token=${accessToken}`);
   if (!response.ok) {
-    throw new Error(`Erreur HTTP! Statut: ${response.status}`);
+    throw new Error(`HTTP error! status: ${response.status}`);
   }
   const data = await response.json();
-  console.log('Données utilisateur récupérées:', data);
+  console.log('User data retrieved:', data);
   return data;
 }
 
 exports.handler = async (event) => {
-  console.log('Événement reçu:', event);
-
+  console.log('Received event:', event);
   if (event.httpMethod !== 'POST') {
-    console.error('Tentative avec une méthode non-POST');
-    return { statusCode: 405, body: JSON.stringify({ error: 'Méthode non autorisée' }) };
+    console.error('Non-POST method attempted');
+    return { statusCode: 405, body: JSON.stringify({ error: 'Method Not Allowed' }) };
   }
 
   try {
-    console.log('Analyse du corps de la requête');
+    console.log('Parsing request body');
     const body = JSON.parse(event.body);
-    console.log('Corps de la requête analysé:', body);
+    console.log('Request body parsed:', body);
 
     const oAuth2Client = new OAuth2Client(process.env.CLIENT_ID, process.env.CLIENT_SECRET);
+    let verificationResult;
 
     if (body.code) {
-      console.log('Échange du code contre des tokens');
+      console.log('Exchanging code for tokens');
       const { tokens } = await oAuth2Client.getToken({
         code: decodeURIComponent(body.code),
         redirect_uri: `${process.env.URLL}/oauth`,
       });
       oAuth2Client.setCredentials(tokens);
-      console.log('Tokens reçus:', tokens);
+      console.log('Tokens received:', tokens);
 
       const userData = await getUserData(tokens.access_token);
-      return await verifyToken(null, userData, tokens.access_token);
-    } if (body.idToken) {
-      console.log('Traitement du ID token');
-      return await verifyToken(body.idToken);
+      verificationResult = await verifyToken(null, userData, tokens.access_token);
+    } else if (body.idToken) {
+      console.log('Processing ID token');
+      verificationResult = await verifyToken(body.idToken);
+    } else {
+      throw new Error('No code or ID token provided');
     }
-    console.error('Aucun code ou ID token fourni');
-    return { statusCode: 400, body: JSON.stringify({ error: 'Code ou ID Token requis' }) };
+
+    if (verificationResult.statusCode === 200) {
+      return {
+        statusCode: 200,
+        body: verificationResult.body,
+      };
+    }
+    return {
+      statusCode: verificationResult.statusCode,
+      body: JSON.stringify({ error: 'Token verification failed' }),
+    };
   } catch (err) {
-    console.error('Erreur durant l\'authentification: ', err);
+    console.error('Error during authentication:', err);
     return {
       statusCode: 500,
-      body: JSON.stringify({
-        error: 'Échec de l\'authentification', details: err.message,
-      }),
+      body: JSON.stringify({ error: 'Authentication failed', details: err.message }),
     };
   }
 };
