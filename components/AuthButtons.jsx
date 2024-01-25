@@ -6,7 +6,7 @@ export const LoginButton = () => {
 
   const handleLogin = async () => {
     try {
-      const authUrl = await getAuthUrl(); // getAuthUrl devrait être une fonction async renvoyant l'URL
+      const authUrl = await getAuthUrl();
       if (authUrl) {
         window.location.href = authUrl; // Redirection vers l'URL d'authentification
       }

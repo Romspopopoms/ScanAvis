@@ -30,7 +30,6 @@ export const AuthProvider = ({ children }) => {
   const getAuthUrl = async () => {
     clearError();
     try {
-      console.log('Requesting authentication URL');
       const response = await fetch('/.netlify/functions/request', {
         method: 'GET',
       });
