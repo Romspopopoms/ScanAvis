@@ -16,7 +16,7 @@ async function verifyToken(idToken, userData = null, accessToken = null) {
       payload = ticket.getPayload();
       console.log('ID token verified, payload:', payload);
     } else if (userData && accessToken) {
-      if (typeof userData === 'object' && !Array.isArray(userData) && userData !== null) {
+      if (typeof userData === 'object' && userData !== null && !Array.isArray(userData)) {
         payload = { ...userData, access_token: accessToken };
       } else {
         throw new Error('Invalid user data structure');
@@ -30,9 +30,8 @@ async function verifyToken(idToken, userData = null, accessToken = null) {
     }
 
     const checkUserQuery = 'SELECT uuid FROM users WHERE email = ?';
-    const results = await conn.execute(checkUserQuery, [payload.email]);
-    console.log(results);
-    const [userResults] = results;
+    const queryResult = await conn.execute(checkUserQuery, [payload.email]);
+    const userResults = queryResult[0];
 
     let userUuid;
     if (userResults.length > 0 && userResults[0].uuid) {
