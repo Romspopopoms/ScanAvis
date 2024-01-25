@@ -7,31 +7,32 @@ async function verifyToken(idToken, userData = null, accessToken = null) {
     let payload;
     const client = new OAuth2Client(process.env.CLIENT_ID);
 
+    // Log pour voir si on entre dans les différentes branches
+    console.log('verifyToken called', { idToken, userData, accessToken });
+
     if (idToken) {
       console.log('Verifying ID token:', idToken);
-      const ticket = await client.verifyIdToken({
-        idToken,
-        audience: process.env.CLIENT_ID,
-      });
+      const ticket = await client.verifyIdToken({ idToken, audience: process.env.CLIENT_ID });
       payload = ticket.getPayload();
       console.log('ID token verified, payload:', payload);
     } else if (userData && accessToken) {
-      if (typeof userData === 'object' && userData !== null && !Array.isArray(userData)) {
-        payload = { ...userData, access_token: accessToken };
-      } else {
-        throw new Error('Invalid user data structure');
-      }
+      payload = { ...userData, access_token: accessToken };
+      console.log('User data and access token provided:', payload);
     } else {
       throw new Error('No ID token or user data provided');
     }
 
-    if (!payload || !payload.email) {
-      throw new Error('Payload is invalid or email is missing');
+    const checkUserQuery = 'SELECT uuid FROM users WHERE email = ?';
+    const queryResult = await conn.execute(checkUserQuery, [payload.email]);
+
+    // Log pour inspecter la structure des résultats
+    console.log('Query result:', queryResult);
+
+    if (!Array.isArray(queryResult) || queryResult.length === 0 || !Array.isArray(queryResult[0])) {
+      throw new Error('Unexpected structure of database query results');
     }
 
-    const checkUserQuery = 'SELECT uuid FROM users WHERE email = ?';
-    const [userResults] = await conn.execute(checkUserQuery, [payload.email]);
-
+    const userResults = queryResult[0];
     let userUuid;
     if (userResults.length > 0 && userResults[0].uuid) {
       userUuid = userResults[0].uuid;
@@ -44,21 +45,11 @@ async function verifyToken(idToken, userData = null, accessToken = null) {
 
     return {
       statusCode: 200,
-      body: JSON.stringify({
-        user: {
-          uuid: userUuid,
-          email: payload.email,
-          name: payload.name,
-          access_token: payload.access_token,
-        },
-      }),
+      body: JSON.stringify({ user: { uuid: userUuid, email: payload.email, name: payload.name, access_token: payload.access_token } }),
     };
   } catch (error) {
     console.error('Error during token verification:', error);
-    return {
-      statusCode: 401,
-      body: JSON.stringify({ error: 'Token verification failed', details: error.message }),
-    };
+    return { statusCode: 401, body: JSON.stringify({ error: 'Token verification failed', details: error.message }) };
   }
 }
 
