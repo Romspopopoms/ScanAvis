@@ -30,16 +30,21 @@ async function verifyToken(idToken, userData = null, accessToken = null) {
     }
 
     const checkUserQuery = 'SELECT uuid FROM users WHERE email = ?';
-    const [userResults] = await conn.execute(checkUserQuery, [payload.email]);
+    const [queryResults] = await conn.execute(checkUserQuery, [payload.email]);
 
     let userUuid;
-    if (userResults.length > 0 && userResults[0].uuid) {
-      userUuid = userResults[0].uuid;
+    if (queryResults && queryResults.length > 0) {
+      const firstRow = queryResults[0];
+      if (firstRow && firstRow.uuid) {
+        userUuid = firstRow.uuid;
+      } else {
+        console.log('User does not exist, creating new user');
+        userUuid = uuidv4();
+        const insertUserQuery = 'INSERT INTO users (uuid, email, name, access_token) VALUES (?, ?, ?, ?)';
+        await conn.execute(insertUserQuery, [userUuid, payload.email, payload.name, payload.access_token]);
+      }
     } else {
-      console.log('User does not exist, creating new user');
-      userUuid = uuidv4();
-      const insertUserQuery = 'INSERT INTO users (uuid, email, name, access_token) VALUES (?, ?, ?, ?)';
-      await conn.execute(insertUserQuery, [userUuid, payload.email, payload.name, payload.access_token]);
+      throw new Error('No results returned from database query');
     }
 
     return {

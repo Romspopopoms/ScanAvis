@@ -67,7 +67,7 @@ export const AuthProvider = ({ children }) => {
   const verifyTokenWithServer = async (token) => {
     try {
       const response = await fetch('/.netlify/functions/verifyToken', {
-        method: 'POST',
+        method: 'POST', // Assurez-vous que c'est POST
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token }),
       });
