@@ -1,6 +1,6 @@
 const { OAuth2Client } = require('google-auth-library');
 const fetch = require('node-fetch');
-const verifyToken = require('./verifyToken'); // Vérifiez le chemin d'accès
+const verifyToken = require('./verifyToken'); // Assurez-vous que le chemin d'accès est correct
 
 async function getUserData(accessToken) {
   console.log('Getting user data with access token:', accessToken);
@@ -26,7 +26,6 @@ exports.handler = async (event) => {
     console.log('Request body parsed:', body);
 
     const oAuth2Client = new OAuth2Client(process.env.CLIENT_ID, process.env.CLIENT_SECRET);
-    let verificationResult;
 
     if (body.code) {
       console.log('Exchanging code for tokens');
@@ -38,24 +37,23 @@ exports.handler = async (event) => {
       console.log('Tokens received:', tokens);
 
       const userData = await getUserData(tokens.access_token);
-      verificationResult = await verifyToken(null, userData, tokens.access_token);
-    } else if (body.idToken) {
-      console.log('Processing ID token');
-      verificationResult = await verifyToken(body.idToken);
-    } else {
-      throw new Error('No code or ID token provided');
-    }
-
-    if (verificationResult.statusCode === 200) {
+      const verificationResult = await verifyToken(null, userData, tokens.access_token);
+      console.log('Verification result:', verificationResult);
       return {
-        statusCode: 200,
+        statusCode: verificationResult.statusCode,
+        body: verificationResult.body,
+      };
+    } if (body.idToken) {
+      console.log('Processing ID token');
+      const verificationResult = await verifyToken(body.idToken);
+      console.log('Verification result:', verificationResult);
+      return {
+        statusCode: verificationResult.statusCode,
         body: verificationResult.body,
       };
     }
-    return {
-      statusCode: verificationResult.statusCode,
-      body: JSON.stringify({ error: 'Token verification failed' }),
-    };
+    console.error('No code or ID token provided');
+    return { statusCode: 400, body: JSON.stringify({ error: 'Code or ID Token is required' }) };
   } catch (err) {
     console.error('Error during authentication:', err);
     return {
