@@ -1,14 +1,20 @@
 import React, { useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 
+// LoginButton.js
 export const LoginButton = () => {
   const { getAuthUrl } = useContext(AuthContext);
 
   const handleLogin = async () => {
     try {
+      console.log('Attempting to get auth URL...');
       const authUrl = await getAuthUrl();
+      console.log('Auth URL received:', authUrl);
       if (authUrl) {
-        window.location.href = authUrl; // Redirection vers l'URL d'authentification
+        console.log('Redirecting to:', authUrl);
+        window.location.href = authUrl;
+      } else {
+        console.error('Auth URL not received.');
       }
     } catch (error) {
       console.error('Error during login:', error);
