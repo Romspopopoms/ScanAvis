@@ -57,6 +57,7 @@ export const AuthProvider = ({ children }) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ code }),
       });
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       await handleAuthResponse(response);
     } catch (error) {
       handleError(`Erreur lors de l'envoi du code: ${error.message}`);

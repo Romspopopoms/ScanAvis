@@ -1,58 +1,57 @@
 const { OAuth2Client } = require('google-auth-library');
 const fetch = require('node-fetch');
-const verifyToken = require('./verifyToken'); // Vérifiez le chemin d'accès
+const verifyToken = require('./verifyToken'); // Assurez-vous que le chemin est correct
 
 async function getUserData(accessToken) {
-  console.log('Getting user data with access token:', accessToken);
+  console.log('Récupération des données utilisateur avec le token:', accessToken);
   const response = await fetch(`https://www.googleapis.com/oauth2/v3/userinfo?access_token=${accessToken}`);
   if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+    throw new Error(`Erreur HTTP! Statut: ${response.status}`);
   }
   const data = await response.json();
-  console.log('User data retrieved:', data);
+  console.log('Données utilisateur récupérées:', data);
   return data;
 }
 
 exports.handler = async (event) => {
-  console.log('Received event:', event);
+  console.log('Événement reçu:', event);
+
   if (event.httpMethod !== 'POST') {
-    console.error('Non-POST method attempted');
-    return { statusCode: 405, body: JSON.stringify({ error: 'Method Not Allowed' }) };
+    console.error('Tentative avec une méthode non-POST');
+    return { statusCode: 405, body: JSON.stringify({ error: 'Méthode non autorisée' }) };
   }
 
   try {
-    console.log('Parsing request body');
+    console.log('Analyse du corps de la requête');
     const body = JSON.parse(event.body);
-    console.log('Request body parsed:', body);
+    console.log('Corps de la requête analysé:', body);
 
-    // Initialisation du client OAuth2 avec les identifiants de l'application
     const oAuth2Client = new OAuth2Client(process.env.CLIENT_ID, process.env.CLIENT_SECRET);
 
     if (body.code) {
-      console.log('Exchanging code for tokens');
-      // Échange du code contre des tokens
+      console.log('Échange du code contre des tokens');
       const { tokens } = await oAuth2Client.getToken({
         code: decodeURIComponent(body.code),
         redirect_uri: `${process.env.URLL}/oauth`,
       });
       oAuth2Client.setCredentials(tokens);
-      console.log('Tokens received:', tokens);
+      console.log('Tokens reçus:', tokens);
 
-      // Récupération des données utilisateur et vérification du token
       const userData = await getUserData(tokens.access_token);
       return await verifyToken(null, userData, tokens.access_token);
     } if (body.idToken) {
-      console.log('Processing ID token');
-      // Vérification directe du ID token
+      console.log('Traitement du ID token');
       return await verifyToken(body.idToken);
     }
-    console.error('No code or ID token provided');
-    return { statusCode: 400, body: JSON.stringify({ error: 'Code or ID Token is required' }) };
+    console.error('Aucun code ou ID token fourni');
+    return { statusCode: 400, body: JSON.stringify({ error: 'Code ou ID Token requis' }) };
   } catch (err) {
-    console.error('Error during authentication:', err);
+    console.error('Erreur durant l\'authentification: ', err);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: 'Authentication failed', details: err.message }),
+      body: JSON.stringify({
+        error: 'Échec de l\'authentification', details: err.message,
+      }),
     };
   }
 };
