@@ -52,7 +52,7 @@ export const AuthProvider = ({ children }) => {
   const handleAuthCode = async (code) => {
     clearError();
     try {
-      const response = await fetch('./netlify/functions/oauth', {
+      const response = await fetch('/.netlify/functions/oauth', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ code }),
