@@ -1,6 +1,6 @@
 const { OAuth2Client } = require('google-auth-library');
 const fetch = require('node-fetch');
-const verifyToken = require('./verifyToken'); // Assurez-vous que le chemin d'accès est correct
+const verifyToken = require('./verifyToken'); // Vérifiez le chemin d'accès
 
 async function getUserData(accessToken) {
   console.log('Getting user data with access token:', accessToken);
@@ -24,21 +24,27 @@ exports.handler = async (event) => {
     console.log('Parsing request body');
     const body = JSON.parse(event.body);
     console.log('Request body parsed:', body);
+
+    // Initialisation du client OAuth2 avec les identifiants de l'application
     const oAuth2Client = new OAuth2Client(process.env.CLIENT_ID, process.env.CLIENT_SECRET);
 
     if (body.code) {
       console.log('Exchanging code for tokens');
+      // Échange du code contre des tokens
       const { tokens } = await oAuth2Client.getToken({
         code: decodeURIComponent(body.code),
         redirect_uri: `${process.env.URLL}/oauth`,
       });
       oAuth2Client.setCredentials(tokens);
       console.log('Tokens received:', tokens);
+
+      // Récupération des données utilisateur et vérification du token
       const userData = await getUserData(tokens.access_token);
-      return await verifyToken(null, userData, tokens.access_token); // Pass userData and accessToken to verifyToken
+      return await verifyToken(null, userData, tokens.access_token);
     } if (body.idToken) {
       console.log('Processing ID token');
-      return await verifyToken(body.idToken); // Pass idToken to verifyToken
+      // Vérification directe du ID token
+      return await verifyToken(body.idToken);
     }
     console.error('No code or ID token provided');
     return { statusCode: 400, body: JSON.stringify({ error: 'Code or ID Token is required' }) };

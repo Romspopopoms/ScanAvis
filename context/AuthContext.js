@@ -10,17 +10,14 @@ export const AuthProvider = ({ children }) => {
   const [errorMessage, setErrorMessage] = useState('');
 
   const clearError = () => {
-    console.log('Clearing errors');
     setErrorMessage('');
   };
 
   const handleError = (message) => {
-    console.error('Error:', message);
     setErrorMessage(message);
   };
 
   const logout = () => {
-    console.log('Logging out');
     localStorage.removeItem('authToken');
     setIsAuthenticated(false);
     setUser(null);
@@ -30,14 +27,9 @@ export const AuthProvider = ({ children }) => {
   const getAuthUrl = async () => {
     clearError();
     try {
-      const response = await fetch('/.netlify/functions/request', {
-        method: 'GET',
-      });
+      const response = await fetch('/.netlify/functions/request', { method: 'GET' });
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const { url } = await response.json();
-      console.log('Received authentication URL:', url);
-
-      // Effectuez la redirection ici
       window.location.href = url;
     } catch (error) {
       handleError(`Erreur lors de la récupération de l'URL d'authentification: ${error.message}`);
@@ -47,10 +39,8 @@ export const AuthProvider = ({ children }) => {
   const handleAuthResponse = async (response) => {
     clearError();
     try {
-      console.log('Processing authentication response');
       const data = await response.json();
       if (response.ok) {
-        console.log('Authentication successful:', data);
         setIsAuthenticated(true);
         setUser({ email: data.user.email, name: data.user.name, access_token: data.user.access_token });
         setUserUuid(data.user.uuid);
@@ -66,7 +56,6 @@ export const AuthProvider = ({ children }) => {
   const handleAuthCode = async (code) => {
     clearError();
     try {
-      console.log('Sending code for authentication:', code);
       const response = await fetch('/.netlify/functions/oauth', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -78,20 +67,37 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Effect pour gérer l'authentification basée sur l'URL ou le localStorage
+  const verifyTokenWithServer = async (token) => {
+    try {
+      const response = await fetch('/.netlify/functions/verifyToken', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setIsAuthenticated(true);
+        setUser({ email: data.user.email, name: data.user.name, access_token: data.user.access_token });
+        setUserUuid(data.user.uuid);
+      } else {
+        throw new Error(data.error || 'Erreur lors de la vérification du token');
+      }
+    } catch (error) {
+      handleError(`Erreur lors de la vérification du token: ${error.message}`);
+      logout();
+    }
+  };
+
   useEffect(() => {
     clearError();
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get('code');
     if (code) {
-      console.log('Code found in URL, handling authentication:', code);
       handleAuthCode(code);
     } else {
       const token = localStorage.getItem('authToken');
       if (token) {
-        console.log('Token found in local storage, verifying');
-        // Vous devrez peut-être ajuster cette partie pour vérifier le token correctement
-        handleAuthResponse(token);
+        verifyTokenWithServer(token);
       }
     }
   }, []);
@@ -101,7 +107,7 @@ export const AuthProvider = ({ children }) => {
       isAuthenticated,
       user,
       userUuid,
-      getAuthUrl, // getAuthUrl pour obtenir l'URL d'authentification
+      getAuthUrl,
       handleAuthCode,
       logout,
       errorMessage,
