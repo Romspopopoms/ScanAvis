@@ -1,6 +1,6 @@
 const { OAuth2Client } = require('google-auth-library');
 const fetch = require('node-fetch');
-const verifyToken = require('./verifyToken'); // Vérifiez le chemin d'accès
+const verifyToken = require('./verifyToken.js'); // Vérifiez le chemin d'accès
 
 async function getUserData(accessToken) {
   console.log('Getting user data with access token:', accessToken);
