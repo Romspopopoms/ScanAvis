@@ -27,6 +27,23 @@ export const AuthProvider = ({ children }) => {
     setUserUuid(null);
   };
 
+  const getAuthUrl = async () => {
+    clearError();
+    try {
+      console.log('Requesting authentication URL');
+      const response = await fetch('/.netlify/functions/request', {
+        method: 'GET',
+      });
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      const { url } = await response.json();
+      console.log('Received authentication URL:', url);
+      return url; // Retourner l'URL pour une utilisation ultérieure
+    } catch (error) {
+      handleError(`Erreur lors de la récupération de l'URL d'authentification: ${error.message}`);
+      return null; // Retourner null en cas d'erreur
+    }
+  };
+
   const handleAuthResponse = async (response) => {
     clearError();
     try {
@@ -35,7 +52,7 @@ export const AuthProvider = ({ children }) => {
       if (response.ok) {
         console.log('Authentication successful:', data);
         setIsAuthenticated(true);
-        setUser({ email: data.user.email, name: data.user.name });
+        setUser({ email: data.user.email, name: data.user.name, access_token: data.user.access_token });
         setUserUuid(data.user.uuid);
         localStorage.setItem('authToken', data.user.access_token);
       } else {
@@ -61,6 +78,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Effect pour gérer l'authentification basée sur l'URL ou le localStorage
   useEffect(() => {
     clearError();
     const urlParams = new URLSearchParams(window.location.search);
@@ -72,7 +90,8 @@ export const AuthProvider = ({ children }) => {
       const token = localStorage.getItem('authToken');
       if (token) {
         console.log('Token found in local storage, verifying');
-        handleAuthResponse(token); // Vérifier le token pour validation
+        // Vous devrez peut-être ajuster cette partie pour vérifier le token correctement
+        handleAuthResponse(token);
       }
     }
   }, []);
@@ -82,7 +101,7 @@ export const AuthProvider = ({ children }) => {
       isAuthenticated,
       user,
       userUuid,
-      getAuthUrl: handleAuthCode, // Utilisez handleAuthCode pour obtenir l'URL d'authentification
+      getAuthUrl, // getAuthUrl pour obtenir l'URL d'authentification
       handleAuthCode,
       logout,
       errorMessage,
