@@ -30,15 +30,7 @@ async function verifyToken(idToken, userData = null, accessToken = null) {
     }
 
     const checkUserQuery = 'SELECT uuid FROM users WHERE email = ?';
-    const queryResult = await conn.execute(checkUserQuery, [payload.email]);
-
-    // Vérifiez si queryResult est bien structuré
-    if (!Array.isArray(queryResult) || queryResult.length === 0 || !Array.isArray(queryResult[0])) {
-      console.error('Unexpected query result structure:', queryResult);
-      throw new Error('Unexpected structure of database query results');
-    }
-
-    const userResults = queryResult[0];
+    const [userResults] = await conn.execute(checkUserQuery, [payload.email]);
 
     let userUuid;
     if (userResults.length > 0 && userResults[0].uuid) {
