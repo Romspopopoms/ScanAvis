@@ -11,29 +11,24 @@ async function verifyToken(idToken, userData = null, accessToken = null) {
     if (idToken) {
       const ticket = await client.verifyIdToken({ idToken, audience: process.env.CLIENT_ID });
       payload = ticket.getPayload();
-      console.log('ID token verified, payload:', payload);
     } else if (userData && accessToken) {
       payload = { ...userData, access_token: accessToken };
-      console.log('User data and access token provided:', payload);
     } else {
       throw new Error('No ID token or user data provided');
     }
 
-    console.log('Checking user in DB with email:', payload.email);
     const checkUserQuery = 'SELECT uuid FROM users WHERE email = ?';
     const [results] = await conn.execute(checkUserQuery, [payload.email]);
 
     let userUuid;
-    // Ajout d'une vérification pour s'assurer que results contient des éléments
-    if (results && results.length > 0) {
+    if (results.length > 0) {
+      // Supposons que la première ligne contient l'UUID que nous cherchons
       userUuid = results[0].uuid;
-      console.log('User exists with UUID:', userUuid);
     } else {
-      console.log('User does not exist, creating new user');
+      // Si l'utilisateur n'existe pas, créez-en un nouveau
       userUuid = uuidv4();
       const insertUserQuery = 'INSERT INTO users (uuid, email, name, access_token) VALUES (?, ?, ?, ?)';
       await conn.execute(insertUserQuery, [userUuid, payload.email, payload.name, payload.access_token]);
-      console.log('New user created with UUID:', userUuid);
     }
 
     return {
