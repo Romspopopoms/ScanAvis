@@ -30,13 +30,14 @@ async function verifyToken(idToken, userData = null, accessToken = null) {
     try {
       console.log('test1.1');
       console.log('Email to query:', cleanedPayload.email);
-      const [rows] = await conn.execute('SELECT uuid FROM users WHERE email = ?', [cleanedPayload.email]);
+      const [rows] = await conn.execute('SELECT count(*) FROM users WHERE email = ?', [cleanedPayload.email]);
       console.log('Query raw results:', rows);
       results = rows; // Récupération des lignes de résultat
       console.log('test1.2');
       console.log('Database results:', results);
     } catch (error) {
       console.error('Erreur lors de la requête à la base de données:', error);
+      console.error('Erreur détaillée:', error.message);
       return {
         statusCode: 500,
         body: JSON.stringify({ error: 'Database query failed', details: error.message }),
