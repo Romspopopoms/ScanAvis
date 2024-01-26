@@ -18,6 +18,18 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
+  const getAuthUrl = async () => {
+    clearError();
+    try {
+      const response = await fetch('/.netlify/functions/request', { method: 'GET' });
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      const { url } = await response.json();
+      return url; // Retourne l'URL pour une redirection ultérieure
+    } catch (error) {
+      handleError(`Erreur lors de la récupération de l'URL d'authentification: ${error.message}`);
+    }
+  };
+
   const handleAuthResponse = async (response) => {
     clearError();
     try {
@@ -87,6 +99,7 @@ export const AuthProvider = ({ children }) => {
     <AuthContext.Provider value={{
       isAuthenticated,
       user,
+      getAuthUrl, // Ajoutez ceci
       handleAuthCode,
       logout,
       errorMessage,
