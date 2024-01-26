@@ -6,64 +6,43 @@ async function verifyToken(idToken, userData = null, accessToken = null) {
   try {
     let payload;
     const client = new OAuth2Client(process.env.CLIENT_ID);
+    console.log('verifyToken called', { idToken, userData, accessToken });
 
     if (idToken) {
-      console.log('Verifying ID token:', idToken);
-      const ticket = await client.verifyIdToken({
-        idToken,
-        audience: process.env.CLIENT_ID,
-      });
+      const ticket = await client.verifyIdToken({ idToken, audience: process.env.CLIENT_ID });
       payload = ticket.getPayload();
       console.log('ID token verified, payload:', payload);
     } else if (userData && accessToken) {
-      if (typeof userData === 'object' && userData !== null && !Array.isArray(userData)) {
-        payload = { ...userData, access_token: accessToken };
-      } else {
-        throw new Error('Invalid user data structure');
-      }
+      payload = { ...userData, access_token: accessToken };
+      console.log('User data and access token provided:', payload);
     } else {
       throw new Error('No ID token or user data provided');
     }
 
-    if (!payload || !payload.email) {
-      throw new Error('Payload is invalid or email is missing');
-    }
-
+    console.log('Checking user in DB with email:', payload.email);
     const checkUserQuery = 'SELECT uuid FROM users WHERE email = ?';
     const [queryResults] = await conn.execute(checkUserQuery, [payload.email]);
-    console.log('Query results:', queryResults);
+    console.log('DB query executed. Results:', queryResults);
+
     let userUuid;
-    if (queryResults && queryResults.length > 0) {
-      const firstRow = queryResults[0];
-      if (firstRow && firstRow.uuid) {
-        userUuid = firstRow.uuid;
-      } else {
-        console.log('User does not exist, creating new user');
-        userUuid = uuidv4();
-        const insertUserQuery = 'INSERT INTO users (uuid, email, name, access_token) VALUES (?, ?, ?, ?)';
-        await conn.execute(insertUserQuery, [userUuid, payload.email, payload.name, payload.access_token]);
-      }
+    if (queryResults && Array.isArray(queryResults) && queryResults.length > 0) {
+      userUuid = queryResults[0].uuid;
+      console.log('User exists with UUID:', userUuid);
     } else {
-      throw new Error('No results returned from database query');
+      console.log('User does not exist, creating new user');
+      userUuid = uuidv4();
+      const insertUserQuery = 'INSERT INTO users (uuid, email, name, access_token) VALUES (?, ?, ?, ?)';
+      const insertResult = await conn.execute(insertUserQuery, [userUuid, payload.email, payload.name, payload.access_token]);
+      console.log('New user created with UUID:', userUuid, 'Insert result:', insertResult);
     }
 
     return {
       statusCode: 200,
-      body: JSON.stringify({
-        user: {
-          uuid: userUuid,
-          email: payload.email,
-          name: payload.name,
-          access_token: payload.access_token,
-        },
-      }),
+      body: JSON.stringify({ user: { uuid: userUuid, email: payload.email, name: payload.name, access_token: payload.access_token } }),
     };
   } catch (error) {
     console.error('Error during token verification:', error);
-    return {
-      statusCode: 401,
-      body: JSON.stringify({ error: 'Token verification failed', details: error.message }),
-    };
+    return { statusCode: 401, body: JSON.stringify({ error: 'Token verification failed', details: error.message }) };
   }
 }
 
