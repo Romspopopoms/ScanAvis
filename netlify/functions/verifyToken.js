@@ -27,7 +27,7 @@ async function verifyToken(idToken, userData = null, accessToken = null) {
 
     let results;
     try {
-      const [queryResults] = await conn.execute('SELECT uuid FROM users WHERE email = ?', [cleanedPayload.email]);
+      const [queryResults] = await conn.execute('SELECT uuid FROM users WHERE email = ?', 'roman.2009@live.fr');
       results = queryResults; // Récupération des lignes de résultat directement grâce à la déstructuration d'array
       console.log('Database results:', results);
     } catch (error) {
