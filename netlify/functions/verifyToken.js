@@ -29,6 +29,7 @@ async function verifyToken(idToken, userData = null, accessToken = null) {
     let results;
     try {
       console.log('test1.1');
+      console.log('Email to query:', cleanedPayload.email);
       const [rows] = await conn.execute('SELECT uuid FROM users WHERE email = ?', [cleanedPayload.email]);
       console.log('Query raw results:', rows);
       results = rows; // Récupération des lignes de résultat
