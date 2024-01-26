@@ -25,29 +25,33 @@ async function verifyToken(idToken, userData = null, accessToken = null) {
     // Nettoyage de payload pour éviter les propriétés non itérables
     const cleanedPayload = JSON.parse(JSON.stringify(payload));
 
-    const [results] = await conn.execute('SELECT uuid FROM users WHERE email = ?', [cleanedPayload.email]);
-    console.log(results);
-    if (!Array.isArray(results)) {
-      throw new Error('Database query did not return an array');
+    let results;
+    try {
+      [results] = await conn.execute('SELECT uuid FROM users WHERE email = ?', [cleanedPayload.email]);
+      console.log('Database results:', results);
+    } catch (error) {
+      console.error('Erreur lors de la requête à la base de données:', error);
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: 'Database query failed', details: error.message }),
+      };
     }
 
-    const userUuid = results.length > 0 ? results[0].uuid : uuidv4();
-
-    if (results.length === 0) {
-      console.log('Inserting new user into the database');
-      await conn.execute('INSERT INTO users (uuid, email, name, access_token) VALUES (?, ?, ?, ?)', [userUuid, cleanedPayload.email, cleanedPayload.name, cleanedPayload.access_token]);
-      console.log('New user created:', userUuid);
+    if (!results || results.length === 0) {
+      console.log('Aucun utilisateur trouvé, création d\'un nouveau utilisateur');
+      const newUuid = uuidv4();
+      await conn.execute('INSERT INTO users (uuid, email, name, access_token) VALUES (?, ?, ?, ?)', [newUuid, cleanedPayload.email, cleanedPayload.name, cleanedPayload.access_token]);
+      console.log('New user created:', newUuid);
+      payload.uuid = newUuid; // Mettre à jour le payload avec le nouveau uuid
     } else {
-      console.log('Existing user found:', userUuid);
+      console.log('Existing user found:', results[0].uuid);
+      payload.uuid = results[0].uuid; // Mettre à jour le payload avec l'uuid trouvé
     }
 
-    console.log('User processed:', userUuid);
+    console.log('User processed:', payload.uuid);
 
     const responseBody = {
-      user: {
-        uuid: userUuid,
-        ...cleanedPayload, // Utilisation de la version nettoyée de payload
-      },
+      user: payload, // Utilisation de la version nettoyée de payload
     };
 
     console.log('Response Body:', JSON.stringify(responseBody, null, 2));
