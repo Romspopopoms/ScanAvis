@@ -25,7 +25,7 @@ async function verifyToken(idToken, userData = null, accessToken = null) {
     console.log('DB query executed. Results:', queryResults);
 
     let userUuid;
-    if (queryResults && Array.isArray(queryResults) && queryResults.length > 0) {
+    if (queryResults && queryResults.length > 0) {
       userUuid = queryResults[0].uuid;
       console.log('User exists with UUID:', userUuid);
     } else {
