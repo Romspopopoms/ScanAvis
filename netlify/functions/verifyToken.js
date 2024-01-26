@@ -26,6 +26,7 @@ async function verifyToken(idToken, userData = null, accessToken = null) {
     const cleanedPayload = JSON.parse(JSON.stringify(payload));
 
     const [results] = await conn.execute('SELECT uuid FROM users WHERE email = ?', [cleanedPayload.email]);
+    console.log(results);
     if (!Array.isArray(results)) {
       throw new Error('Database query did not return an array');
     }
