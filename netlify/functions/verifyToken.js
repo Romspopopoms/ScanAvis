@@ -43,14 +43,22 @@ async function verifyToken(idToken, userData = null, accessToken = null) {
 
     console.log('User processed:', userUuid);
 
+    // Assurez-vous que le payload ne contient que des objets, pas des valeurs non itérables
+    const safePayload = {};
+    Object.keys(payload).forEach((key) => {
+      if (typeof payload[key] !== 'object' || payload[key] === null) { // Prise en compte des valeurs null
+        safePayload[key] = payload[key];
+      }
+    });
+
     const responseBody = {
       user: {
         uuid: userUuid,
-        ...payload,
+        ...safePayload,
       },
     };
 
-    console.log('Response Body:', responseBody);
+    console.log('Response Body:', JSON.stringify(responseBody, null, 2));
     return {
       statusCode: 200,
       body: JSON.stringify(responseBody),
