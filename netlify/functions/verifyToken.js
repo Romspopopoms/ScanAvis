@@ -22,12 +22,10 @@ async function verifyToken(idToken, userData = null, accessToken = null) {
 
     console.log('Payload:', payload);
 
-    // Ici, nous imprimons les clés et les valeurs de payload pour mieux comprendre sa structure
-    Object.entries(payload).forEach(([key, value]) => {
-      console.log(`Key: ${key}, Value: ${value}, Type of Value: ${typeof value}`);
-    });
+    // Nettoyage de payload pour éviter les propriétés non itérables
+    const cleanedPayload = JSON.parse(JSON.stringify(payload));
 
-    const [results] = await conn.execute('SELECT uuid FROM users WHERE email = ?', [payload.email]);
+    const [results] = await conn.execute('SELECT uuid FROM users WHERE email = ?', [cleanedPayload.email]);
     if (!Array.isArray(results)) {
       throw new Error('Database query did not return an array');
     }
@@ -36,7 +34,7 @@ async function verifyToken(idToken, userData = null, accessToken = null) {
 
     if (results.length === 0) {
       console.log('Inserting new user into the database');
-      await conn.execute('INSERT INTO users (uuid, email, name, access_token) VALUES (?, ?, ?, ?)', [userUuid, payload.email, payload.name, payload.access_token]);
+      await conn.execute('INSERT INTO users (uuid, email, name, access_token) VALUES (?, ?, ?, ?)', [userUuid, cleanedPayload.email, cleanedPayload.name, cleanedPayload.access_token]);
       console.log('New user created:', userUuid);
     } else {
       console.log('Existing user found:', userUuid);
@@ -47,14 +45,14 @@ async function verifyToken(idToken, userData = null, accessToken = null) {
     const responseBody = {
       user: {
         uuid: userUuid,
-        ...JSON.parse(JSON.stringify(payload)), // Utilisation de JSON.parse(JSON.stringify()) pour nettoyer payload
+        ...cleanedPayload, // Utilisation de la version nettoyée de payload
       },
     };
 
     console.log('Response Body:', JSON.stringify(responseBody, null, 2));
     return {
       statusCode: 200,
-      body: JSON.stringify({ user: { uuid: userUuid, ...payload } }),
+      body: JSON.stringify(responseBody),
     };
   } catch (error) {
     console.error('Erreur lors de la vérification du token:', error);

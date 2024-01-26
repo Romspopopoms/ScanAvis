@@ -6,7 +6,6 @@ export const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
-  const [userUuid, setUserUuid] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
 
   const clearError = () => setErrorMessage('');
@@ -17,19 +16,6 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('authToken');
     setIsAuthenticated(false);
     setUser(null);
-    setUserUuid(null);
-  };
-
-  const getAuthUrl = async () => {
-    clearError();
-    try {
-      const response = await fetch('/.netlify/functions/request', { method: 'GET' });
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-      const { url } = await response.json();
-      window.location.href = url;
-    } catch (error) {
-      handleError(`Erreur lors de la récupération de l'URL d'authentification: ${error.message}`);
-    }
   };
 
   const handleAuthResponse = async (response) => {
@@ -39,7 +25,6 @@ export const AuthProvider = ({ children }) => {
       if (response.ok) {
         setIsAuthenticated(true);
         setUser({ email: data.user.email, name: data.user.name, access_token: data.user.access_token });
-        setUserUuid(data.user.uuid);
         localStorage.setItem('authToken', data.user.access_token);
       } else {
         handleError(data.error || 'Erreur lors du traitement de la réponse.');
@@ -69,13 +54,13 @@ export const AuthProvider = ({ children }) => {
       const response = await fetch('/.netlify/functions/verifyToken', {
         method: 'POST', // Assurez-vous que c'est POST
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token }),
+        body: JSON.stringify({ idToken: token }), // Assurez-vous d'envoyer le token sous la bonne clé attendue par votre fonction serveur
       });
       const data = await response.json();
       if (response.ok && data.user) {
         setIsAuthenticated(true);
         setUser({ email: data.user.email, name: data.user.name, access_token: data.user.access_token });
-        setUserUuid(data.user.uuid);
+        localStorage.setItem('authToken', data.user.access_token);
       } else {
         logout();
         handleError(data.error || 'Erreur lors de la vérification du token');
@@ -90,13 +75,11 @@ export const AuthProvider = ({ children }) => {
     clearError();
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get('code');
+    const token = localStorage.getItem('authToken');
     if (code) {
       handleAuthCode(code);
-    } else {
-      const token = localStorage.getItem('authToken');
-      if (token) {
-        verifyTokenWithServer(token);
-      }
+    } else if (token) {
+      verifyTokenWithServer(token);
     }
   }, []);
 
@@ -104,8 +87,6 @@ export const AuthProvider = ({ children }) => {
     <AuthContext.Provider value={{
       isAuthenticated,
       user,
-      userUuid,
-      getAuthUrl,
       handleAuthCode,
       logout,
       errorMessage,
