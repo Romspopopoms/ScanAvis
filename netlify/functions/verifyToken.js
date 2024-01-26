@@ -29,11 +29,10 @@ async function verifyToken(idToken, userData = null, accessToken = null) {
     let results;
     try {
       console.log('test1.1');
-      const [queryResults] = await conn.execute('SELECT uuid FROM users WHERE email = ?', [cleanedPayload.email]);
-      console.log(queryResults);
+      const [rows] = await conn.execute('SELECT uuid FROM users WHERE email = ?', [cleanedPayload.email]);
+      console.log('Query raw results:', rows);
+      results = rows; // Récupération des lignes de résultat
       console.log('test1.2');
-      results = queryResults; // Récupération des lignes de résultat directement grâce à la déstructuration d'array
-      console.log('test1.3');
       console.log('Database results:', results);
     } catch (error) {
       console.error('Erreur lors de la requête à la base de données:', error);
@@ -42,6 +41,7 @@ async function verifyToken(idToken, userData = null, accessToken = null) {
         body: JSON.stringify({ error: 'Database query failed', details: error.message }),
       };
     }
+
     console.log('test2');
 
     if (!results || results.length === 0) {
