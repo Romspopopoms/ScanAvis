@@ -27,7 +27,8 @@ async function verifyToken(idToken, userData = null, accessToken = null) {
 
     let results;
     try {
-      [results] = await conn.execute('SELECT uuid FROM users WHERE email = ?', [cleanedPayload.email]);
+      const [queryResults] = await conn.execute('SELECT uuid FROM users WHERE email = ?', [cleanedPayload.email]);
+      results = queryResults; // Récupération des lignes de résultat directement grâce à la déstructuration d'array
       console.log('Database results:', results);
     } catch (error) {
       console.error('Erreur lors de la requête à la base de données:', error);
@@ -42,16 +43,16 @@ async function verifyToken(idToken, userData = null, accessToken = null) {
       const newUuid = uuidv4();
       await conn.execute('INSERT INTO users (uuid, email, name, access_token) VALUES (?, ?, ?, ?)', [newUuid, cleanedPayload.email, cleanedPayload.name, cleanedPayload.access_token]);
       console.log('New user created:', newUuid);
-      payload.uuid = newUuid; // Mettre à jour le payload avec le nouveau uuid
+      cleanedPayload.uuid = newUuid; // Mettre à jour le cleanedPayload avec le nouveau uuid
     } else {
       console.log('Existing user found:', results[0].uuid);
-      payload.uuid = results[0].uuid; // Mettre à jour le payload avec l'uuid trouvé
+      cleanedPayload.uuid = results[0].uuid; // Mettre à jour le cleanedPayload avec l'uuid trouvé
     }
 
-    console.log('User processed:', payload.uuid);
+    console.log('User processed:', cleanedPayload.uuid);
 
     const responseBody = {
-      user: payload, // Utilisation de la version nettoyée de payload
+      user: cleanedPayload, // Utilisation de la version nettoyée de payload
     };
 
     console.log('Response Body:', JSON.stringify(responseBody, null, 2));
