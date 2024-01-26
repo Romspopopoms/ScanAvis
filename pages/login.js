@@ -6,40 +6,45 @@ const LoginPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const { getAuthUrl } = useContext(AuthContext);
+  const { getAuthUrl, handleAuthCode } = useContext(AuthContext);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    console.log('Submit button clicked');
     setErrorMessage('');
 
     if (!username || !password) {
-      console.error('Username or password missing');
       setErrorMessage('Le nom d\'utilisateur et le mot de passe sont requis');
       return;
     }
 
     try {
-      console.log('Sending login request');
       const response = await fetch('/.netlify/functions/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
       });
 
       const data = await response.json();
       if (response.ok) {
-        console.log('Login successful:', data);
-        // Gérer la réussite de la connexion ici
+        handleAuthCode(data.access_token); // Utiliser la fonction de contexte pour traiter la réponse de connexion
       } else {
-        console.error('Login error:', data.message);
-        setErrorMessage(data.message || 'Erreur lors de la connexion');
+        setErrorMessage(data.error || 'Erreur lors de la connexion');
       }
     } catch (error) {
-      console.error('Network error:', error);
       setErrorMessage('Problème de connexion réseau');
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      const authUrl = await getAuthUrl();
+      if (authUrl) {
+        window.location.href = authUrl;
+      } else {
+        setErrorMessage('Erreur lors de la récupération de l\'URL d\'authentification');
+      }
+    } catch (error) {
+      setErrorMessage('Erreur lors de la récupération de l\'URL d\'authentification');
     }
   };
 
@@ -78,10 +83,9 @@ const LoginPage = () => {
             Se connecter
           </button>
 
-          <button type="button" className="w-full bg-purple-600 py-3 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 transition duration-200 ease-in-out text-white" onClick={getAuthUrl}>
+          <button type="button" className="w-full bg-purple-600 py-3 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 transition duration-200 ease-in-out text-white" onClick={handleGoogleSignIn}>
             S'identifier avec Google
           </button>
-
           <div className="flex items-center justify-between mt-4">
             <label htmlFor="remember-me" className="flex items-center">
               <input id="remember-me" type="checkbox" className="rounded text-blue-500 focus:ring-blue-500" />

@@ -7,17 +7,17 @@ export const LoginButton = () => {
 
   const handleLogin = async () => {
     try {
-      console.log('Attempting to get auth URL...');
+      console.log('Tentative de récupération de l\'URL d\'authentification...');
       const authUrl = await getAuthUrl();
-      console.log('Auth URL received:', authUrl);
+      console.log('URL d\'authentification reçue:', authUrl);
       if (authUrl) {
-        console.log('Redirecting to:', authUrl);
-        window.location.href = authUrl;
+        console.log('Redirection vers:', authUrl);
+        window.location.href = authUrl; // La redirection doit se produire ici
       } else {
-        console.error('Auth URL not received.');
+        console.error('L\'URL d\'authentification n\'a pas été reçue.');
       }
     } catch (error) {
-      console.error('Error during login:', error);
+      console.error('Erreur pendant la connexion:', error);
     }
   };
 
