@@ -22,9 +22,10 @@ async function verifyToken(idToken, userData = null, accessToken = null) {
 
     console.log('Payload:', payload);
 
-    if (typeof payload.email !== 'string') {
-      throw new Error('Email is not provided or not a string in payload');
-    }
+    // Ici, nous imprimons les clés et les valeurs de payload pour mieux comprendre sa structure
+    Object.entries(payload).forEach(([key, value]) => {
+      console.log(`Key: ${key}, Value: ${value}, Type of Value: ${typeof value}`);
+    });
 
     const [results] = await conn.execute('SELECT uuid FROM users WHERE email = ?', [payload.email]);
     if (!Array.isArray(results)) {
@@ -53,7 +54,7 @@ async function verifyToken(idToken, userData = null, accessToken = null) {
     console.log('Response Body:', JSON.stringify(responseBody, null, 2));
     return {
       statusCode: 200,
-      body: JSON.stringify(responseBody),
+      body: JSON.stringify({ user: { uuid: userUuid, ...payload } }),
     };
   } catch (error) {
     console.error('Erreur lors de la vérification du token:', error);
