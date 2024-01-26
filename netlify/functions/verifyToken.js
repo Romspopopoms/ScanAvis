@@ -31,7 +31,7 @@ async function verifyToken(idToken, userData = null, accessToken = null) {
 
     const checkUserQuery = 'SELECT uuid FROM users WHERE email = ?';
     const [queryResults] = await conn.execute(checkUserQuery, [payload.email]);
-
+    console.log('Query results:', queryResults);
     let userUuid;
     if (queryResults && queryResults.length > 0) {
       const firstRow = queryResults[0];
