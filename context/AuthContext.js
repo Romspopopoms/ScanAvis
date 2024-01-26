@@ -102,6 +102,7 @@ export const AuthProvider = ({ children }) => {
       getAuthUrl, // Ajoutez ceci
       handleAuthCode,
       logout,
+      verifyTokenWithServer,
       errorMessage,
     }}
     >
