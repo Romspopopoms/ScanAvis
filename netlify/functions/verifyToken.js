@@ -25,10 +25,14 @@ async function verifyToken(idToken, userData = null, accessToken = null) {
     // Nettoyage de payload pour éviter les propriétés non itérables
     const cleanedPayload = JSON.parse(JSON.stringify(payload));
 
+    console.log('test1');
     let results;
     try {
-      const [queryResults] = await conn.execute('SELECT uuid FROM users WHERE email = ?', 'roman.2009@live.fr');
+      console.log('test1.1');
+      const [queryResults] = await conn.execute('SELECT uuid FROM users WHERE email = roman.2009@live.fr');
+      console.log('test1.2');
       results = queryResults; // Récupération des lignes de résultat directement grâce à la déstructuration d'array
+      console.log('test1.3');
       console.log('Database results:', results);
     } catch (error) {
       console.error('Erreur lors de la requête à la base de données:', error);
@@ -37,6 +41,7 @@ async function verifyToken(idToken, userData = null, accessToken = null) {
         body: JSON.stringify({ error: 'Database query failed', details: error.message }),
       };
     }
+    console.log('test2');
 
     if (!results || results.length === 0) {
       console.log('Aucun utilisateur trouvé, création d\'un nouveau utilisateur');
@@ -49,6 +54,7 @@ async function verifyToken(idToken, userData = null, accessToken = null) {
       cleanedPayload.uuid = results[0].uuid; // Mettre à jour le cleanedPayload avec l'uuid trouvé
     }
 
+    console.log('test3');
     console.log('User processed:', cleanedPayload.uuid);
 
     const responseBody = {
