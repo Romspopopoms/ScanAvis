@@ -22,11 +22,10 @@ async function verifyToken(idToken, userData = null, accessToken = null) {
     console.log('Checking user in DB with email:', payload.email);
     const checkUserQuery = 'SELECT uuid FROM users WHERE email = ?';
     const [results] = await conn.execute(checkUserQuery, [payload.email]);
-    console.log('DB query executed. Results:', results);
 
     let userUuid;
-    // Vérification que results est bien un tableau et qu'il contient au moins un élément
-    if (Array.isArray(results) && results.length > 0) {
+    // Ajout d'une vérification pour s'assurer que results contient des éléments
+    if (results && results.length > 0) {
       userUuid = results[0].uuid;
       console.log('User exists with UUID:', userUuid);
     } else {
