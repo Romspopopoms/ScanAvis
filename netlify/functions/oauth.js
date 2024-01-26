@@ -8,9 +8,7 @@ async function getUserData(accessToken) {
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`);
   }
-  const data = await response.json();
-  console.log('User data retrieved:', data);
-  return data;
+  return response.json();
 }
 
 exports.handler = async (event) => {
@@ -27,6 +25,12 @@ exports.handler = async (event) => {
 
     const oAuth2Client = new OAuth2Client(process.env.CLIENT_ID, process.env.CLIENT_SECRET);
 
+    if (!body.code && !body.idToken) {
+      console.error('No code or ID token provided');
+      return { statusCode: 400, body: JSON.stringify({ error: 'Code or ID Token is required' }) };
+    }
+
+    let verificationResult;
     if (body.code) {
       console.log('Exchanging code for tokens');
       const { tokens } = await oAuth2Client.getToken({
@@ -37,23 +41,14 @@ exports.handler = async (event) => {
       console.log('Tokens received:', tokens);
 
       const userData = await getUserData(tokens.access_token);
-      const verificationResult = await verifyToken(null, userData, tokens.access_token);
-      console.log('Verification result:', verificationResult);
-      return {
-        statusCode: verificationResult.statusCode,
-        body: verificationResult.body,
-      };
-    } if (body.idToken) {
+      verificationResult = await verifyToken(null, userData, tokens.access_token);
+    } else if (body.idToken) {
       console.log('Processing ID token');
-      const verificationResult = await verifyToken(body.idToken);
-      console.log('Verification result:', verificationResult);
-      return {
-        statusCode: verificationResult.statusCode,
-        body: verificationResult.body,
-      };
+      verificationResult = await verifyToken(body.idToken);
     }
-    console.error('No code or ID token provided');
-    return { statusCode: 400, body: JSON.stringify({ error: 'Code or ID Token is required' }) };
+
+    console.log('Verification result:', verificationResult);
+    return verificationResult;
   } catch (err) {
     console.error('Error during authentication:', err);
     return {
