@@ -21,19 +21,20 @@ async function verifyToken(idToken, userData = null, accessToken = null) {
 
     console.log('Checking user in DB with email:', payload.email);
     const checkUserQuery = 'SELECT uuid FROM users WHERE email = ?';
-    const [queryResults] = await conn.execute(checkUserQuery, [payload.email]);
-    console.log('DB query executed. Results:', queryResults);
+    const [results] = await conn.execute(checkUserQuery, [payload.email]);
+    console.log('DB query executed. Results:', results);
 
     let userUuid;
-    if (queryResults && queryResults.length > 0) {
-      userUuid = queryResults[0].uuid;
+    // Vérification que results est bien un tableau et qu'il contient au moins un élément
+    if (Array.isArray(results) && results.length > 0) {
+      userUuid = results[0].uuid;
       console.log('User exists with UUID:', userUuid);
     } else {
       console.log('User does not exist, creating new user');
       userUuid = uuidv4();
       const insertUserQuery = 'INSERT INTO users (uuid, email, name, access_token) VALUES (?, ?, ?, ?)';
-      const insertResult = await conn.execute(insertUserQuery, [userUuid, payload.email, payload.name, payload.access_token]);
-      console.log('New user created with UUID:', userUuid, 'Insert result:', insertResult);
+      await conn.execute(insertUserQuery, [userUuid, payload.email, payload.name, payload.access_token]);
+      console.log('New user created with UUID:', userUuid);
     }
 
     return {
