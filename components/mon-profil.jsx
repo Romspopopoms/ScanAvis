@@ -15,7 +15,7 @@ const MonProfil = () => {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ userUuid: user.uuid }), // Utilisez user.uuid qui est maintenant l'identifiant unique de l'utilisateur
+          body: JSON.stringify({ userUuid: user.uuid }), // Assurez-vous que user.uuid est correct et contient l'UUID de l'utilisateur
         });
 
         if (!response.ok) {
@@ -23,7 +23,7 @@ const MonProfil = () => {
         }
 
         const data = await response.json();
-        setUserPayments(data.transactions); // Ajustez en fonction de la clé réelle dans la réponse
+        setUserPayments(data.transactions); // Assurez-vous que data.transactions contient bien les transactions
       } catch (error) {
         console.error('Erreur lors de la récupération des paiements utilisateur :', error);
       } finally {
@@ -31,7 +31,7 @@ const MonProfil = () => {
       }
     };
 
-    if (user) {
+    if (user && user.uuid) {
       fetchPayments();
     }
   }, [user]);
