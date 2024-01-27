@@ -28,23 +28,13 @@ async function verifyToken(idToken, userData = null, accessToken = null) {
 
     console.log('Executing SQL Query:', sqlQuery);
     console.log('With Parameters:', email);
-    let results;
 
-    try {
-      const result = await conn.execute(sqlQuery, [email]);
-      console.log('Result from conn.execute:', result); // Vérifiez ce que conn.execute retourne
-      const rows = result[0]; // Adaptez cette ligne en fonction de ce que conn.execute retourne
-      console.log('Query raw results:', rows);
-      results = rows;
-    } catch (error) {
-      console.error('Erreur lors de la requête à la base de données:', error);
-      return {
-        statusCode: 500,
-        body: JSON.stringify({ error: 'Database query failed', details: error.message }),
-      };
-    }
+    const result = await conn.execute(sqlQuery, [email]);
+    console.log('Result from conn.execute:', result);
+    const { rows } = result; // Assurez-vous que c'est la structure correcte pour les résultats de votre base de données
+    console.log('Query results:', rows);
 
-    if (!results || results.length === 0) {
+    if (rows.length === 0) {
       console.log('Aucun utilisateur trouvé, création d\'un nouveau utilisateur');
       const newUuid = uuidv4();
       const insertSql = 'INSERT INTO users (uuid, email, name, access_token) VALUES (?, ?, ?, ?)';
@@ -55,8 +45,8 @@ async function verifyToken(idToken, userData = null, accessToken = null) {
       console.log('New user created:', newUuid);
       cleanedPayload.uuid = newUuid;
     } else {
-      console.log('Existing user found:', results[0].uuid);
-      cleanedPayload.uuid = results[0].uuid;
+      console.log('Existing user found:', rows[0].uuid);
+      cleanedPayload.uuid = rows[0].uuid;
     }
 
     const responseBody = {
