@@ -28,6 +28,7 @@ const MonProfil = () => {
         }
 
         const data = await response.json();
+        console.log(data);
         if (data.transactions && data.transactions.length > 0) {
           setUserPayments(data.transactions);
         } else {
