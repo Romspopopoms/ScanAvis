@@ -24,10 +24,12 @@ exports.handler = async (event) => {
 
   try {
     const query = 'SELECT * FROM Transactions WHERE paymentIntentId = ?';
-    const [transaction] = await conn.execute(query, [paymentIntentId]);
-    console.log('Résultat de la requête:', transaction);
+    const result = await conn.execute(query, [paymentIntentId]);
+    console.log('Result from conn.execute:', result);
+    const rows = result[0]; // Assurez-vous que c'est la structure correcte pour les résultats de votre base de données
+    console.log('Query results:', rows);
 
-    if (transaction.length === 0) {
+    if (!rows || rows.length === 0) {
       console.log(`Transaction non trouvée pour paymentIntentId: ${paymentIntentId}`);
       return {
         statusCode: 404,
@@ -36,12 +38,13 @@ exports.handler = async (event) => {
       };
     }
 
+    const transaction = rows[0]; // En supposant que paymentIntentId est unique et renvoie une seule transaction
     const response = {
-      transactionId: transaction[0].transactionId,
-      items: JSON.parse(transaction[0].items || '[]'),
-      totalAmount: transaction[0].totalAmount,
-      paymentIntentId: transaction[0].paymentIntentId,
-      createdAt: transaction[0].createdAt,
+      transactionId: transaction.transactionId,
+      items: JSON.parse(transaction.items || '[]'),
+      totalAmount: transaction.totalAmount,
+      paymentIntentId: transaction.paymentIntentId,
+      createdAt: transaction.createdAt,
       // Exclure les données sensibles comme clientSecret
     };
 
