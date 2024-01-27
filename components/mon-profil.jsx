@@ -3,11 +3,16 @@ import { AuthContext } from '../context/AuthContext'; // Assurez-vous que le che
 
 const MonProfil = () => {
   const { user, logout } = useContext(AuthContext);
-  const [userPayments, setUserPayments] = useState(null);
+  const [userPayments, setUserPayments] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchPayments = async () => {
+      if (!user || !user.uuid) {
+        setLoading(false);
+        return;
+      }
+
       setLoading(true);
       try {
         const response = await fetch('/.netlify/functions/getUserPayments', {
@@ -22,8 +27,8 @@ const MonProfil = () => {
           throw new Error(`Erreur HTTP ! Statut : ${response.status}`);
         }
 
-        const data = await response.json();
-        setUserPayments(data.transactions); // Assurez-vous que data.transactions contient bien les transactions
+        const { transactions } = await response.json(); // Assurez-vous que la clé est 'transactions' dans la réponse JSON
+        setUserPayments(transactions);
       } catch (error) {
         console.error('Erreur lors de la récupération des paiements utilisateur :', error);
       } finally {
@@ -31,9 +36,7 @@ const MonProfil = () => {
       }
     };
 
-    if (user && user.uuid) {
-      fetchPayments();
-    }
+    fetchPayments();
   }, [user]);
 
   if (!user || loading) {
@@ -44,32 +47,25 @@ const MonProfil = () => {
     <div className="profile-container">
       <h1>Mon Profil</h1>
       <button type="button" onClick={logout}>Déconnexion</button>
-      <table className="profile-table">
-        <tbody>
-          <tr>
-            <th>Nom</th>
-            <td>{user.name}</td>
-          </tr>
-          <tr>
-            <th>Email</th>
-            <td>{user.email}</td>
-          </tr>
-          {/* Vous pouvez ajouter plus d'informations ici */}
-          {userPayments && userPayments.length > 0 && (
-            <tr>
-              <th>Paiements</th>
-              <td>
-                {/* Vous pouvez formater et afficher les informations de paiement comme vous le souhaitez */}
-                {userPayments.map((payment, index) => (
-                  <div key={index}>
-                    {payment.items} - {payment.totalAmount} - {new Date(payment.createdAt).toLocaleDateString()}
-                  </div>
-                ))}
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+      <div className="profile-details">
+        <p>Nom: {user.name}</p>
+        <p>Email: {user.email}</p>
+        {userPayments.length > 0 ? (
+          <div>
+            <h2>Paiements</h2>
+            {userPayments.map((payment, index) => (
+              <div key={index} className="payment-details">
+                <p>Transaction ID: {payment.transactionId}</p>
+                <p>Items: {JSON.stringify(payment.items)}</p>
+                <p>Montant Total: {payment.totalAmount}</p>
+                <p>Date: {new Date(payment.createdAt).toLocaleDateString()}</p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p>Aucun paiement trouvé.</p>
+        )}
+      </div>
     </div>
   );
 };
