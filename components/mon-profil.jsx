@@ -27,10 +27,11 @@ const MonProfil = () => {
           throw new Error(`Erreur HTTP ! Statut : ${response.status}`);
         }
 
-        const data = await response.json();
-        console.log(data);
-        if (data.transactions && data.transactions.length > 0) {
-          setUserPayments(data.transactions);
+        const data = await response.json(); // Parse la réponse du serveur
+        const parsedBody = JSON.parse(data.body); // Parse le contenu du champ 'body' pour obtenir l'objet des transactions
+
+        if (parsedBody.transactions && parsedBody.transactions.length > 0) {
+          setUserPayments(parsedBody.transactions);
         } else {
           setError('Aucun paiement trouvé.');
         }
@@ -41,8 +42,9 @@ const MonProfil = () => {
         setLoading(false);
       }
     };
+
     fetchPayments();
-  }, [user]);
+  }, [user]); // La dépendance [user] permet de refaire la requête si l'utilisateur change
 
   if (loading) {
     return <div>Chargement de votre profil...</div>;
