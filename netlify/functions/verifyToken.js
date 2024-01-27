@@ -31,7 +31,9 @@ async function verifyToken(idToken, userData = null, accessToken = null) {
     let results;
 
     try {
-      const [rows] = await conn.execute(sqlQuery, [email]);
+      const result = await conn.execute(sqlQuery, [email]);
+      console.log('Result from conn.execute:', result); // Vérifiez ce que conn.execute retourne
+      const rows = result[0]; // Adaptez cette ligne en fonction de ce que conn.execute retourne
       console.log('Query raw results:', rows);
       results = rows;
     } catch (error) {
