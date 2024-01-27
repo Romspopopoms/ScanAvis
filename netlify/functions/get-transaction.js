@@ -26,7 +26,7 @@ exports.handler = async (event) => {
     const query = 'SELECT * FROM Transactions WHERE paymentIntentId = ?';
     const result = await conn.execute(query, [paymentIntentId]);
     console.log('Result from conn.execute:', result);
-    const rows = result[0]; // Assurez-vous que c'est la structure correcte pour les résultats de votre base de données
+    const { rows } = result; // Assurez-vous que c'est la structure correcte pour les résultats de votre base de données
     console.log('Query results:', rows);
 
     if (!rows || rows.length === 0) {
