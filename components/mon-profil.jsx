@@ -33,14 +33,13 @@ const MonProfil = () => {
         } else {
           setError('Aucun paiement trouvé.');
         }
-      } catch (fetchError) { // Renommage de 'error' en 'fetchError'
+      } catch (fetchError) {
         console.error('Erreur lors de la récupération des paiements utilisateur :', fetchError);
         setError('Erreur lors de la récupération des paiements.');
       } finally {
         setLoading(false);
       }
     };
-
     fetchPayments();
   }, [user]);
 
