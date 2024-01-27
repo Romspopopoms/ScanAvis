@@ -22,54 +22,43 @@ async function verifyToken(idToken, userData = null, accessToken = null) {
 
     console.log('Payload:', payload);
 
-    // Nettoyage de payload pour éviter les propriétés non itérables
     const cleanedPayload = JSON.parse(JSON.stringify(payload));
+    const { email } = cleanedPayload;
+    const sqlQuery = 'SELECT uuid FROM users WHERE email = ?';
 
-    // Définissez vos paramètres dans une autre variable
-    const queryParams = cleanedPayload.email;
-    // Définissez votre requête SQL dans une variable
-    const sqlQuery = `SELECT uuid FROM users WHERE email = '${queryParams}'`;
-
-    // Vous pouvez maintenant imprimer ces variables pour vérifier leur contenu
-    console.log('Query:', sqlQuery);
-    console.log('Parameters:', queryParams);
-    console.log('test1');
+    console.log('Executing SQL Query:', sqlQuery);
+    console.log('With Parameters:', email);
     let results;
+
     try {
-      console.log('test1.1');
-      console.log('Email to query:', cleanedPayload.email);
-      const [rows] = await conn.execute(sqlQuery, queryParams);
+      const [rows] = await conn.execute(sqlQuery, [email]);
       console.log('Query raw results:', rows);
-      results = rows; // Récupération des lignes de résultat
-      console.log('test1.2');
-      console.log('Database results:', results);
+      results = rows;
     } catch (error) {
       console.error('Erreur lors de la requête à la base de données:', error);
-      console.error('Erreur détaillée:', error.message);
       return {
         statusCode: 500,
         body: JSON.stringify({ error: 'Database query failed', details: error.message }),
       };
     }
 
-    console.log('test2');
-
     if (!results || results.length === 0) {
       console.log('Aucun utilisateur trouvé, création d\'un nouveau utilisateur');
       const newUuid = uuidv4();
-      await conn.execute('INSERT INTO users (uuid, email, name, access_token) VALUES (?, ?, ?, ?)', [newUuid, cleanedPayload.email, cleanedPayload.name, cleanedPayload.access_token]);
+      const insertSql = 'INSERT INTO users (uuid, email, name, access_token) VALUES (?, ?, ?, ?)';
+      const insertParams = [newUuid, cleanedPayload.email, cleanedPayload.name, cleanedPayload.access_token];
+      console.log('Executing SQL Query:', insertSql);
+      console.log('With Parameters:', insertParams);
+      await conn.execute(insertSql, insertParams);
       console.log('New user created:', newUuid);
-      cleanedPayload.uuid = newUuid; // Mettre à jour le cleanedPayload avec le nouveau uuid
+      cleanedPayload.uuid = newUuid;
     } else {
       console.log('Existing user found:', results[0].uuid);
-      cleanedPayload.uuid = results[0].uuid; // Mettre à jour le cleanedPayload avec l'uuid trouvé
+      cleanedPayload.uuid = results[0].uuid;
     }
 
-    console.log('test3');
-    console.log('User processed:', cleanedPayload.uuid);
-
     const responseBody = {
-      user: cleanedPayload, // Utilisation de la version nettoyée de payload
+      user: cleanedPayload,
     };
 
     console.log('Response Body:', JSON.stringify(responseBody, null, 2));
