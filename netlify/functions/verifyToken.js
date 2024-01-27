@@ -24,11 +24,11 @@ async function verifyToken(idToken, userData = null, accessToken = null) {
 
     // Nettoyage de payload pour éviter les propriétés non itérables
     const cleanedPayload = JSON.parse(JSON.stringify(payload));
-    // Définissez votre requête SQL dans une variable
-    const sqlQuery = 'SELECT uuid FROM users WHERE email = ?';
 
     // Définissez vos paramètres dans une autre variable
     const queryParams = cleanedPayload.email;
+    // Définissez votre requête SQL dans une variable
+    const sqlQuery = `SELECT uuid FROM users WHERE email = ${queryParams}`;
 
     // Vous pouvez maintenant imprimer ces variables pour vérifier leur contenu
     console.log('Query:', sqlQuery);
