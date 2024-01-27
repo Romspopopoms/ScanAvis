@@ -19,7 +19,8 @@ const PaymentForm = ({ onSuccessfulPayment, onFailedPayment }) => {
       const response = await fetch('/.netlify/functions/create-payment-intent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items: formattedCartItems, userId: user.userId }),
+        // Assurez-vous d'envoyer l'uuid de l'utilisateur
+        body: JSON.stringify({ items: formattedCartItems, userUuid: user.uuid }), // Utilisez user.uuid ici
       });
 
       const data = await response.json();

@@ -1,5 +1,5 @@
 // Import Stripe and PlanetScale DB
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const stripe = require('stripe')('sk_test_51OPtGvDWmnYPaxs1DJZliUMMDttrNP1a4usU0uBgZgjnfe4Ho3WuCzFivSpwXhqL0YgVl9c41lbsuHI1O4nHAUhz00ibE6rzPX');
 const { conn } = require('../../utils/db');
 
 exports.handler = async (event) => {
@@ -12,11 +12,11 @@ exports.handler = async (event) => {
   }
 
   try {
-    const { items, userId } = JSON.parse(event.body);
+    const { items, userUuid } = JSON.parse(event.body);
 
-    // Valider les items et le userId
-    if (!userId) {
-      throw new Error('User ID is required');
+    // Valider les items et userUuid
+    if (!userUuid) {
+      throw new Error('User UUID is required');
     }
     if (!Array.isArray(items) || items.some((item) => !item.id || typeof item.quantity !== 'number' || typeof item.price !== 'number')) {
       throw new Error('Invalid items format');
@@ -30,8 +30,8 @@ exports.handler = async (event) => {
     });
 
     const result = await conn.execute(
-      'INSERT INTO Transactions (items, totalAmount, paymentIntentId, clientSecret, user_id) VALUES (?, ?, ?, ?, ?)',
-      [JSON.stringify(items), totalAmount, paymentIntent.id, paymentIntent.client_secret, userId],
+      'INSERT INTO Transactions (items, totalAmount, paymentIntentId, clientSecret, user_uuid) VALUES (?, ?, ?, ?, ?)',
+      [JSON.stringify(items), totalAmount, paymentIntent.id, paymentIntent.client_secret, userUuid],
     );
 
     if (!result || !result.insertId) {

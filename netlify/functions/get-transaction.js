@@ -11,26 +11,26 @@ exports.handler = async (event) => {
     };
   }
 
-  // Supposons que l'ID de l'utilisateur soit transmis en tant que paramètre de requête
-  const userId = event.queryStringParameters?.userId?.trim();
-  console.log('userId nettoyé:', userId);
+  // Supposons que l'UUID de l'utilisateur soit transmis en tant que paramètre de requête
+  const userUuid = event.queryStringParameters?.userUuid?.trim();
+  console.log('userUuid nettoyé:', userUuid);
 
-  if (!userId) {
+  if (!userUuid) {
     return {
       statusCode: 400,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: 'L\'ID de l\'utilisateur est requis et ne peut pas être vide' }),
+      body: JSON.stringify({ message: 'L\'UUID de l\'utilisateur est requis et ne peut pas être vide' }),
     };
   }
 
   try {
-    // Modifier la requête pour récupérer les transactions basées sur l'ID de l'utilisateur
-    const query = 'SELECT * FROM Transactions WHERE user_id = ?';
-    const [transactions] = await conn.execute(query, [userId]);
+    // Modifier la requête pour récupérer les transactions basées sur l'UUID de l'utilisateur
+    const query = 'SELECT * FROM Transactions WHERE user_uuid = ?';
+    const [transactions] = await conn.execute(query, [userUuid]);
     console.log('Résultat de la requête:', transactions);
 
     if (transactions.length === 0) {
-      console.log(`Transactions non trouvées pour userId: ${userId}`);
+      console.log(`Transactions non trouvées pour userUuid: ${userUuid}`);
       return {
         statusCode: 404,
         headers: { 'Content-Type': 'application/json' },

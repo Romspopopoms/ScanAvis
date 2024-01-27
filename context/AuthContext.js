@@ -36,7 +36,13 @@ export const AuthProvider = ({ children }) => {
       const data = await response.json();
       if (response.ok) {
         setIsAuthenticated(true);
-        setUser({ email: data.user.email, name: data.user.name, access_token: data.user.access_token });
+        // Assurez-vous que l'`uuid` est également inclus dans la réponse de votre backend
+        setUser({
+          uuid: data.user.uuid, // Incluez l'`uuid` ici
+          email: data.user.email,
+          name: data.user.name,
+          access_token: data.user.access_token,
+        });
         localStorage.setItem('authToken', data.user.access_token);
       } else {
         handleError(data.error || 'Erreur lors du traitement de la réponse.');

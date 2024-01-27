@@ -1,15 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { useRouter } from 'next/router';
 import { useCart } from '../context/CartContext';
+import { AuthContext } from '../context/AuthContext'; // Assurez-vous d'importer AuthContext correctement
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY); // Utilisez NEXT_PUBLIC_ pour les variables d'environnement côté client
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY);
 
 const CheckoutForm = () => {
   const stripe = useStripe();
   const elements = useElements();
   const { cartItems, formatCartItemsForPayment, clearCart } = useCart();
+  const { user } = useContext(AuthContext); // Utilisez AuthContext pour accéder à l'`uuid` de l'utilisateur
   const [clientSecret, setClientSecret] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -17,13 +19,13 @@ const CheckoutForm = () => {
 
   useEffect(() => {
     const fetchPaymentIntent = async () => {
-      if (cartItems.length === 0) return;
+      if (cartItems.length === 0 || !user) return;
       const formattedCartItems = formatCartItemsForPayment();
       try {
         const response = await fetch('/.netlify/functions/create-payment-intent', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ items: formattedCartItems }),
+          body: JSON.stringify({ items: formattedCartItems, userUuid: user.uuid }), // Passez l'`uuid` de l'utilisateur
         });
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || 'Erreur du serveur');
@@ -35,7 +37,7 @@ const CheckoutForm = () => {
     };
 
     fetchPaymentIntent();
-  }, [cartItems, formatCartItemsForPayment]);
+  }, [cartItems, formatCartItemsForPayment, user]);
 
   const onSuccessfulPayment = (paymentIntentId) => {
     clearCart();
