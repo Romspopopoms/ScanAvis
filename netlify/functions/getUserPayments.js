@@ -3,20 +3,46 @@ const { conn } = require('../../utils/db');
 async function getUserPayments(userUuid) {
   console.log('Fetching payments for user:', userUuid);
   try {
-    // Query to fetch transactions for the given user
-    const query = `
-      SELECT * FROM Transactions
-      WHERE user_uuid = ?
-    `;
+    const query = 'SELECT * FROM Transactions WHERE user_uuid = ?'; // Utilisez user_uuid pour la colonne correspondante dans la base de données
+    const result = await conn.execute(query, [userUuid]);
+    console.log('Result from conn.execute:', result);
+    const { rows } = result; // Assurez-vous que c'est la structure correcte pour les résultats de votre base de données
+    console.log('Query results:', rows);
 
-    // Execute the query
-    const [transactions] = await conn.execute(query, [userUuid]);
+    if (!rows || rows.length === 0) {
+      console.log(`Aucune transaction trouvée pour userUuid: ${userUuid}`);
+      return {
+        statusCode: 404,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: 'Aucune transaction trouvée' }),
+      };
+    }
 
-    console.log('Transactions retrieved:', transactions);
-    return transactions;
+    // Générer une réponse avec toutes les transactions
+    const transactions = rows.map((transaction) => ({
+      transactionId: transaction.transactionId,
+      items: JSON.parse(transaction.items || '[]'),
+      totalAmount: transaction.totalAmount,
+      paymentIntentId: transaction.paymentIntentId,
+      createdAt: transaction.createdAt,
+      // Exclure les données sensibles comme clientSecret
+    }));
+
+    return {
+      statusCode: 200,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ transactions }),
+    };
   } catch (error) {
-    console.error('Error fetching user payments:', error);
-    throw error; // Rethrow the error to handle it in the calling function
+    console.error('Erreur lors de la récupération des paiements utilisateur :', error);
+    return {
+      statusCode: 500,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        error: 'Échec de la récupération des paiements utilisateur',
+        details: error.message,
+      }),
+    };
   }
 }
 
