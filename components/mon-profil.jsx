@@ -9,13 +9,8 @@ const MonProfil = () => {
 
   useEffect(() => {
     const fetchPayments = async () => {
-      if (!user || !user.uuid) {
-        setLoading(false);
-        setError('Aucun utilisateur connecté.');
-        return;
-      }
+      // Votre code existant pour le début de la fonction
 
-      setLoading(true);
       try {
         const response = await fetch('/.netlify/functions/getUserPayments', {
           method: 'POST',
@@ -27,12 +22,18 @@ const MonProfil = () => {
           throw new Error(`Erreur HTTP ! Statut : ${response.status}`);
         }
 
-        const data = await response.json();
-        console.log(data); // Ajoutez ce log pour voir la réponse du serveur
-        if (data.transactions && data.transactions.length > 0) {
-          setUserPayments(data.transactions);
+        const data = await response.json(); // Parse la réponse du serveur
+        // Vérifiez si data.transactions et data.transactions.body existent et sont des chaînes
+        if (data.transactions && typeof data.transactions.body === 'string') {
+          const transactionsObject = JSON.parse(data.transactions.body); // Parsez le contenu de body pour obtenir l'objet des transactions
+          if (transactionsObject.transactions && transactionsObject.transactions.length > 0) {
+            setUserPayments(transactionsObject.transactions);
+          } else {
+            setError('Aucun paiement trouvé.');
+          }
         } else {
-          setError('Aucun paiement trouvé.');
+          // Gérer le cas où data.transactions.body est undefined ou n'est pas une chaîne
+          setError('Réponse inattendue du serveur.');
         }
       } catch (fetchError) {
         console.error('Erreur lors de la récupération des paiements utilisateur :', fetchError);
