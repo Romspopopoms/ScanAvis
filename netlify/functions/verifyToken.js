@@ -28,7 +28,7 @@ async function verifyToken(idToken, userData = null, accessToken = null) {
     const sqlQuery = 'SELECT uuid FROM users WHERE email = ?';
 
     // Définissez vos paramètres dans une autre variable
-    const queryParams = [cleanedPayload.email];
+    const queryParams = cleanedPayload.email;
 
     // Vous pouvez maintenant imprimer ces variables pour vérifier leur contenu
     console.log('Query:', sqlQuery);
