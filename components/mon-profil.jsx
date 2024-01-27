@@ -27,7 +27,8 @@ const MonProfil = () => {
           throw new Error(`Erreur HTTP ! Statut : ${response.status}`);
         }
 
-        const data = await response.json(); // Parse la réponse du serveur
+        const data = await response.json();
+        console.log(data); // Ajoutez ce log pour voir la réponse du serveur
         if (data.transactions && data.transactions.length > 0) {
           setUserPayments(data.transactions);
         } else {
