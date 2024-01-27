@@ -1,15 +1,17 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { AuthContext } from '../context/AuthContext'; // Assurez-vous que le chemin est correct
+import { AuthContext } from '../context/AuthContext';
 
 const MonProfil = () => {
   const { user, logout } = useContext(AuthContext);
   const [userPayments, setUserPayments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const fetchPayments = async () => {
       if (!user || !user.uuid) {
         setLoading(false);
+        setError('Aucun utilisateur connecté.');
         return;
       }
 
@@ -17,20 +19,23 @@ const MonProfil = () => {
       try {
         const response = await fetch('/.netlify/functions/getUserPayments', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ userUuid: user.uuid }), // Assurez-vous que user.uuid est correct et contient l'UUID de l'utilisateur
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userUuid: user.uuid }),
         });
 
         if (!response.ok) {
           throw new Error(`Erreur HTTP ! Statut : ${response.status}`);
         }
 
-        const { transactions } = await response.json(); // Assurez-vous que la clé est 'transactions' dans la réponse JSON
-        setUserPayments(transactions);
-      } catch (error) {
-        console.error('Erreur lors de la récupération des paiements utilisateur :', error);
+        const data = await response.json();
+        if (data.transactions && data.transactions.length > 0) {
+          setUserPayments(data.transactions);
+        } else {
+          setError('Aucun paiement trouvé.');
+        }
+      } catch (fetchError) { // Renommage de 'error' en 'fetchError'
+        console.error('Erreur lors de la récupération des paiements utilisateur :', fetchError);
+        setError('Erreur lors de la récupération des paiements.');
       } finally {
         setLoading(false);
       }
@@ -39,8 +44,18 @@ const MonProfil = () => {
     fetchPayments();
   }, [user]);
 
-  if (!user || loading) {
+  if (loading) {
     return <div>Chargement de votre profil...</div>;
+  }
+
+  if (error) {
+    return (
+      <div className="profile-container">
+        <h1>Mon Profil</h1>
+        <p>{error}</p>
+        <button type="button" onClick={logout}>Déconnexion</button>
+      </div>
+    );
   }
 
   return (
@@ -56,7 +71,7 @@ const MonProfil = () => {
             {userPayments.map((payment, index) => (
               <div key={index} className="payment-details">
                 <p>Transaction ID: {payment.transactionId}</p>
-                <p>Items: {JSON.stringify(payment.items)}</p>
+                <p>Articles: {payment.items.map((item) => `ID: ${item.id}, Quantité: ${item.quantity}`).join(', ')}</p>
                 <p>Montant Total: {payment.totalAmount}</p>
                 <p>Date: {new Date(payment.createdAt).toLocaleDateString()}</p>
               </div>
