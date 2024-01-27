@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { AuthContext } from '../context/AuthContext'; // Make sure the path is correct
+import { AuthContext } from '../context/AuthContext'; // Assurez-vous que le chemin est correct
 
 const MonProfil = () => {
   const { user, logout } = useContext(AuthContext);
@@ -15,17 +15,17 @@ const MonProfil = () => {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ userId: user.id }), // Make sure user ID is correctly passed
+          body: JSON.stringify({ userUuid: user.uuid }), // Utilisez user.uuid qui est maintenant l'identifiant unique de l'utilisateur
         });
 
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          throw new Error(`Erreur HTTP ! Statut : ${response.status}`);
         }
 
         const data = await response.json();
-        setUserPayments(data.transactions); // Adjust according to the actual key in the response
+        setUserPayments(data.transactions); // Ajustez en fonction de la clé réelle dans la réponse
       } catch (error) {
-        console.error('Error fetching user payments:', error);
+        console.error('Erreur lors de la récupération des paiements utilisateur :', error);
       } finally {
         setLoading(false);
       }
@@ -37,29 +37,29 @@ const MonProfil = () => {
   }, [user]);
 
   if (!user || loading) {
-    return <div>Loading your profile...</div>;
+    return <div>Chargement de votre profil...</div>;
   }
 
   return (
     <div className="profile-container">
-      <h1>My Profile</h1>
-      <button type="button" onClick={logout}>Log Out</button>
+      <h1>Mon Profil</h1>
+      <button type="button" onClick={logout}>Déconnexion</button>
       <table className="profile-table">
         <tbody>
           <tr>
-            <th>Name</th>
+            <th>Nom</th>
             <td>{user.name}</td>
           </tr>
           <tr>
             <th>Email</th>
             <td>{user.email}</td>
           </tr>
-          {/* You can add more information here */}
+          {/* Vous pouvez ajouter plus d'informations ici */}
           {userPayments && userPayments.length > 0 && (
             <tr>
-              <th>Payments</th>
+              <th>Paiements</th>
               <td>
-                {/* You can format and display the payment information as you wish */}
+                {/* Vous pouvez formater et afficher les informations de paiement comme vous le souhaitez */}
                 {userPayments.map((payment, index) => (
                   <div key={index}>
                     {payment.items} - {payment.totalAmount} - {new Date(payment.createdAt).toLocaleDateString()}

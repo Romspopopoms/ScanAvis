@@ -1,16 +1,16 @@
 const { conn } = require('../../utils/db');
 
-async function getUserPayments(userId) {
-  console.log('Fetching payments for user:', userId);
+async function getUserPayments(userUuid) {
+  console.log('Fetching payments for user:', userUuid);
   try {
     // Query to fetch transactions for the given user
     const query = `
       SELECT * FROM Transactions
-      WHERE user_id = ?
+      WHERE user_uuid = ?
     `;
 
     // Execute the query
-    const [transactions] = await conn.execute(query, [userId]);
+    const [transactions] = await conn.execute(query, [userUuid]);
 
     console.log('Transactions retrieved:', transactions);
     return transactions;
@@ -33,18 +33,18 @@ exports.handler = async (event) => {
   try {
     console.log('Parsing request body');
     const body = JSON.parse(event.body);
-    const { userId } = body;
+    const { userUuid } = body;
 
-    if (!userId) {
-      console.error('User ID is required');
+    if (!userUuid) {
+      console.error('User UUID is required');
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: 'User ID is required' }),
+        body: JSON.stringify({ error: 'User UUID is required' }),
       };
     }
 
     console.log('Fetching user payments');
-    const userPayments = await getUserPayments(userId);
+    const userPayments = await getUserPayments(userUuid);
 
     return {
       statusCode: 200,
