@@ -27,17 +27,21 @@ const MonProfil = () => {
           throw new Error(`Erreur HTTP ! Statut : ${response.status}`);
         }
 
-        const data = await response.json(); // Parse la réponse du serveur
-        const parsedBody = JSON.parse(data.body); // Parse le contenu du champ 'body' pour obtenir l'objet des transactions
-
-        if (parsedBody.transactions && parsedBody.transactions.length > 0) {
-          setUserPayments(parsedBody.transactions);
+        const data = await response.json();
+        if (data.body && typeof data.body === 'string') {
+          const parsedBody = JSON.parse(data.body);
+          if (parsedBody.transactions && parsedBody.transactions.length > 0) {
+            setUserPayments(parsedBody.transactions);
+          } else {
+            setError('Aucun paiement trouvé.');
+          }
         } else {
-          setError('Aucun paiement trouvé.');
+          // Gérer le cas où data.body est undefined ou n'est pas une chaîne
+          setError('Réponse inattendue du serveur.');
         }
       } catch (fetchError) {
         console.error('Erreur lors de la récupération des paiements utilisateur :', fetchError);
-        setError('Erreur lors de la récupération des paiements.');
+        setError(`Erreur lors de la récupération des paiements : ${fetchError.message}`);
       } finally {
         setLoading(false);
       }
