@@ -48,58 +48,39 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-indigo-900 via-indigo-800 to-indigo-900">
-      {/* Centrez le formulaire avec flexbox et définissez une largeur maximale */}
-      <div className="flex-grow flex items-center justify-center px-6 py-8">
-        {/* Cette div est maintenant le conteneur direct du formulaire et contrôlera sa largeur maximale */}
-        <div className="max-w-sm w-full">
-          <form className="bg-white rounded-lg shadow-2xl p-6 space-y-6" onSubmit={handleSubmit}>
-            <h1 className="text-4xl font-bold text-center text-blue-500 mb-4">Connexion</h1>
+    <div className="flex min-h-screen flex-col bg-gradient-to-br from-indigo-900 via-indigo-800 to-indigo-900">
+      <div className="flex flex-grow items-center justify-center px-6 py-8">
+        <div className="w-full max-w-xs">
+          <form className="space-y-6 rounded-lg bg-white p-6 shadow-2xl" onSubmit={handleSubmit}>
+            <h1 className="mb-4 text-center text-4xl font-bold text-blue-500">Connexion</h1>
             {errorMessage && <p className="text-red-500 text-center">{errorMessage}</p>}
             <div>
-              <label htmlFor="username" className="text-sm font-bold text-gray-700 block mb-2">Nom d'utilisateur</label>
-              <input
-                id="username"
-                type="text"
-                className="w-full p-3 rounded-lg bg-gray-200 text-gray-700 placeholder-gray-500"
-                placeholder="Entrez votre nom d'utilisateur"
-                autoComplete="username"
+              <label htmlFor="username" className="mb-2 block text-sm font-bold text-gray-700">Nom d'utilisateur</label>
+              <input id="username" type="text" className="w-full rounded-lg bg-gray-200 p-3 text-gray-700 placeholder-gray-500" placeholder="Entrez votre nom d'utilisateur" autoComplete="username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
               />
             </div>
+
             <div>
-              <label htmlFor="password" className="text-sm font-bold text-gray-700 block mb-2">Mot de passe</label>
-              <input
-                id="password"
-                type="password"
-                className="w-full p-3 rounded-lg bg-gray-200 text-gray-700 placeholder-gray-500"
-                placeholder="Entrez votre mot de passe"
-                autoComplete="current-password"
+              <label htmlFor="password" className="mb-2 block text-sm font-bold text-gray-700">Mot de passe</label>
+              <input id="password" type="password" className="w-full rounded-lg bg-gray-200 p-3 text-gray-700 placeholder-gray-500" placeholder="Entrez votre mot de passe" autoComplete="current-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
-            <button
-              type="submit"
-              className="w-full p-3 rounded-lg bg-blue-600 text-white hover:bg-blue-700 focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50 transition duration-200"
-            >
-              Se connecter
-            </button>
+            <button type="submit" className="w-full rounded-lg bg-blue-600 p-3 text-white transition duration-200 hover:bg-blue-700 focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50">Se connecter</button>
+
             <div className="text-center text-sm text-gray-700">
               <a href="/" className="hover:text-blue-500">Mot de passe oublié ?</a>
             </div>
             <hr className="my-6 border-gray-300" />
-            <button
-              type="button"
-              className="w-full p-3 rounded-lg bg-red-600 text-white hover:bg-red-700 focus:ring-4 focus:ring-red-500 focus:ring-opacity-50 transition duration-200"
+            <button type="button" className="w-full rounded-lg bg-red-600 p-3 text-white transition duration-200 hover:bg-red-700 focus:ring-4 focus:ring-red-500 focus:ring-opacity-50"
               onClick={handleGoogleSignIn}
             >
               Connexion avec Google
             </button>
-            <p className="mt-6 text-sm text-center text-gray-700">
-              Pas encore de compte ? <a href="/" className="hover:text-blue-500">Inscrivez-vous</a>
-            </p>
+            <p className="mt-6 text-center text-sm text-gray-700">Pas encore de compte ? <a href="/" className="hover:text-blue-500">Inscrivez-vous </a></p>
           </form>
         </div>
       </div>
