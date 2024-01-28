@@ -49,7 +49,9 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen gradient-01">
+    <div className="relative min-h-screen">
+      {/* Fond avec gradient et flou */}
+      <div className="absolute inset-0 z-[-1] gradient-01" />
       <Navbar />
       <div className="flex-grow flex items-center justify-center">
         <div className="w-full max-w-sm">

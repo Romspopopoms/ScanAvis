@@ -21,8 +21,10 @@
     hsl(221deg 73% 70%) 74%,
     hsl(220deg 76% 51%) 100%
   );
-  filter: blur(125px);
+  /* Supprimez ou réduisez cette valeur pour moins de flou */
+  filter: blur(50px); /* Ajustez ou supprimez selon vos besoins */
 }
+
 
 .hero-gradient {
   background: linear-gradient(
