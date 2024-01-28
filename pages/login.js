@@ -48,8 +48,8 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-blue-700 to-blue-900">
-      <div className="w-full max-w-md px-5 py-12 bg-white rounded-lg shadow-2xl">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-600 to-blue-800">
+      <div className="w-full max-w-md px-5 py-12 bg-white rounded-lg shadow-xl">
         <h1 className="mb-6 text-3xl font-bold text-center text-blue-500">Connexion</h1>
         <form className="space-y-6" onSubmit={handleSubmit}>
           {errorMessage && <p className="text-red-500 text-center">{errorMessage}</p>}
