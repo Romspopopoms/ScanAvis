@@ -1,6 +1,5 @@
 import React, { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
-import { Navbar, Footer } from '../components';
 
 const LoginPage = () => {
   const [username, setUsername] = useState('');
@@ -49,10 +48,9 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-br from-blue-600 via-blue-500 to-blue-600">
-      {/* Assurez-vous que Navbar ne perturbe pas la mise en page du formulaire */}
-      <Navbar />
-      <div className="flex-grow flex items-center justify-center p-6">
+    <div className="flex flex-col min-h-screen bg-gradient-to-br from-indigo-900 via-indigo-800 to-indigo-900">
+      {/* <Navbar /> */}
+      <div className="flex-grow flex items-center justify-center px-6 py-8">
         <div className="w-full max-w-sm"> {/* Ajustez 'max-w-sm' selon la largeur désirée */}
           <form className="bg-white rounded-lg shadow-2xl p-8 space-y-6" onSubmit={handleSubmit}>
             <h1 className="text-4xl font-bold text-center text-blue-500 mb-4">Connexion</h1>
@@ -111,7 +109,7 @@ const LoginPage = () => {
           </form>
         </div>
       </div>
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 };
