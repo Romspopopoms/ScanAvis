@@ -53,31 +53,31 @@ const LoginPage = () => {
       <Navbar />
       <div className="flex-grow flex items-center justify-center p-4">
         <div className="w-full max-w-md">
-          <form className="bg-gray-700 bg-opacity-80 rounded-lg shadow-xl p-8 space-y-6" onSubmit={handleSubmit}>
-            <h1 className="text-3xl font-bold text-center text-white mb-4">Connexion</h1>
+          <form className="bg-white rounded-lg shadow-xl p-8 space-y-6" onSubmit={handleSubmit}>
+            <h1 className="text-3xl font-bold text-center text-gray-800 mb-4">Connexion</h1>
             {errorMessage && <p className="text-red-500 text-center">{errorMessage}</p>}
 
             <div>
-              <label htmlFor="username" className="text-sm font-bold text-white block mb-2">Nom d'utilisateur</label>
+              <label htmlFor="username" className="text-sm font-bold text-gray-600 block mb-2">Nom d'utilisateur</label>
               <input
                 id="username"
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="w-full mt-2 p-3 rounded text-gray-900"
+                className="w-full p-3 rounded bg-gray-200 text-gray-800"
                 placeholder="Entrez votre nom d'utilisateur"
                 autoComplete="username"
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="text-sm font-bold text-white block mb-2">Mot de passe</label>
+              <label htmlFor="password" className="text-sm font-bold text-gray-600 block mb-2">Mot de passe</label>
               <input
                 id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full mt-2 p-3 rounded text-gray-900"
+                className="w-full p-3 rounded bg-gray-200 text-gray-800"
                 placeholder="Entrez votre mot de passe"
                 autoComplete="current-password"
               />
@@ -85,32 +85,32 @@ const LoginPage = () => {
 
             <button
               type="submit"
-              className="w-full mt-4 bg-blue-500 text-white p-3 rounded hover:bg-blue-600"
+              className="w-full p-3 rounded bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-200"
             >
               Se connecter
             </button>
 
-            <div className="text-center text-white">
-              <a href="/forgot-password" className="text-sm hover:text-blue-400">Mot de passe oublié ?</a>
+            <div className="text-center text-sm">
+              <a href="/forgot-password" className="text-blue-600 hover:underline">Mot de passe oublié ?</a>
             </div>
 
-            <hr className="my-6 border-gray-500" />
+            <hr className="my-6 border-gray-300" />
 
             <button
               type="button"
               onClick={handleGoogleSignIn}
-              className="w-full bg-red-500 text-white p-3 rounded hover:bg-red-600"
+              className="w-full p-3 rounded bg-red-600 text-white hover:bg-red-700 transition-colors duration-200"
             >
               Connexion avec Google
             </button>
 
-            <p className="mt-6 text-sm text-center text-white">
-              Pas encore de compte ? <a href="/register" className="hover:text-blue-400">Inscrivez-vous</a>
+            <p className="mt-6 text-sm text-center">
+              Pas encore de compte ? <a href="/register" className="text-blue-600 hover:underline">Inscrivez-vous</a>
             </p>
           </form>
         </div>
       </div>
-      <Footer />
+      <Footer className="w-full bg-gray-800 text-white py-4 px-6 mt-auto" />
     </div>
   );
 };
