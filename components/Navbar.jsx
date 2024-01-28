@@ -17,9 +17,11 @@ const Navbar = () => {
     closed: { x: '-100%' },
   };
 
+  const navbarHeight = '4rem'; // Ajustez selon la hauteur de votre navbar.
+
   return (
     <>
-      <nav className="fixed top-0 left-0 w-full flex justify-between items-center px-4 bg-gray-900 text-white z-50">
+      <nav className="fixed top-0 left-0 w-full flex justify-between items-center px-4 bg-gray-900 text-white z-50" style={{ height: navbarHeight }}>
         <h2 className="font-extrabold text-2xl">
           <Link href="/">SCAN'AVIS</Link>
         </h2>
@@ -57,16 +59,19 @@ const Navbar = () => {
         animate={isMenuOpen ? 'open' : 'closed'}
         variants={menuVariants}
         className="fixed top-0 left-0 w-64 h-full bg-gray-800 text-white shadow-xl z-40 p-5"
+        style={{ top: navbarHeight }}
         transition={{ type: 'spring', stiffness: 260, damping: 20 }}
       >
-        <button
-          type="button"
-          onClick={handleToggleMenu}
-          className="mb-5 px-4 py-2 bg-gray-700 hover:bg-gray-600 transition rounded"
-          aria-label="Fermer"
-        >
-          Fermer
-        </button>
+        <div className="flex justify-end -mt-12 mr-4">
+          <button
+            type="button"
+            onClick={handleToggleMenu}
+            className="text-white"
+            aria-label="Fermer"
+          >
+            <img src="/iconarrow.png" alt="Fermer" className="w-6 h-6" />
+          </button>
+        </div>
         <div className="space-y-4">
           {isAuthenticated && <Link href="/mon-profil" className="block hover:text-gray-300">Mon Profil</Link>}
           <Link href="/" className="block hover:text-gray-300">Accueil</Link>
