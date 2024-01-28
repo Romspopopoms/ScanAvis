@@ -1,5 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
+import { Navbar, Footer } from '../components';
 
 const LoginPage = () => {
   const [username, setUsername] = useState('');
@@ -49,6 +50,7 @@ const LoginPage = () => {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-600 via-blue-500 to-blue-600">
+      <Navbar />
       <div className="w-full max-w-sm">
         <form className="mb-8 space-y-4 rounded-lg bg-white p-8 shadow-lg" onSubmit={handleSubmit}>
           <h1 className="mb-6 text-center text-5xl font-extrabold text-gray-900">Connexion</h1>
@@ -68,7 +70,7 @@ const LoginPage = () => {
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
-          <button type="submit" className="w-full rounded-md bg-blue-500 py-3 px-4 text-white shadow-md transition duration-200 ease-in-out hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">Se connecter</button>
+          <button type="submit" className="mb-4 w-full rounded-md bg-blue-500 py-3 px-4 text-white shadow-md transition duration-200 ease-in-out hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">Se connecter</button>
 
           <div className="mt-6 text-center text-sm text-gray-700">
             <a href="/" className="font-medium text-blue-600 hover:underline">Mot de passe oublié ?</a>
@@ -82,6 +84,7 @@ const LoginPage = () => {
           <p className="mt-6 text-center text-sm text-gray-700">Pas encore de compte ? <a href="/" className="font-medium text-blue-600 hover:underline">Inscrivez-vous</a></p>
         </form>
       </div>
+      <Footer />
     </div>
 
   );
