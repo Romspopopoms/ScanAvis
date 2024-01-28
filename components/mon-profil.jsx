@@ -22,15 +22,17 @@ const MonProfil = () => {
           throw new Error(`Erreur HTTP ! Statut : ${response.status}`);
         }
 
-        const data = await response.json();
+        const data = await response.json(); // Parse la réponse du serveur
+        // Vérifiez si data.transactions et data.transactions.body existent et sont des chaînes
         if (data.transactions && typeof data.transactions.body === 'string') {
-          const transactionsObject = JSON.parse(data.transactions.body);
+          const transactionsObject = JSON.parse(data.transactions.body); // Parsez le contenu de body pour obtenir l'objet des transactions
           if (transactionsObject.transactions && transactionsObject.transactions.length > 0) {
             setUserPayments(transactionsObject.transactions);
           } else {
             setError('Aucun paiement trouvé.');
           }
         } else {
+          // Gérer le cas où data.transactions.body est undefined ou n'est pas une chaîne
           setError('Réponse inattendue du serveur.');
         }
       } catch (fetchError) {
@@ -42,69 +44,49 @@ const MonProfil = () => {
     };
 
     fetchPayments();
-  }, [user]);
+  }, [user]); // La dépendance [user] permet de refaire la requête si l'utilisateur change
 
   if (loading) {
-    return <div className="text-center">Chargement de votre profil...</div>;
+    return <div className="text-center mt-10">Chargement de votre profil...</div>;
   }
 
   if (error) {
     return (
-      <div className="container mx-auto my-4 p-4 bg-blue-900 text-white rounded-lg">
-        <h1 className="text-xl font-bold mb-4">Mon Profil</h1>
-        <p>{error}</p>
-        <button type="button"
-          onClick={logout}
-          className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-        >
-          Déconnexion
-        </button>
+      <div className="container mx-auto p-4">
+        <h1 className="text-2xl font-bold mb-4">Mon Profil</h1>
+        <p className="text-red-500">{error}</p>
+        <button type="button" className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition" onClick={logout}>Déconnexion</button>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto my-4 p-4 bg-blue-900 text-white rounded-lg">
-      <h1 className="text-xl font-bold mb-4">Mon Profil</h1>
-      <button type="button"
-        onClick={logout}
-        className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-      >
-        Déconnexion
-      </button>
-      <div>
-        <p>Nom: {user.name}</p>
-        <p>Email: {user.email}</p>
+    <div className="container mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-4">Mon Profil</h1>
+      <button type="button" className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition" onClick={logout}>Déconnexion</button>
+
+      <div className="mt-8">
+        <div className="bg-white shadow-md rounded-lg p-6 mb-6">
+          <p><span className="font-bold">Nom:</span> {user.name}</p>
+          <p><span className="font-bold">Email:</span> {user.email}</p>
+        </div>
+
         {userPayments.length > 0 ? (
-          <div className="mt-4">
-            <h2 className="text-lg font-semibold mb-3">Paiements</h2>
-            <div className="overflow-x-auto">
-              <table className="min-w-full bg-blue-800 rounded-lg">
-                <thead className="border-b border-gray-700">
-                  <tr>
-                    <th className="text-left p-3">Transaction ID</th>
-                    <th className="text-left p-3">Articles</th>
-                    <th className="text-left p-3">Montant Total</th>
-                    <th className="text-left p-3">Date</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {userPayments.map((payment, index) => (
-                    <tr key={index} className="border-b border-gray-700">
-                      <td className="p-3">{payment.transactionId}</td>
-                      <td className="p-3">
-                        {payment.items.map((item) => `ID: ${item.id}, Quantité: ${item.quantity}`).join(', ')}
-                      </td>
-                      <td className="p-3">{payment.totalAmount.toFixed(2)}</td>
-                      <td className="p-3">{new Date(payment.createdAt).toLocaleDateString()}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+          <div>
+            <h2 className="text-xl font-bold mb-4">Paiements</h2>
+            <div className="grid md:grid-cols-2 gap-4">
+              {userPayments.map((payment, index) => (
+                <div key={index} className="bg-white shadow-md rounded-lg p-4">
+                  <p><span className="font-bold">Transaction ID:</span> {payment.transactionId}</p>
+                  <p><span className="font-bold">Articles:</span> {payment.items.map((item) => `ID: ${item.id}, Quantité: ${item.quantity}`).join(', ')}</p>
+                  <p><span className="font-bold">Montant Total:</span> {payment.totalAmount}</p>
+                  <p><span className="font-bold">Date:</span> {new Date(payment.createdAt).toLocaleDateString()}</p>
+                </div>
+              ))}
             </div>
           </div>
         ) : (
-          <p className="mt-4">Aucun paiement trouvé.</p>
+          <p>Aucun paiement trouvé.</p>
         )}
       </div>
     </div>
