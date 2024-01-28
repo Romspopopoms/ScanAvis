@@ -53,8 +53,8 @@ const LoginPage = () => {
       {/* Fond avec gradient et flou */}
       <div className="absolute inset-0 gradient-01 z-[-1]" />
       <Navbar />
-      <div className="flex-grow flex items-center justify-center">
-        <div className="w-full max-w-sm">
+      <div className="flex-grow flex items-center justify-center px-4 sm:px-6 lg:px-8">
+        <div className="w-full max-w-md">
           <form className="mb-8 space-y-4 rounded-lg bg-white p-8 shadow-lg" onSubmit={handleSubmit}>
             <h1 className="mb-6 text-center text-5xl font-extrabold text-gray-900">Connexion</h1>
             {errorMessage && <p className="mb-4 text-center text-sm text-red-600">{errorMessage}</p>}
@@ -87,7 +87,6 @@ const LoginPage = () => {
             <p className="mt-6 text-center text-sm text-gray-700">Pas encore de compte ? <a href="/" className="font-medium text-blue-600 hover:underline">Inscrivez-vous</a></p>
           </form>
         </div>
-        <div className="gradient-04 z-0" />
         <Footer />
       </div>
     </div>
