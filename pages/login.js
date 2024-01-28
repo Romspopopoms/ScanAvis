@@ -48,60 +48,56 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-br from-indigo-900 via-indigo-800 to-indigo-900">
-      <div className="flex-grow flex items-center justify-center px-6 py-8">
-        <div className="w-full max-w-xs">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-indigo-900 via-indigo-800 to-indigo-900">
+      <div className="w-full max-w-xs">
+        <form className="bg-white rounded-lg shadow-2xl p-6 space-y-6" onSubmit={handleSubmit}>
           <h1 className="text-4xl font-bold text-center text-blue-500 mb-4">Connexion</h1>
-          <form className="bg-white rounded-lg shadow-2xl p-6 space-y-6" onSubmit={handleSubmit}>
-            {errorMessage && <p className="text-red-500 text-center">{errorMessage}</p>}
-            <div>
-              <label htmlFor="username" className="block text-sm font-bold text-gray-700">Nom d'utilisateur</label>
-              <input
-                id="username"
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="w-full px-4 py-2 mt-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Entrez votre nom d'utilisateur"
-                autoComplete="username"
-                required
-              />
-            </div>
-            <div>
-              <label htmlFor="password" className="block text-sm font-bold text-gray-700">Mot de passe</label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-2 mt-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Entrez votre mot de passe"
-                autoComplete="current-password"
-                required
-              />
-            </div>
-            <button
-              type="submit"
-              className="w-full py-3 mt-4 text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50"
-            >
-              Se connecter
-            </button>
-            <div className="text-center">
-              <a href="/forgot-password" className="text-sm text-blue-600 hover:underline">Mot de passe oublié ?</a>
-            </div>
-            <div className="w-full border-t border-gray-300" />
-            <button
-              type="button"
-              onClick={handleGoogleSignIn}
-              className="w-full py-3 mt-4 text-white bg-red-600 rounded-lg hover:bg-red-700 focus:ring-4 focus:ring-red-500 focus:ring-opacity-50"
-            >
-              Connexion avec Google
-            </button>
-            <p className="mt-6 text-sm text-center text-gray-700">
-              Pas encore de compte ? <a href="/register" className="text-blue-600 hover:underline">Inscrivez-vous</a>
-            </p>
-          </form>
-        </div>
+          {errorMessage && <p className="text-red-500 text-center">{errorMessage}</p>}
+          <div>
+            <label htmlFor="username" className="text-sm font-bold text-gray-700 block mb-2">Nom d'utilisateur</label>
+            <input
+              id="username"
+              type="text"
+              className="w-full p-3 rounded-lg bg-gray-200 text-gray-700 placeholder-gray-500"
+              placeholder="Entrez votre nom d'utilisateur"
+              autoComplete="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+          </div>
+          <div>
+            <label htmlFor="password" className="text-sm font-bold text-gray-700 block mb-2">Mot de passe</label>
+            <input
+              id="password"
+              type="password"
+              className="w-full p-3 rounded-lg bg-gray-200 text-gray-700 placeholder-gray-500"
+              placeholder="Entrez votre mot de passe"
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
+          <button
+            type="submit"
+            className="w-full p-3 rounded-lg bg-blue-600 text-white hover:bg-blue-700 focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50 transition duration-200"
+          >
+            Se connecter
+          </button>
+          <div className="text-center text-sm text-gray-700">
+            <a href="/" className="hover:text-blue-500">Mot de passe oublié ?</a>
+          </div>
+          <hr className="my-6 border-gray-300" />
+          <button
+            type="button"
+            className="w-full p-3 rounded-lg bg-red-600 text-white hover:bg-red-700 focus:ring-4 focus:ring-red-500 focus:ring-opacity-50 transition duration-200"
+            onClick={handleGoogleSignIn}
+          >
+            Connexion avec Google
+          </button>
+          <p className="mt-6 text-sm text-center text-gray-700">
+            Pas encore de compte ? <a href="/" className="hover:text-blue-500">Inscrivez-vous</a>
+          </p>
+        </form>
       </div>
     </div>
   );
