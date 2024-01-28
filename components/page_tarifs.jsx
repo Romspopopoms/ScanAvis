@@ -92,7 +92,7 @@ const TarifsContent = () => {
         {services.map((service) => (
           <div key={service.id} className="bg-white rounded-lg shadow overflow-hidden">
             <img src={service.imgUrl} alt={`Service ${service.name}`} className="w-full" />
-            <div className="p-4">
+            <div className="p-4 space-y-2"> {/* Add spacing between feature rows */}
               {service.features.map((feature, index) => (
                 <FeatureRow key={index} title={feature} imgSrc="/check.png" />
               ))}

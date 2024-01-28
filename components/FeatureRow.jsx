@@ -1,8 +1,7 @@
 const FeatureRow = ({ title, imgSrc }) => (
-  <div className="flex items-center space-x-2"> {/* Utilise flexbox pour aligner les éléments */}
-    <img src={imgSrc} alt={title} className="w-4 h-4" /> {/* Rétrécit l'image à 1rem par 1rem */}
-    <span className="text-sm">{title}</span> {/* Taille de texte ajustée si nécessaire */}
+  <div className="flex items-center space-x-2 my-1"> {/* Add vertical spacing */}
+    <img src={imgSrc} alt={title} className="w-4 h-4" /> {/* Keep the check icon small */}
+    <span className="text-sm font-normal">{title}</span> {/* Normal font weight */}
   </div>
 );
-
 export default FeatureRow;
