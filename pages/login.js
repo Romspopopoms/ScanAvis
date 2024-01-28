@@ -26,7 +26,7 @@ const LoginPage = () => {
 
       const data = await response.json();
       if (response.ok) {
-        handleAuthCode(data.access_token); // Utiliser la fonction de contexte pour traiter la réponse de connexion
+        handleAuthCode(data.access_token);
       } else {
         setErrorMessage(data.error || 'Erreur lors de la connexion');
       }
@@ -49,35 +49,35 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+    <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-900 via-gray-700 to-gray-900">
       <Navbar />
-      <div className="flex-grow flex items-center justify-center p-4">
-        <div className="w-full max-w-md">
-          <form className="bg-white rounded-lg shadow-xl p-8 space-y-6" onSubmit={handleSubmit}>
-            <h1 className="text-3xl font-bold text-center text-gray-800 mb-4">Connexion</h1>
-            {errorMessage && <p className="text-red-500 text-center">{errorMessage}</p>}
+      <div className="flex-grow flex items-center justify-center px-6 py-8">
+        <div className="w-full max-w-lg">
+          <form className="bg-gray-800 bg-opacity-90 rounded-lg shadow-2xl p-8 space-y-6" onSubmit={handleSubmit}>
+            <h1 className="text-4xl font-bold text-center text-blue-500 mb-4">Connexion</h1>
+            {errorMessage && <p className="text-red-400 text-center">{errorMessage}</p>}
 
             <div>
-              <label htmlFor="username" className="text-sm font-bold text-gray-600 block mb-2">Nom d'utilisateur</label>
+              <label htmlFor="username" className="text-sm font-bold text-gray-300 block mb-2">Nom d'utilisateur</label>
               <input
                 id="username"
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="w-full p-3 rounded bg-gray-200 text-gray-800"
+                className="w-full p-3 rounded-lg bg-gray-700 text-gray-300 placeholder-gray-500"
                 placeholder="Entrez votre nom d'utilisateur"
                 autoComplete="username"
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="text-sm font-bold text-gray-600 block mb-2">Mot de passe</label>
+              <label htmlFor="password" className="text-sm font-bold text-gray-300 block mb-2">Mot de passe</label>
               <input
                 id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full p-3 rounded bg-gray-200 text-gray-800"
+                className="w-full p-3 rounded-lg bg-gray-700 text-gray-300 placeholder-gray-500"
                 placeholder="Entrez votre mot de passe"
                 autoComplete="current-password"
               />
@@ -85,32 +85,32 @@ const LoginPage = () => {
 
             <button
               type="submit"
-              className="w-full p-3 rounded bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-200"
+              className="w-full p-3 rounded-lg bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50 transition duration-200"
             >
               Se connecter
             </button>
 
-            <div className="text-center text-sm">
-              <a href="/forgot-password" className="text-blue-600 hover:underline">Mot de passe oublié ?</a>
+            <div className="text-center text-sm text-gray-300">
+              <a href="/forgot-password" className="hover:text-blue-500">Mot de passe oublié ?</a>
             </div>
 
-            <hr className="my-6 border-gray-300" />
+            <hr className="my-6 border-gray-600" />
 
             <button
               type="button"
               onClick={handleGoogleSignIn}
-              className="w-full p-3 rounded bg-red-600 text-white hover:bg-red-700 transition-colors duration-200"
+              className="w-full p-3 rounded-lg bg-red-600 text-white hover:bg-red-700 focus:outline-none focus:ring-4 focus:ring-red-500 focus:ring-opacity-50 transition duration-200"
             >
               Connexion avec Google
             </button>
 
-            <p className="mt-6 text-sm text-center">
-              Pas encore de compte ? <a href="/register" className="text-blue-600 hover:underline">Inscrivez-vous</a>
+            <p className="mt-6 text-sm text-center text-gray-300">
+              Pas encore de compte ? <a href="/register" className="hover:text-blue-500">Inscrivez-vous</a>
             </p>
           </form>
         </div>
       </div>
-      <Footer className="w-full bg-gray-800 text-white py-4 px-6 mt-auto" />
+      <Footer className="w-full bg-gray-900 text-white py-4 px-6 mt-auto" />
     </div>
   );
 };
