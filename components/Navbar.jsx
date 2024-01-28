@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import CartSummary from './CartSummary';
@@ -7,6 +7,8 @@ import { AuthContext } from '../context/AuthContext';
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [navbarHeight, setNavbarHeight] = useState(0);
+  const navbarRef = useRef();
   const { isAuthenticated, logout } = useContext(AuthContext);
 
   const handleToggleMenu = () => setIsMenuOpen(!isMenuOpen);
@@ -17,11 +19,15 @@ const Navbar = () => {
     closed: { x: '-100%' },
   };
 
-  const navbarHeight = '4rem'; // Ajustez selon la hauteur de votre navbar.
+  useEffect(() => {
+    if (navbarRef.current) {
+      setNavbarHeight(navbarRef.current.offsetHeight);
+    }
+  }, [navbarRef]);
 
   return (
     <>
-      <nav className="fixed top-0 left-0 w-full flex justify-between items-center px-4 bg-gray-900 text-white z-50" style={{ height: navbarHeight }}>
+      <nav ref={navbarRef} className="fixed top-0 left-0 w-full flex justify-between items-center px-4 bg-gray-900 text-white z-50">
         <h2 className="font-extrabold text-2xl">
           <Link href="/">SCAN'AVIS</Link>
         </h2>
@@ -58,8 +64,8 @@ const Navbar = () => {
         initial="closed"
         animate={isMenuOpen ? 'open' : 'closed'}
         variants={menuVariants}
-        className="fixed top-0 left-0 w-64 h-full bg-gray-800 text-white shadow-xl z-40 p-5"
-        style={{ top: navbarHeight }}
+        className="fixed left-0 w-64 bg-gray-800 text-white shadow-xl z-40 p-5"
+        style={{ top: `${navbarHeight}px` }}
         transition={{ type: 'spring', stiffness: 260, damping: 20 }}
       >
         <div className="flex justify-end -mt-12 mr-4">
