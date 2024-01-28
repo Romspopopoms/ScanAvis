@@ -61,24 +61,53 @@ const MonProfil = () => {
   }
 
   return (
-    <div className="profile-container">
-      <h1>Mon Profil</h1>
-      <button type="button" onClick={logout}>Déconnexion</button>
-      <div className="profile-details">
+    <div className="bg-blue-900 text-white p-5 rounded-lg">
+      <h1 className="text-xl font-bold">Mon Profil</h1>
+      <button type="button"
+        onClick={logout}
+        className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded my-3"
+      >
+        Déconnexion
+      </button>
+      <div>
         <p>Nom: {user.name}</p>
         <p>Email: {user.email}</p>
         {userPayments.length > 0 ? (
-          <div>
-            <h2>Paiements</h2>
-            {userPayments.map((payment, index) => (
-              <div key={index} className="payment-details">
-                <p>Transaction ID: {payment.transactionId}</p>
-                <p>Articles: {payment.items.map((item) => `ID: ${item.id}, Quantité: ${item.quantity}`).join(', ')}</p>
-                <p>Montant Total: {payment.totalAmount}</p>
-                <p>Date: {new Date(payment.createdAt).toLocaleDateString()}</p>
-              </div>
-            ))}
-          </div>
+          <>
+            <h2 className="text-lg font-semibold mt-3 mb-2">Paiements</h2>
+            <div className="overflow-x-auto">
+              <table className="min-w-full leading-normal">
+                <thead>
+                  <tr>
+                    <th className="border-b-2 border-gray-600 text-left px-3 py-2">
+                      ID de Transaction
+                    </th>
+                    <th className="border-b-2 border-gray-600 text-left px-3 py-2">
+                      Articles
+                    </th>
+                    <th className="border-b-2 border-gray-600 text-left px-3 py-2">
+                      Montant Total
+                    </th>
+                    <th className="border-b-2 border-gray-600 text-left px-3 py-2">
+                      Date
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="text-gray-200">
+                  {userPayments.map((payment, index) => (
+                    <tr key={index}>
+                      <td className="border-b border-gray-700 px-3 py-2">{payment.transactionId}</td>
+                      <td className="border-b border-gray-700 px-3 py-2">
+                        {payment.items.map((item) => `ID: ${item.id}, Quantité: ${item.quantity}`).join(', ')}
+                      </td>
+                      <td className="border-b border-gray-700 px-3 py-2">{payment.totalAmount.toFixed(2)}</td>
+                      <td className="border-b border-gray-700 px-3 py-2">{new Date(payment.createdAt).toLocaleDateString()}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         ) : (
           <p>Aucun paiement trouvé.</p>
         )}
