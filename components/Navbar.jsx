@@ -25,32 +25,21 @@ const Navbar = () => {
         </h2>
         <div className="flex items-center">
           {isAuthenticated ? (
-            // Bouton de déconnexion
             <button
               type="button"
               onClick={logout}
-              style={{ cursor: 'pointer' }}
+              className="px-4 py-2 bg-red-600 hover:bg-red-700 transition rounded text-white"
               aria-label="Déconnexion"
             >
               Déconnexion
             </button>
           ) : (
-            <>
-              <button
-                type="button"
-                style={{ cursor: 'pointer' }}
-                aria-label="Se connecter"
-              />
-              <Link href="/login">Se connecter</Link>
-            </>
+            <Link href="/login" className="px-4 py-2 bg-blue-600 hover:bg-blue-700 transition rounded text-white">
+              Se connecter
+            </Link>
           )}
           <div onClick={toggleCart} className="relative cursor-pointer ml-4">
-            <img
-              src="/cart-icon.svg"
-              alt="Cart"
-              style={{ width: '24px', height: '24px' }}
-            />
-            {/* Afficher le nombre d'articles ici si nécessaire */}
+            <img src="/cart-icon.svg" alt="Cart" className="w-6 h-6" />
           </div>
           <button
             type="button"
@@ -58,27 +47,32 @@ const Navbar = () => {
             className="ml-4"
             aria-label="Menu"
           >
-            <img
-              src="/menu.svg"
-              alt="Menu"
-              style={{ width: '24px', height: '24px' }}
-            />
+            <img src="/menu.svg" alt="Menu" className="w-6 h-6" />
           </button>
         </div>
-        <motion.div
-          initial="closed"
-          animate={isMenuOpen ? 'open' : 'closed'}
-          variants={menuVariants}
-          className="fixed top-0 left-0 w-[250px] h-full bg-gray-800 shadow-lg z-40"
-        >
-          <button type="button" onClick={handleToggleMenu} aria-label="Fermer">
-            Fermer
-          </button>
-          {isAuthenticated && <Link href="/mon-profil">Mon Profil</Link>}
-          <Link href="/">Accueil</Link>
-          <Link href="/tarifs">Nos offres</Link>
-        </motion.div>
       </nav>
+
+      <motion.div
+        initial="closed"
+        animate={isMenuOpen ? 'open' : 'closed'}
+        variants={menuVariants}
+        className="fixed top-0 left-0 w-64 h-full bg-gray-800 text-white shadow-xl z-40 p-5"
+        transition={{ type: 'spring', stiffness: 260, damping: 20 }}
+      >
+        <button
+          type="button"
+          onClick={handleToggleMenu}
+          className="mb-5 px-4 py-2 bg-gray-700 hover:bg-gray-600 transition rounded"
+          aria-label="Fermer"
+        >
+          Fermer
+        </button>
+        <div className="space-y-4">
+          {isAuthenticated && <Link href="/mon-profil" className="block hover:text-gray-300">Mon Profil</Link>}
+          <Link href="/" className="block hover:text-gray-300">Accueil</Link>
+          <Link href="/tarifs" className="block hover:text-gray-300">Nos offres</Link>
+        </div>
+      </motion.div>
 
       {isCartOpen && (
         <CartSummary isCartOpen={isCartOpen} toggleCart={toggleCart} />

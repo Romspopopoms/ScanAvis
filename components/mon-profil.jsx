@@ -73,7 +73,7 @@ const MonProfil = () => {
 
         {userPayments.length > 0 ? (
           <div>
-            <h2 className="text-xl font-bold mb-4">Paiements</h2>
+            <h2 className="text-xl font-bold mb-4 text-white rounded">Paiements</h2>
             <div className="grid md:grid-cols-2 gap-4">
               {userPayments.map((payment, index) => (
                 <div key={index} className="bg-white shadow-md rounded-lg p-4">
