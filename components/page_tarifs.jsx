@@ -84,7 +84,7 @@ const TarifsContent = () => {
   };
 
   return (
-    <div className="bg-gradient-to-r from-purple-600 to-blue-400 min-h-screen py-8 px-4">
+    <div>
       <h2 className="text-center text-4xl font-extrabold text-white mb-12">
         Voici les options disponibles
       </h2>
