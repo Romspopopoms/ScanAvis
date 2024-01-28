@@ -84,23 +84,23 @@ const TarifsContent = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h2 className="text-center text-4xl font-extrabold text-white mb-10">
+    <div className="bg-gradient-to-r from-purple-600 to-blue-400 min-h-screen py-8 px-4">
+      <h2 className="text-center text-4xl font-extrabold text-white mb-12">
         Voici les options disponibles
       </h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {services.map((service) => (
-          <div key={service.id} className="bg-white rounded-lg shadow-xl p-5 flex flex-col items-center">
-            <img src={service.imgUrl} alt={`Service ${service.name}`} className="w-32 h-32 object-cover" />
-            <ul className="my-4">
+          <div key={service.id} className="bg-white rounded-lg shadow overflow-hidden">
+            <img src={service.imgUrl} alt={`Service ${service.name}`} className="w-full" />
+            <div className="p-4">
               {service.features.map((feature, index) => (
                 <FeatureRow key={index} title={feature} imgSrc="/check.png" />
               ))}
-            </ul>
+            </div>
             <button
               type="button"
               onClick={() => handleAddToCart(service.id)}
-              className="bg-blue-500 text-white text-sm px-4 py-2 rounded hover:bg-blue-600 transition-colors duration-300 w-full"
+              className="bg-green-500 text-white text-sm px-4 py-2 rounded hover:bg-green-600 transition-colors duration-300 w-full"
             >
               Ajouter au panier
             </button>
