@@ -95,13 +95,18 @@
   filter: blur(175px);
 }
 
+/* Ensure that the parent of your footer has a relative position */
+.page-container {
+  position: relative;
+  min-height: 100vh; /* Full height of the viewport */
+}
+
 .footer-gradient {
   position: absolute;
-  width: 500px;
-  height: 100px;
-  left: 37%;
+  left: 0;
+  right: 0;
   bottom: 0;
-
+  height: 100px;
   background: #65c4fa;
-  filter: blur(150px);
+  filter: blur(80px); /* Adjust the blur to a lower value */
 }
