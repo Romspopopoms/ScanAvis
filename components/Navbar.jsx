@@ -80,7 +80,7 @@ const Navbar = () => {
         style={{ top: `${navbarHeight}px` }} // Appliquer la hauteur du navbar pour le style top du sidebar
         transition={{ type: 'spring', stiffness: 260, damping: 20 }}
       >
-        <div className="mt-4"> {/* Ajouter une marge en haut pour éviter le chevauchement avec le navbar */}
+        <div className="mt-2"> {/* Ajouter une marge en haut pour éviter le chevauchement avec le navbar */}
           {isAuthenticated && <Link href="/mon-profil" className="block hover:text-gray-300">Mon Profil</Link>}
           <Link href="/" className="block hover:text-gray-300">Accueil</Link>
           <Link href="/tarifs" className="block hover:text-gray-300">Nos offres</Link>
