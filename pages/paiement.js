@@ -3,8 +3,6 @@ import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
 import { useRouter } from 'next/router';
 import PaymentForm from '../components/tableauStripe';
-import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
 import { useCart } from '../context/CartContext';
 import Spinner from '../components/Spinner';
 
@@ -45,14 +43,12 @@ const PagePaiement = () => {
 
   return (
     <div className="relative z-10 min-h-screen">
-      <Navbar />
       <Elements stripe={stripePromise}>
         <div className="page-container">
           {/* Passons les fonctions de gestion de paiement au composant PaymentForm */}
           <PaymentForm onSuccessfulPayment={onSuccessfulPayment} onFailedPayment={onFailedPayment} />
         </div>
       </Elements>
-      <Footer />
     </div>
   );
 };

@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
 import Spinner from '../components/Spinner';
 
 const PaymentStatusPage = () => {
@@ -42,7 +40,6 @@ const PaymentStatusPage = () => {
 
   return (
     <div className="page-container">
-      <Navbar />
       <div className="payment-status-main">
         {error ? (
           <div className="message-container error-message">
@@ -83,7 +80,6 @@ const PaymentStatusPage = () => {
           </div>
         )}
       </div>
-      <Footer />
     </div>
   );
 };

@@ -1,6 +1,5 @@
 import React from 'react';
 import { useCart } from '../context/CartContext'; // Assurez-vous que ce chemin est correct
-import { TitleText } from './CustomTexts';
 import FeatureRow from './FeatureRow';
 
 const TarifsContent = () => {
@@ -85,29 +84,23 @@ const TarifsContent = () => {
   };
 
   return (
-    <div>
-      <TitleText
-        title={(
-          <>
-            Voici les options disponibles
-            <br className="md:block hidden" />
-          </>
-)}
-        textStyles="text-center"
-      />
-      <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '16px' }}>
+    <div className="container mx-auto px-4 py-8">
+      <h2 className="text-center text-4xl font-extrabold text-white mb-10">
+        Voici les options disponibles
+      </h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {services.map((service) => (
-          <div key={service.id} style={{ maxWidth: '250px', margin: '10px' }}>
-            <img src={service.imgUrl} alt={`Service ${service.name}`} style={{ width: '100%', height: 'auto' }} />
-            <div>
+          <div key={service.id} className="bg-white rounded-lg shadow-xl p-5 flex flex-col items-center">
+            <img src={service.imgUrl} alt={`Service ${service.name}`} className="w-32 h-32 object-cover" />
+            <ul className="my-4">
               {service.features.map((feature, index) => (
                 <FeatureRow key={index} title={feature} imgSrc="/check.png" />
               ))}
-            </div>
+            </ul>
             <button
               type="button"
               onClick={() => handleAddToCart(service.id)}
-              className="button"
+              className="bg-blue-500 text-white text-sm px-4 py-2 rounded hover:bg-blue-600 transition-colors duration-300 w-full"
             >
               Ajouter au panier
             </button>
