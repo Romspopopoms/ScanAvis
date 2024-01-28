@@ -50,10 +50,10 @@ const LoginPage = () => {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-indigo-900 via-indigo-800 to-indigo-900">
       {/* Centrez le formulaire avec flexbox et définissez une largeur maximale */}
-      <div className="flex-grow flex items-center justify-center px-6 py-8">
+      <div className="flex-grow flex items-center justify-center px-10 py-12">
         {/* Cette div est maintenant le conteneur direct du formulaire et contrôlera sa largeur maximale */}
         <div className="max-w-sm w-full">
-          <form className="bg-white rounded-lg shadow-2xl p-10 space-y-10" onSubmit={handleSubmit}>
+          <form className="bg-white rounded-lg shadow-2xl p-6 space-y-6" onSubmit={handleSubmit}>
             <h1 className="text-4xl font-bold text-center text-blue-500 mb-4">Connexion</h1>
             {errorMessage && <p className="text-red-500 text-center">{errorMessage}</p>}
             <div>
