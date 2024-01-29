@@ -27,7 +27,7 @@ const SectionOne = () => {
   }, [controls, inView]);
 
   return (
-    <section ref={ref} className="bg-gray-900 text-white py-16 px-4">
+    <section ref={ref} className=" text-white py-16 px-4">
       <motion.div
         initial={{ x: '-100%', opacity: 0 }}
         animate={controls}
@@ -53,7 +53,7 @@ const SectionOne = () => {
           {descriptionPoints.map((point, index) => (
             <div key={index} className="flex items-center text-lg md:text-xl">
               <span className="w-6 h-6 mr-2">
-                <img src="/check.svg" alt="Check" />
+                <img src="/check.png" alt="Check" />
               </span>
               {point}
             </div>
