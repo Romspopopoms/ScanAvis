@@ -70,7 +70,7 @@ const PaymentForm = ({ onSuccessfulPayment, onFailedPayment }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex justify-center items-center">
+    <div className="min-h-screen flex justify-center items-center">
       <div className="bg-white p-8 rounded-lg shadow-xl max-w-md w-full">
         <h2 className="text-2xl font-semibold mb-6">Mon Panier</h2>
         <ul className="mb-6">
