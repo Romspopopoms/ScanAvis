@@ -70,36 +70,43 @@ const PaymentForm = ({ onSuccessfulPayment, onFailedPayment }) => {
   };
 
   return (
-    <div className="payment-form">
-      <div className="payment-details">
-        <h2>Mon Panier</h2>
-        <ul>
+    <div className="min-h-screen bg-gray-100 flex justify-center items-center">
+      <div className="bg-white p-8 rounded-lg shadow-xl max-w-md w-full">
+        <h2 className="text-2xl font-semibold mb-6">Mon Panier</h2>
+        <ul className="mb-6">
           {cartItems.map((item) => (
-            <li key={item.id}>{item.name} - {item.quantity} x ${(item.price / 100).toFixed(2)}</li>
+            <li key={item.id} className="flex justify-between text-lg mb-2">
+              <span>{item.name} - {item.quantity}</span>
+              <span>${(item.price / 100).toFixed(2)}</span>
+            </li>
           ))}
         </ul>
-        <p className="cart-total">Total à payer: ${(calculateTotal() / 100).toFixed(2)}</p>
+        <p className="text-lg font-semibold mb-6">Total à payer: ${(calculateTotal() / 100).toFixed(2)}</p>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {errorMessage && <div className="text-red-500">{errorMessage}</div>}
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Numéro de la carte</label>
+            <CardNumberElement className="stripe-element p-2 border border-gray-300 rounded mt-1" />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Date d'expiration</label>
+            <CardExpiryElement className="stripe-element p-2 border border-gray-300 rounded mt-1" />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">CVC</label>
+            <CardCvcElement className="stripe-element p-2 border border-gray-300 rounded mt-1" />
+          </div>
+
+          <button type="submit" disabled={!stripe || isProcessing} className={`w-full text-white font-bold py-2 px-4 rounded ${!stripe || isProcessing ? 'bg-gray-400' : 'bg-blue-600 hover:bg-blue-700'}`}>
+            {isProcessing ? 'Traitement...' : 'Payer'}
+          </button>
+        </form>
       </div>
-      <form onSubmit={handleSubmit}>
-        {errorMessage && <div className="error-message">{errorMessage}</div>}
-        <div>
-          <label>Numéro de la carte</label>
-          <CardNumberElement className="stripe-element" />
-        </div>
-        <div>
-          <label>Date d'expiration</label>
-          <CardExpiryElement className="stripe-element" />
-        </div>
-        <div>
-          <label>CVC</label>
-          <CardCvcElement className="stripe-element" />
-        </div>
-        <button type="submit" disabled={!stripe || isProcessing}>
-          {isProcessing ? 'Traitement...' : 'Payer'}
-        </button>
-      </form>
     </div>
   );
 };
-
 export default PaymentForm;
