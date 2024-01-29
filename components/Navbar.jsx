@@ -1,4 +1,4 @@
-import React, { useState, useContext, useRef } from 'react';
+import React, { useState, useContext, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import CartSummary from './CartSummary';
@@ -7,14 +7,31 @@ import { AuthContext } from '../context/AuthContext';
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const navbarRef = useRef();
+  const [navbarHeight, setNavbarHeight] = useState(0); // Définir la variable d'état pour la hauteur du navbar
+  const navbarRef = useRef(); // Ref pour accéder au DOM du navbar
   const { isAuthenticated, logout } = useContext(AuthContext);
 
-  // Logique pour basculer le menu et le panier
-  const handleToggleMenu = () => setIsMenuOpen(!isMenuOpen);
-  const handleCartClick = () => setIsCartOpen(!isCartOpen); // Nouvelle fonction pour gérer le clic sur l'icône du panier
+  // Mise en place d'un effet pour mettre à jour la hauteur du navbar
+  useEffect(() => {
+    const updateNavbarHeight = () => {
+      setNavbarHeight(navbarRef.current.offsetHeight);
+    };
 
-  // Menu animation variants
+    // Mettre à jour la hauteur lors du premier rendu
+    updateNavbarHeight();
+
+    // Ajouter un écouteur d'événement pour les changements de taille de la fenêtre
+    window.addEventListener('resize', updateNavbarHeight);
+
+    // Nettoyer l'écouteur d'événement lors du démontage
+    return () => {
+      window.removeEventListener('resize', updateNavbarHeight);
+    };
+  }, []);
+
+  const handleToggleMenu = () => setIsMenuOpen(!isMenuOpen);
+  const toggleCart = () => setIsCartOpen(!isCartOpen);
+
   const menuVariants = {
     open: { x: 0 },
     closed: { x: '-100%' },
@@ -22,11 +39,9 @@ const Navbar = () => {
 
   return (
     <>
-      <nav ref={navbarRef} className="fixed top-0 left-0 w-full flex justify-between items-center p-4 bg-gray-900 text-white z-50">
+      <nav ref={navbarRef} className="fixed top-0 left-0 w-full flex justify-between items-center px-4 bg-gray-900 text-white z-50">
         <h2 className="font-extrabold text-2xl">
-          <Link href="/">
-            SCAN'AVIS
-          </Link>
+          <Link href="/">SCAN'AVIS</Link>
         </h2>
         <div className="flex items-center">
           {isAuthenticated ? (
@@ -39,15 +54,12 @@ const Navbar = () => {
               Déconnexion
             </button>
           ) : (
-            <Link href="/login"
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 transition rounded text-white"
-            >
+            <Link href="/login" className="px-4 py-2 bg-blue-600 hover:bg-blue-700 transition rounded text-white">
               Se connecter
             </Link>
           )}
-          <div onClick={handleCartClick} className="relative cursor-pointer ml-4">
+          <div onClick={toggleCart} className="relative cursor-pointer ml-4">
             <img src="/cart-icon.svg" alt="Cart" className="w-6 h-6" />
-            {/* Ici, nous utilisons handleCartClick pour basculer la vue du panier */}
           </div>
           <button
             type="button"
@@ -55,7 +67,7 @@ const Navbar = () => {
             className="ml-4"
             aria-label="Menu"
           >
-            <img src="/menu-icon.svg" alt="Menu" className="w-6 h-6" />
+            <img src="/menu.svg" alt="Menu" className="w-6 h-6" />
           </button>
         </div>
       </nav>
@@ -64,8 +76,8 @@ const Navbar = () => {
         initial="closed"
         animate={isMenuOpen ? 'open' : 'closed'}
         variants={menuVariants}
-        className="fixed top-16 left-0 w-64 bg-gray-800 text-white shadow-xl z-40 p-5"
-        // Pas besoin de style dynamique ici si le Navbar a une hauteur fixe
+        className="fixed left-0 w-64 bg-gray-800 text-white shadow-xl z-40 p-5"
+        style={{ top: `${navbarHeight}px` }} // Appliquer la hauteur du navbar pour le style top du sidebar
         transition={{ type: 'spring', stiffness: 260, damping: 20 }}
       >
         <div className="mt-2"> {/* Ajouter une marge en haut pour éviter le chevauchement avec le navbar */}
@@ -75,9 +87,11 @@ const Navbar = () => {
         </div>
       </motion.div>
 
-      {isCartOpen && <CartSummary />}
-      {/* Plus besoin de passer toggleCart en props */}
+      {isCartOpen && (
+        <CartSummary isCartOpen={isCartOpen} toggleCart={toggleCart} />
+      )}
     </>
   );
 };
+
 export default Navbar;
