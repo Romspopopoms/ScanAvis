@@ -84,15 +84,15 @@ const TarifsContent = () => {
   };
 
   return (
-    <div>
+    <div className="min-h-screen py-8 px-4">
       <h2 className="text-center text-4xl font-extrabold text-white mb-12">
         Voici les options disponibles
       </h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {services.map((service) => (
-          <div key={service.id} className="bg-white rounded-lg shadow overflow-hidden">
-            <img src={service.imgUrl} alt={`Service ${service.name}`} className="w-full" />
-            <div className="p-4 space-y-2"> {/* Add spacing between feature rows */}
+          <div key={service.id} className="bg-white rounded-lg shadow overflow-hidden transform transition duration-500 hover:scale-105">
+            <img src={service.imgUrl} alt={`Service ${service.name}`} className="w-full h-40 object-cover" />
+            <div className="p-4 space-y-2">
               {service.features.map((feature, index) => (
                 <FeatureRow key={index} title={feature} imgSrc="/check.png" />
               ))}
