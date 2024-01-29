@@ -39,43 +39,49 @@ const PaymentStatusPage = () => {
   }
 
   return (
-    <div className="page-container">
-      <div className="payment-status-main">
+    <div className="min-h-screen flex justify-center items-center p-4">
+      <div className="max-w-lg w-full bg-white shadow-xl rounded-lg p-8">
         {error ? (
-          <div className="message-container error-message">
-            <h2>Oups !</h2>
-            <p>Erreur : {error}</p>
-            <Link href="/" passHref>
-              <button type="button" className="btn btn-primary">Retour à l'accueil</button>
+          <div className="text-center">
+            <h2 className="text-xl font-bold text-red-600 mb-4">Oups !</h2>
+            <p className="mb-4">Erreur : {error}</p>
+            <Link href="/"
+              className="inline-block bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition duration-200"
+            >
+              Retour à l'accueil
             </Link>
           </div>
         ) : !paymentStatus || paymentStatus === 'failed' ? (
-          <div className="message-container error-message">
-            <h2>Statut de Paiement Inconnu</h2>
-            <p>Accès non autorisé à cette page ou paramètre manquant.</p>
-            <Link href="/" passHref>
-              <button type="button" className="btn btn-secondary">Retour à l'accueil</button>
+          <div className="text-center">
+            <h2 className="text-xl font-bold text-yellow-500 mb-4">Statut de Paiement Inconnu</h2>
+            <p className="mb-4">Accès non autorisé à cette page ou paramètre manquant.</p>
+            <Link href="/"
+              className="inline-block bg-gray-500 text-white px-6 py-2 rounded hover:bg-gray-600 transition duration-200"
+            >
+              Retour à l'accueil
             </Link>
           </div>
         ) : (
-          <div className="message-container success-message">
-            <h1>Merci pour votre achat !</h1>
-            <p>Votre transaction a été réalisée avec succès.</p>
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-green-600 mb-4">Merci pour votre achat !</h1>
+            <p className="mb-4">Votre transaction a été réalisée avec succès.</p>
             {transaction && (
-              <div>
-                <p>ID de transaction : {transaction.transactionId}</p>
-                <p>Montant : ${(transaction.totalAmount / 100).toFixed(2)}</p>
-                <p>Date de création : {new Date(transaction.createdAt).toLocaleString()}</p>
-                <p>Articles :</p>
-                <ul>
+              <div className="text-left">
+                <p className="font-semibold">ID de transaction : {transaction.transactionId}</p>
+                <p className="font-semibold">Montant : ${(transaction.totalAmount / 100).toFixed(2)}</p>
+                <p className="font-semibold">Date de création : {new Date(transaction.createdAt).toLocaleString()}</p>
+                <p className="font-semibold mb-2">Articles :</p>
+                <ul className="list-disc pl-5">
                   {transaction.items.map((item, index) => (
-                    <li key={index}>{item.name} - Quantité : {item.quantity} - Prix : ${(item.price / 100).toFixed(2)}</li>
+                    <li key={index} className="mb-1">{item.name} - Quantité : {item.quantity} - Prix : ${(item.price / 100).toFixed(2)}</li>
                   ))}
                 </ul>
               </div>
             )}
-            <Link href="/" passHref>
-              <button type="button" className="btn btn-success">Retour à l'accueil</button>
+            <Link href="/"
+              className="inline-block bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600 transition duration-200 mt-4"
+            >
+              Retour à l'accueil
             </Link>
           </div>
         )}
