@@ -52,7 +52,7 @@ const MonProfil = () => {
 
   if (error) {
     return (
-      <div className="container mx-auto p-4">
+      <div className="container mx-auto pt-16 p-4">
         <h1 className="text-2xl font-bold mb-4">Mon Profil</h1>
         <p className="text-red-500">{error}</p>
       </div>
@@ -60,7 +60,7 @@ const MonProfil = () => {
   }
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto pt-16 p-4"> {/* pt-16 pour donner suffisamment d'espace en haut */}
       <h1 className="text-2xl font-bold mb-4">Mon Profil</h1>
 
       <div className="mt-8">
