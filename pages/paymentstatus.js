@@ -67,13 +67,15 @@ const PaymentStatusPage = () => {
             <p className="mb-4">Votre transaction a été réalisée avec succès.</p>
             {transaction && (
               <div className="text-left">
-                <p className="font-semibold">ID de transaction : {transaction.transactionId}</p>
-                <p className="font-semibold">Montant : ${(transaction.totalAmount / 100).toFixed(2)}</p>
-                <p className="font-semibold">Date de création : {new Date(transaction.createdAt).toLocaleString()}</p>
+                <p className="font-semibold">ID de transaction : <span className="font-normal">{transaction.transactionId}</span></p>
+                <p className="font-semibold">Montant : <span className="font-normal">${(transaction.totalAmount / 100).toFixed(2)}</span></p>
+                <p className="font-semibold">Date de création : <span className="font-normal">{new Date(transaction.createdAt).toLocaleString()}</span></p>
                 <p className="font-semibold mb-2">Articles :</p>
                 <ul className="list-disc pl-5">
                   {transaction.items.map((item, index) => (
-                    <li key={index} className="mb-1">{item.name} - Quantité : {item.quantity} - Prix : ${(item.price / 100).toFixed(2)}</li>
+                    <li key={index} className="mb-1">
+                      <span className="font-semibold">{item.name}</span> - Quantité : <span className="font-normal">{item.quantity}</span> - Prix : <span className="font-normal">${(item.price / 100).toFixed(2)}</span>
+                    </li>
                   ))}
                 </ul>
               </div>
