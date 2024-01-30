@@ -32,18 +32,21 @@ const CheckoutFormContent = () => {
   const stripe = useStripe();
   const elements = useElements();
   const { cartItems, formatCartItemsForSubscription, clearCart } = useCart();
-  console.log('Formatted items for subscription:', formatCartItemsForSubscription);
   const { user } = useContext(AuthContext);
   const [clientSecret, setClientSecret] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
+  // Fonction pour calculer le total
   const calculateTotal = () => cartItems.reduce((total, item) => total + item.price, 0);
 
   useEffect(() => {
     const fetchSubscriptionIntent = async () => {
       if (cartItems.length === 0 || !user) return;
+
+      // Exécution de la fonction pour obtenir les éléments formatés
       const formattedCartItems = formatCartItemsForSubscription();
+
       try {
         const response = await fetch('/.netlify/functions/SubscriptionIntent', {
           method: 'POST',
