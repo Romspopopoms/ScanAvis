@@ -92,6 +92,7 @@ const CheckoutFormContent = () => {
 
       // Assurez-vous que les éléments du panier sont formatés juste avant de les envoyer
       const formattedCartItems = formatCartItemsForSubscription();
+      console.log('Formatted Items for Subscription:', formattedCartItems);
 
       const { error, setupIntent } = await stripe.confirmCardSetup(clientSecret, {
         payment_method: {

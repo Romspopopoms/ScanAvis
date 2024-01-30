@@ -17,11 +17,8 @@ const initialCartItems = [
     throw new Error(`Produit non trouvé pour l'ID : ${item.id}`);
   }
   return {
-    id: item.id, // Conservez l'id sous forme de chaîne
-    name: product.name,
-    imgUrl: product.imgUrl,
-    price: product.price, // Prix en centimes
-    stripePlanId: product.stripePlanId,
+    ...item,
+    ...product,
   };
 });
 
