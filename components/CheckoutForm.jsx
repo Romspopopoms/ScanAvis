@@ -22,7 +22,7 @@ const CheckoutForm = () => {
       if (cartItems.length === 0 || !user) return;
       const formattedCartItems = formatCartItemsForSubscription();
       try {
-        const response = await fetch('/.netlify/functions/create-subscription', {
+        const response = await fetch('/.netlify/functions/SubscriptionIntent', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ items: formattedCartItems, userUuid: user.uuid }),
