@@ -2,59 +2,65 @@ import React, { createContext, useState, useMemo, useContext } from 'react';
 
 const CartContext = createContext({
   cartItems: [],
+  totalCost: 0, // Coût total pour les abonnements
   addToCart: () => {},
   removeFromCart: () => {},
   clearCart: () => {},
-  totalPrice: 0,
-  formatCartItemsForPayment: () => {},
+  formatCartItemsForSubscription: () => {},
 });
 
 export const useCart = () => useContext(CartContext);
 
 export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
+  const [totalCost, setTotalCost] = useState(0);
+
+  const updateTotalCost = (items) => {
+    const newTotalCost = items.reduce((total, item) => total + item.price, 0);
+    setTotalCost(newTotalCost);
+  };
 
   const addToCart = (newItem) => {
     setCartItems((prevItems) => {
-      const existingItem = prevItems.find((item) => item.id === newItem.id);
-      if (existingItem) {
-        return prevItems.map((item) => (item.id === newItem.id
-          ? { ...item, quantity: item.quantity + 1 }
-          : item));
+      const existingItemIndex = prevItems.findIndex((item) => item.id === newItem.id);
+      if (existingItemIndex === -1) {
+        // Si l'abonnement n'est pas déjà dans le panier, ajoutez-le
+        const updatedItems = [...prevItems, newItem];
+        updateTotalCost(updatedItems); // Mettre à jour le coût total
+        return updatedItems;
       }
-      return [...prevItems, { ...newItem, quantity: 1 }];
+      // Optionnel : Gérer la mise à jour de la quantité ici si nécessaire
+      return prevItems;
     });
   };
 
   const removeFromCart = (itemId) => {
-    setCartItems((prevItems) => prevItems.filter((item) => item.id !== itemId));
+    setCartItems((prevItems) => {
+      const updatedItems = prevItems.filter((item) => item.id !== itemId);
+      updateTotalCost(updatedItems); // Mettre à jour le coût total
+      return updatedItems;
+    });
   };
 
   const clearCart = () => {
     setCartItems([]);
+    setTotalCost(0);
   };
 
-  const totalPrice = cartItems.reduce(
-    (total, item) => total + item.price * item.quantity,
-    0,
-  );
-
-  const formatCartItemsForPayment = () => cartItems.map((item) => ({
-    id: typeof item.id === 'number' ? item.id : String(item.id),
-    quantity: item.quantity,
-    price: item.price, // Assurez-vous que le prix est également envoyé
+  const formatCartItemsForSubscription = () => cartItems.map((item) => ({
+    plan: item.stripePlanId, // Utilisez l'identifiant du plan d'abonnement Stripe
   }));
 
   const value = useMemo(
     () => ({
       cartItems,
+      totalCost,
       addToCart,
       removeFromCart,
       clearCart,
-      totalPrice,
-      formatCartItemsForPayment,
+      formatCartItemsForSubscription,
     }),
-    [cartItems, totalPrice],
+    [cartItems, totalCost],
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

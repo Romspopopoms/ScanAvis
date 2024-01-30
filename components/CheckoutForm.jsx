@@ -3,49 +3,49 @@ import { loadStripe } from '@stripe/stripe-js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { useRouter } from 'next/router';
 import { useCart } from '../context/CartContext';
-import { AuthContext } from '../context/AuthContext'; // Assurez-vous d'importer AuthContext correctement
+import { AuthContext } from '../context/AuthContext';
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY);
 
 const CheckoutForm = () => {
   const stripe = useStripe();
   const elements = useElements();
-  const { cartItems, formatCartItemsForPayment, clearCart } = useCart();
-  const { user } = useContext(AuthContext); // Utilisez AuthContext pour accéder à l'`uuid` de l'utilisateur
+  const { cartItems, formatCartItemsForSubscription, clearCart } = useCart();
+  const { user } = useContext(AuthContext);
   const [clientSecret, setClientSecret] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const router = useRouter();
 
   useEffect(() => {
-    const fetchPaymentIntent = async () => {
+    const fetchSubscriptionIntent = async () => {
       if (cartItems.length === 0 || !user) return;
-      const formattedCartItems = formatCartItemsForPayment();
+      const formattedCartItems = formatCartItemsForSubscription();
       try {
-        const response = await fetch('/.netlify/functions/create-payment-intent', {
+        const response = await fetch('/.netlify/functions/create-subscription', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ items: formattedCartItems, userUuid: user.uuid }), // Passez l'`uuid` de l'utilisateur
+          body: JSON.stringify({ items: formattedCartItems, userUuid: user.uuid }),
         });
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || 'Erreur du serveur');
         setClientSecret(data.clientSecret);
       } catch (error) {
-        console.error('Erreur lors de la création de l’intention de paiement:', error);
+        console.error('Erreur lors de la création de l’intention de souscription:', error);
         setErrorMessage(error.message);
       }
     };
 
-    fetchPaymentIntent();
-  }, [cartItems, formatCartItemsForPayment, user]);
+    fetchSubscriptionIntent();
+  }, [cartItems, formatCartItemsForSubscription, user]);
 
-  const onSuccessfulPayment = (paymentIntentId) => {
+  const onSuccessfulSubscription = (subscriptionId) => {
     clearCart();
-    router.push(`/paymentstatus?paymentStatus=succeeded&paymentIntentId=${paymentIntentId}`);
+    router.push(`/subscriptionstatus?subscriptionStatus=succeeded&subscriptionId=${subscriptionId}`);
   };
 
-  const onFailedPayment = (message) => {
-    router.push(`/paymentstatus?paymentStatus=failed&message=${encodeURIComponent(message)}`);
+  const onFailedSubscription = (message) => {
+    router.push(`/subscriptionstatus?subscriptionStatus=failed&message=${encodeURIComponent(message)}`);
   };
 
   const handleSubmit = async (event) => {
@@ -60,21 +60,31 @@ const CheckoutForm = () => {
 
     try {
       const cardElement = elements.getElement(CardElement);
-      const paymentResult = await stripe.confirmCardPayment(clientSecret, {
+      const setupResult = await stripe.confirmCardSetup(clientSecret, {
         payment_method: { card: cardElement },
       });
 
-      if (paymentResult.error) {
-        throw new Error(`Erreur de paiement: ${paymentResult.error.message}`);
-      } else if (paymentResult.paymentIntent && paymentResult.paymentIntent.status === 'succeeded') {
-        onSuccessfulPayment(paymentResult.paymentIntent.id);
+      if (setupResult.error) {
+        throw new Error(`Erreur de configuration: ${setupResult.error.message}`);
+      } else if (setupResult.setupIntent && setupResult.setupIntent.status === 'succeeded') {
+        // Envoyez l'ID de l'intention de configuration à votre serveur pour créer l'abonnement
+        const subscriptionResult = await fetch('/.netlify/functions/complete-subscription', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ setupIntentId: setupResult.setupIntent.id }),
+        });
+
+        const subscriptionData = await subscriptionResult.json();
+        if (!subscriptionResult.ok) throw new Error(subscriptionData.error || 'Erreur lors de la création de l’abonnement');
+
+        onSuccessfulSubscription(subscriptionData.subscriptionId);
       } else {
-        throw new Error('Le paiement a échoué pour une raison inconnue.');
+        throw new Error('La configuration a échoué pour une raison inconnue.');
       }
     } catch (error) {
-      console.error('Erreur lors du traitement du paiement:', error);
+      console.error('Erreur lors du traitement de l’abonnement:', error);
       setErrorMessage(error.message);
-      onFailedPayment(error.message);
+      onFailedSubscription(error.message);
     } finally {
       setIsProcessing(false);
     }
@@ -86,7 +96,7 @@ const CheckoutForm = () => {
         {errorMessage && <div className="error-message">{errorMessage}</div>}
         <CardElement />
         <button type="submit" disabled={!stripe || !clientSecret || isProcessing}>
-          {isProcessing ? 'Traitement...' : 'Payer'}
+          {isProcessing ? 'Traitement...' : 'S’abonner'}
         </button>
       </form>
     </Elements>
