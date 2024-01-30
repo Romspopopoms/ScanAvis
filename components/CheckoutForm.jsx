@@ -32,6 +32,7 @@ const CheckoutFormContent = () => {
   const stripe = useStripe();
   const elements = useElements();
   const { cartItems, formatCartItemsForSubscription, clearCart } = useCart();
+  console.log('Formatted items for subscription:', formatCartItemsForSubscription);
   const { user } = useContext(AuthContext);
   const [clientSecret, setClientSecret] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);

@@ -43,7 +43,14 @@ exports.handler = async (event) => {
     console.log('Souscription créée avec succès:', subscription.id);
 
     const insertQuery = 'INSERT INTO Subscriptions (subscriptionId, items, user_uuid) VALUES (?, ?, ?)';
-    const [result] = await conn.execute(insertQuery, [subscription.id, JSON.stringify(items), userUuid]);
+    const result = await conn.execute(insertQuery, [subscription.id, JSON.stringify(items), userUuid]);
+    console.log('Items reçus:', items);
+    if (!Array.isArray(items)) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ message: "Invalid 'items' format. 'items' should be an array." }),
+      };
+    }
     const { rows } = result; // Assurez-vous que c'est la structure correcte pour votre implémentation de base de données
     console.log('Souscription enregistrée dans la base de données:', rows);
 
