@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, CardNumberElement, CardExpiryElement, CardCvcElement, useStripe, useElements, CardElement } from '@stripe/react-stripe-js';
-import { useRouter } from 'next/router';
 import { useCart } from '../context/CartContext';
 import { AuthContext } from '../context/AuthContext';
 
@@ -15,7 +14,6 @@ const CheckoutForm = () => {
   const [clientSecret, setClientSecret] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const router = useRouter();
 
   const calculateTotal = () => cartItems.reduce((total, item) => total + item.price, 0);
 
