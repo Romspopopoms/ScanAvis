@@ -1,13 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
-import {
-  Elements,
-  CardNumberElement,
-  CardExpiryElement,
-  CardCvcElement,
-  useStripe,
-  useElements,
-} from '@stripe/react-stripe-js';
+import { Elements, CardNumberElement, CardExpiryElement, CardCvcElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { useCart } from '../context/CartContext';
 import { AuthContext } from '../context/AuthContext';
 
@@ -43,7 +36,6 @@ const CheckoutFormContent = () => {
     const fetchSubscriptionIntent = async () => {
       if (cartItems.length === 0 || !user) return;
 
-      // Obtenir les éléments formatés directement sans avoir besoin de l'exécuter en tant que fonction
       const formattedCartItems = formatCartItemsForSubscription();
 
       try {
@@ -97,11 +89,14 @@ const CheckoutFormContent = () => {
         throw new Error('Élément de carte non trouvé');
       }
 
+      // Assurez-vous que les éléments du panier sont formatés juste avant de les envoyer
+      const formattedCartItems = formatCartItemsForSubscription();
+
       const { error, setupIntent } = await stripe.confirmCardSetup(clientSecret, {
         payment_method: {
-          card: cardNumberElement, // Utilisez cardNumberElement ici
+          card: cardNumberElement,
           billing_details: {
-            name: user ? user.name : 'Guest User', // Assurez-vous que l'utilisateur a un nom ou utilisez une alternative
+            name: user ? user.name : 'Guest User',
           },
         },
       });
@@ -111,11 +106,14 @@ const CheckoutFormContent = () => {
       }
 
       if (setupIntent.status === 'succeeded') {
-        // Envoi de l'ID de l'intention de configuration au serveur pour créer l'abonnement
         const subscriptionResult = await fetch('/.netlify/functions/complete-subscription', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ setupIntentId: setupIntent.id, userUuid: user ? user.uuid : null }),
+          body: JSON.stringify({
+            setupIntentId: setupIntent.id,
+            userUuid: user ? user.uuid : null,
+            items: formattedCartItems,
+          }),
         });
 
         const subscriptionData = await subscriptionResult.json();
@@ -152,7 +150,6 @@ const CheckoutFormContent = () => {
         <p className="text-lg font-semibold mb-6">Total à payer: ${(calculateTotal() / 100).toFixed(2)}</p>
         <form onSubmit={handleSubmit} className="space-y-4">
           {errorMessage && <div className="error-message">{errorMessage}</div>}
-          {errorMessage && <div className="error-message">{errorMessage}</div>}
           <div>
             <label className="block text-sm font-medium text-gray-700">Numéro de la carte</label>
             <CardNumberElement className="stripe-element p-2 border border-gray-300 rounded mt-1" options={cardElementOptions} />
@@ -171,7 +168,6 @@ const CheckoutFormContent = () => {
         </form>
       </div>
     </div>
-
   );
 };
 
