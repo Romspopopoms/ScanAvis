@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import { useCart } from '../context/CartContext';
 import { AuthContext } from '../context/AuthContext';
 
-const stripePromise = loadStripe('pk_test_51OPtGvDWmnYPaxs1gSpLL1WpDyU6gaxOBszqNCSu9iHVeEYuPcjUEvOpKzjwdbF6NUWquoEPf24Y3qMwIDLmeLvl00FwQkUSKx');
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY);
 
 const CheckoutForm = () => {
   const stripe = useStripe();
@@ -16,6 +16,8 @@ const CheckoutForm = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const router = useRouter();
+
+  const calculateTotal = () => cartItems.reduce((total, item) => total + item.price, 0);
 
   useEffect(() => {
     const fetchSubscriptionIntent = async () => {
@@ -71,7 +73,7 @@ const CheckoutForm = () => {
         const subscriptionResult = await fetch('/.netlify/functions/complete-subscription', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ setupIntentId: setupResult.setupIntent.id }),
+          body: JSON.stringify({ setupIntentId: setupResult.setupIntent.id, userUuid: user.uuid }),
         });
 
         const subscriptionData = await subscriptionResult.json();
@@ -91,15 +93,29 @@ const CheckoutForm = () => {
   };
 
   return (
-    <Elements stripe={stripePromise}>
-      <form onSubmit={handleSubmit}>
-        {errorMessage && <div className="error-message">{errorMessage}</div>}
-        <CardElement />
-        <button type="submit" disabled={!stripe || !clientSecret || isProcessing}>
-          {isProcessing ? 'Traitement...' : 'S’abonner'}
-        </button>
-      </form>
-    </Elements>
+    <div className="min-h-screen flex justify-center items-center">
+      <div className="bg-white p-8 rounded-lg shadow-xl max-w-md w-full">
+        <h2 className="text-2xl font-semibold mb-6">Détails de l'abonnement</h2>
+        <ul className="mb-6">
+          {cartItems.map((item) => (
+            <li key={item.id} className="flex justify-between text-lg mb-2">
+              <span>{item.name} - Quantité: {item.quantity}</span>
+              <span>${(item.price / 100).toFixed(2)}</span>
+            </li>
+          ))}
+        </ul>
+        <p className="text-lg font-semibold mb-6">Total à payer: ${(calculateTotal() / 100).toFixed(2)}</p>
+        <Elements stripe={stripePromise}>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {errorMessage && <div className="error-message">{errorMessage}</div>}
+            <CardElement />
+            <button type="submit" disabled={!stripe || !clientSecret || isProcessing} className={`w-full text-white font-bold py-2 px-4 rounded ${!stripe || isProcessing ? 'bg-gray-400' : 'bg-blue-600 hover:bg-blue-700'}`}>
+              {isProcessing ? 'Traitement...' : 'S’abonner'}
+            </button>
+          </form>
+        </Elements>
+      </div>
+    </div>
   );
 };
 
