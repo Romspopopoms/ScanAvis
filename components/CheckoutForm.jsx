@@ -89,9 +89,6 @@ const CheckoutForm = () => {
       const cardNumberElement = elements.getElement(CardNumberElement);
       const cardExpiryElement = elements.getElement(CardExpiryElement);
       const cardCvcElement = elements.getElement(CardCvcElement);
-      console.log('cardNumberElement', cardNumberElement);
-      console.log('cardExpiryElement', cardExpiryElement);
-      console.log('cardCvcElement', cardCvcElement);
 
       if (!cardNumberElement || !cardExpiryElement || !cardCvcElement) {
         throw new Error('Élément de carte non trouvé');
@@ -138,8 +135,8 @@ const CheckoutForm = () => {
   };
 
   return (
-    <div className="min-h-screen flex justify-center items-center">
-      <Elements stripe={stripePromise}>
+    <Elements stripe={stripePromise}>
+      <div className="min-h-screen flex justify-center items-center">
         <div className="bg-white p-8 rounded-lg shadow-xl max-w-md w-full">
           <h2 className="text-2xl font-semibold mb-6">Détails de l'abonnement</h2>
           <ul className="mb-6">
@@ -153,7 +150,6 @@ const CheckoutForm = () => {
           <p className="text-lg font-semibold mb-6">Total à payer: ${calculateTotal().toFixed(2)}</p>
           <form onSubmit={handleSubmit} className="space-y-4">
             {errorMessage && <div className="error-message">{errorMessage}</div>}
-            {/* Elements for card details */}
             <div>
               <label className="block text-sm font-medium text-gray-700">Numéro de la carte</label>
               <CardNumberElement className="stripe-element p-2 border border-gray-300 rounded mt-1" options={cardElementOptions} />
@@ -171,8 +167,8 @@ const CheckoutForm = () => {
             </button>
           </form>
         </div>
-      </Elements>
-    </div>
+      </div>
+    </Elements>
   );
 };
 
