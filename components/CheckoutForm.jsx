@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
-import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { Elements, CardNumberElement, CardExpiryElement, CardCvcElement, useStripe, useElements, CardElement } from '@stripe/react-stripe-js';
 import { useRouter } from 'next/router';
 import { useCart } from '../context/CartContext';
 import { AuthContext } from '../context/AuthContext';
@@ -104,11 +104,25 @@ const CheckoutForm = () => {
             </li>
           ))}
         </ul>
-        <p className="text-lg font-semibold mb-6">Total à payer: ${(calculateTotal() / 100).toFixed(2)}</p>
+        <p className="text-lg font-semibold mb-6">Total à payer: ${((calculateTotal() / 100).toFixed(2))}</p>
         <Elements stripe={stripePromise}>
           <form onSubmit={handleSubmit} className="space-y-4">
             {errorMessage && <div className="error-message">{errorMessage}</div>}
-            <CardElement />
+            {/* Elements for card details */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Numéro de la carte</label>
+              <CardNumberElement className="stripe-element p-2 border border-gray-300 rounded mt-1" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Date d'expiration</label>
+              <CardExpiryElement className="stripe-element p-2 border border-gray-300 rounded mt-1" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">CVC</label>
+              <CardCvcElement className="stripe-element p-2 border border-gray-300 rounded mt-1" />
+            </div>
+
+            {/* Submit button */}
             <button type="submit" disabled={!stripe || !clientSecret || isProcessing} className={`w-full text-white font-bold py-2 px-4 rounded ${!stripe || isProcessing ? 'bg-gray-400' : 'bg-blue-600 hover:bg-blue-700'}`}>
               {isProcessing ? 'Traitement...' : 'S’abonner'}
             </button>
