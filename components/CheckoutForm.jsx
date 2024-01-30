@@ -54,6 +54,7 @@ const CheckoutForm = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
     if (!stripe || !elements) {
       setErrorMessage('Stripe.js n’a pas encore été chargé!');
       return;
@@ -63,23 +64,39 @@ const CheckoutForm = () => {
     setErrorMessage('');
 
     try {
+      // Utilisez CardElement pour collecter les informations de paiement
       const cardElement = elements.getElement(CardElement);
-      const setupResult = await stripe.confirmCardSetup(clientSecret, {
-        payment_method: { card: cardElement },
+
+      if (!cardElement) {
+        throw new Error('Élément de carte non trouvé');
+      }
+
+      const { error, setupIntent } = await stripe.confirmCardSetup(clientSecret, {
+        payment_method: {
+          card: cardElement,
+          billing_details: {
+            name: user ? user.name : 'Guest User', // Assurez-vous que l'utilisateur a un nom ou utilisez une alternative
+          },
+        },
       });
 
-      if (setupResult.error) {
-        throw new Error(`Erreur de configuration: ${setupResult.error.message}`);
-      } else if (setupResult.setupIntent && setupResult.setupIntent.status === 'succeeded') {
-        // Envoyez l'ID de l'intention de configuration à votre serveur pour créer l'abonnement
+      if (error) {
+        throw error;
+      }
+
+      if (setupIntent.status === 'succeeded') {
+        // Envoi de l'ID de l'intention de configuration au serveur pour créer l'abonnement
         const subscriptionResult = await fetch('/.netlify/functions/complete-subscription', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ setupIntentId: setupResult.setupIntent.id, userUuid: user.uuid }),
+          body: JSON.stringify({ setupIntentId: setupIntent.id, userUuid: user ? user.uuid : null }),
         });
 
         const subscriptionData = await subscriptionResult.json();
-        if (!subscriptionResult.ok) throw new Error(subscriptionData.error || 'Erreur lors de la création de l’abonnement');
+
+        if (!subscriptionResult.ok) {
+          throw new Error(subscriptionData.error || 'Erreur lors de la création de l’abonnement');
+        }
 
         onSuccessfulSubscription(subscriptionData.subscriptionId);
       } else {
@@ -87,7 +104,7 @@ const CheckoutForm = () => {
       }
     } catch (error) {
       console.error('Erreur lors du traitement de l’abonnement:', error);
-      setErrorMessage(error.message);
+      setErrorMessage(error.message || 'Erreur lors du traitement de l’abonnement');
       onFailedSubscription(error.message);
     } finally {
       setIsProcessing(false);
