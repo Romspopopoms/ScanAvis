@@ -3,7 +3,10 @@ const { conn } = require('../../utils/db');
 const findOrCreateStripeCustomer = require('./findOrCreateStripeCustomer');
 
 exports.handler = async (event) => {
+  console.log('Requête reçue:', event);
+
   if (event.httpMethod !== 'POST') {
+    console.error('Méthode HTTP non autorisée');
     return {
       statusCode: 405,
       headers: { 'Content-Type': 'application/json' },
@@ -13,36 +16,41 @@ exports.handler = async (event) => {
 
   try {
     const { setupIntentId, items, userUuid } = JSON.parse(event.body);
+    console.log('Traitement du setupIntentId:', setupIntentId, 'pour l\'utilisateur:', userUuid);
 
-    // Vérifier et récupérer les détails du setupIntent
     const setupIntent = await stripe.setupIntents.retrieve(setupIntentId);
     if (!setupIntent) {
+      console.error(`SetupIntent non trouvé pour l'ID: ${setupIntentId}`);
       throw new Error(`SetupIntent not found for ID: ${setupIntentId}`);
     }
+    console.log('SetupIntent récupéré:', setupIntent.id);
 
-    // Utiliser le payment_method du setupIntent pour créer la souscription
     const paymentMethodId = setupIntent.payment_method;
     const formattedItems = items.map((item) => ({ price: item.stripePlanId }));
-    const customer = await findOrCreateStripeCustomer(userUuid); // Assurez-vous que cette fonction est définie et importée correctement
+    console.log('Items formatés pour la souscription:', formattedItems);
+
+    const customer = await findOrCreateStripeCustomer(userUuid);
+    console.log('Client Stripe trouvé ou créé:', customer.id);
 
     const subscription = await stripe.subscriptions.create({
       customer: customer.id,
       items: formattedItems,
       default_payment_method: paymentMethodId,
     });
+    console.log('Souscription créée avec succès:', subscription.id);
 
-    // Enregistrer les détails de la souscription dans votre base de données
     const insertQuery = 'INSERT INTO Subscriptions (subscriptionId, items, user_uuid) VALUES (?, ?, ?)';
-    await conn.execute(insertQuery, [subscription.id, JSON.stringify(items), userUuid]);
+    const [result] = await conn.execute(insertQuery, [subscription.id, JSON.stringify(items), userUuid]);
+    const { rows } = result; // Assurez-vous que c'est la structure correcte pour votre implémentation de base de données
+    console.log('Souscription enregistrée dans la base de données:', rows);
 
-    // Renvoyer l'ID de la souscription
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ subscriptionId: subscription.id }),
     };
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Erreur lors de la complétion de la souscription:', error);
     return {
       statusCode: 500,
       headers: { 'Content-Type': 'application/json' },
