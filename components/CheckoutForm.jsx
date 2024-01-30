@@ -67,6 +67,9 @@ const CheckoutForm = () => {
       const cardNumberElement = elements.getElement(CardNumberElement);
       const cardExpiryElement = elements.getElement(CardExpiryElement);
       const cardCvcElement = elements.getElement(CardCvcElement);
+      console.log('cardNumberElement', cardNumberElement);
+      console.log('cardExpiryElement', cardExpiryElement);
+      console.log('cardCvcElement', cardCvcElement);
 
       if (!cardNumberElement || !cardExpiryElement || !cardCvcElement) {
         throw new Error('Élément de carte non trouvé');
