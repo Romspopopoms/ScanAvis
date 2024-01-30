@@ -1,5 +1,27 @@
 import React, { createContext, useState, useMemo, useContext } from 'react';
 
+const productDetails = {
+  base: { name: 'Base', price: 2000, imgUrl: 'base.png', stripePlanId: 'plan_base' },
+  bronze: { name: 'Bronze', price: 4000, imgUrl: 'bronze.png', stripePlanId: 'plan_bronze' },
+  silver: { name: 'Silver', price: 6000, imgUrl: 'silver.png', stripePlanId: 'plan_silver' },
+  gold: { name: 'Gold', price: 10000, imgUrl: 'gold.png', stripePlanId: 'plan_gold' },
+};
+
+// Exemple initial des données de cartItems
+const initialCartItems = [
+  { id: 'base' }, // Abonnement de type 'base'
+  { id: 'gold' }, // Abonnement de type 'gold'
+].map((item) => {
+  const product = productDetails[item.id];
+  if (!product) {
+    throw new Error(`Produit non trouvé pour l'ID : ${item.id}`);
+  }
+  return {
+    ...item,
+    ...product,
+  };
+});
+
 const CartContext = createContext({
   cartItems: [],
   totalCost: 0, // Coût total pour les abonnements
@@ -12,8 +34,8 @@ const CartContext = createContext({
 export const useCart = () => useContext(CartContext);
 
 export const CartProvider = ({ children }) => {
-  const [cartItems, setCartItems] = useState([]);
-  const [totalCost, setTotalCost] = useState(0);
+  const [cartItems, setCartItems] = useState(initialCartItems);
+  const [totalCost, setTotalCost] = useState(cartItems.reduce((total, item) => total + item.price, 0));
 
   const updateTotalCost = () => {
     const newTotalCost = cartItems.reduce((total, item) => total + item.price, 0);

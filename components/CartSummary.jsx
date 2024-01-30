@@ -4,18 +4,15 @@ import Link from 'next/link';
 import { useCart } from '../context/CartContext';
 
 const CartSummary = ({ isCartOpen }) => {
-  const { cartItems, removeFromCart, clearCart, formatCartItemsForSubscription } = useCart();
+  const { cartItems, removeFromCart, clearCart } = useCart();
 
   const cartVariants = {
     open: { x: 0, opacity: 1, scale: 1, transition: { type: 'spring', stiffness: 120 } },
     closed: { x: '-100%', opacity: 0, scale: 0.95, transition: { type: 'spring', stiffness: 120 } },
   };
 
-  // Fonction pour calculer le total, adaptée pour les abonnements
-  const calculateTotal = () => {
-    const formattedCartItems = formatCartItemsForSubscription();
-    return formattedCartItems.reduce((total, item) => total + item.price, 0);
-  };
+  // Fonction pour calculer le total
+  const calculateTotal = () => cartItems.reduce((total, item) => total + (item.price * (item.quantity || 1)), 0);
 
   return (
     <motion.div
@@ -35,7 +32,7 @@ const CartSummary = ({ isCartOpen }) => {
                 <div className="flex justify-between items-center" key={item.id}>
                   <div>
                     <h4 className="font-semibold">{item.name}</h4>
-                    <p className="text-sm text-gray-600">{(item.price / 100).toFixed(2)}$ - Quantité: {item.quantity}</p>
+                    <p className="text-sm text-gray-600">{(item.price / 100).toFixed(2)}$ - Quantité: {item.quantity || 1}</p>
                   </div>
                   <button
                     type="button"
@@ -48,8 +45,8 @@ const CartSummary = ({ isCartOpen }) => {
               ))}
             </div>
             <div className="mt-4">
-              <strong className="text-lg">Total: {(calculateTotal() / 100).toFixed(2)}$</strong>
-              <div className="mt-4">
+              <strong className="text-lg">Total: ${(calculateTotal() / 100).toFixed(2)}</strong>
+              <div className="mt-4 flex justify-between">
                 <button
                   type="button"
                   className="bg-red-500 text-white text-sm px-3 py-1 rounded hover:bg-red-600 transition-colors duration-300"
