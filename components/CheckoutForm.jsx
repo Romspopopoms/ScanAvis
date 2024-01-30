@@ -1,10 +1,32 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
-import { Elements, CardNumberElement, CardExpiryElement, CardCvcElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import {
+  Elements,
+  CardNumberElement,
+  CardExpiryElement,
+  CardCvcElement,
+  useStripe,
+  useElements,
+} from '@stripe/react-stripe-js';
 import { useCart } from '../context/CartContext';
 import { AuthContext } from '../context/AuthContext';
 
 const stripePromise = loadStripe('pk_test_51OPtGvDWmnYPaxs1gSpLL1WpDyU6gaxOBszqNCSu9iHVeEYuPcjUEvOpKzjwdbF6NUWquoEPf24Y3qMwIDLmeLvl00FwQkUSKx');
+
+const cardElementOptions = {
+  style: {
+    base: {
+      fontSize: '16px',
+      color: '#424770',
+      '::placeholder': {
+        color: '#aab7c4',
+      },
+    },
+    invalid: {
+      color: '#9e2146',
+    },
+  },
+};
 
 const CheckoutForm = () => {
   const stripe = useStripe();
@@ -131,21 +153,18 @@ const CheckoutForm = () => {
           <p className="text-lg font-semibold mb-6">Total à payer: ${((calculateTotal() / 100).toFixed(2))}</p>
           <form onSubmit={handleSubmit} className="space-y-4">
             {errorMessage && <div className="error-message">{errorMessage}</div>}
-            {/* Elements for card details */}
             <div>
               <label className="block text-sm font-medium text-gray-700">Numéro de la carte</label>
-              <CardNumberElement className="stripe-element p-2 border border-gray-300 rounded mt-1" />
+              <CardNumberElement className="stripe-element p-2 border border-gray-300 rounded mt-1" options={cardElementOptions} />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">Date d'expiration</label>
-              <CardExpiryElement className="stripe-element p-2 border border-gray-300 rounded mt-1" />
+              <CardExpiryElement className="stripe-element p-2 border border-gray-300 rounded mt-1" options={cardElementOptions} />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">CVC</label>
-              <CardCvcElement className="stripe-element p-2 border border-gray-300 rounded mt-1" />
+              <CardCvcElement className="stripe-element p-2 border border-gray-300 rounded mt-1" options={cardElementOptions} />
             </div>
-
-            {/* Submit button */}
             <button type="submit" disabled={!stripe || !clientSecret || isProcessing} className={`w-full text-white font-bold py-2 px-4 rounded ${!stripe || isProcessing ? 'bg-gray-400' : 'bg-blue-600 hover:bg-blue-700'}`}>
               {isProcessing ? 'Traitement...' : 'S’abonner'}
             </button>
