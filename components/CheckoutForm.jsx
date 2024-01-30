@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import { useCart } from '../context/CartContext';
 import { AuthContext } from '../context/AuthContext';
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY);
+const stripePromise = loadStripe('pk_test_51OPtGvDWmnYPaxs1gSpLL1WpDyU6gaxOBszqNCSu9iHVeEYuPcjUEvOpKzjwdbF6NUWquoEPf24Y3qMwIDLmeLvl00FwQkUSKx');
 
 const CheckoutForm = () => {
   const stripe = useStripe();
