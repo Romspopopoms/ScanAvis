@@ -37,6 +37,7 @@ const CheckoutFormContent = () => {
       if (cartItems.length === 0 || !user) return;
 
       const formattedCartItems = formatCartItemsForSubscription();
+      console.log('Formatted Items for Subscription:', formattedCartItems);
 
       try {
         const response = await fetch('/.netlify/functions/SubscriptionIntent', {
