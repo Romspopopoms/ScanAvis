@@ -21,6 +21,7 @@ exports.handler = async (event) => {
     if (!Array.isArray(items) || items.length === 0) {
       throw new Error('Items are required and should be an array');
     }
+
     const setupIntent = await stripe.setupIntents.retrieve(setupIntentId);
     if (!setupIntent) {
       console.error(`SetupIntent non trouvé pour l'ID: ${setupIntentId}`);
@@ -29,7 +30,9 @@ exports.handler = async (event) => {
     console.log('SetupIntent récupéré:', setupIntent.id);
 
     const paymentMethodId = setupIntent.payment_method;
-    const formattedItems = items.map((item) => ({ price: item.plan })); // Assurez-vous que 'plan' est le bon champ attendu par Stripe
+
+    // Assurez-vous que 'stripePlanId' est le bon champ attendu par Stripe
+    const formattedItems = items.map((item) => ({ price: item.stripePlanId }));
     console.log('Items formatés pour la souscription:', formattedItems);
 
     const customer = await findOrCreateStripeCustomer(userUuid);
