@@ -2,13 +2,15 @@ const { OAuth2Client } = require('google-auth-library');
 const { v4: uuidv4 } = require('uuid');
 const { conn } = require('../../utils/db');
 
-async function verifyToken(idToken, userData = null, accessToken = null) {
+exports.handler = async (event) => {
   console.log('Début de verifyToken');
 
   const client = new OAuth2Client(process.env.CLIENT_ID);
   let payload;
 
   try {
+    const { idToken, userData, accessToken } = JSON.parse(event.body);
+
     if (idToken) {
       console.log('Vérification du ID token');
       const ticket = await client.verifyIdToken({ idToken, audience: process.env.CLIENT_ID });
@@ -31,16 +33,14 @@ async function verifyToken(idToken, userData = null, accessToken = null) {
 
     const result = await conn.execute(sqlQuery, [email]);
     console.log('Result from conn.execute:', result);
-    const { rows } = result; // Assurez-vous que c'est la structure correcte pour les résultats de votre base de données
+    const { rows } = result;
     console.log('Query results:', rows);
 
     if (rows.length === 0) {
       console.log('Aucun utilisateur trouvé, création d\'un nouveau utilisateur');
       const newUuid = uuidv4();
       const insertSql = 'INSERT INTO users (uuid, email, name, access_token) VALUES (?, ?, ?, ?)';
-      const insertParams = [newUuid, cleanedPayload.email, cleanedPayload.name, cleanedPayload.access_token];
-      console.log('Executing SQL Query:', insertSql);
-      console.log('With Parameters:', insertParams);
+      const insertParams = [newUuid, email, cleanedPayload.name, cleanedPayload.access_token];
       await conn.execute(insertSql, insertParams);
       console.log('New user created:', newUuid);
       cleanedPayload.uuid = newUuid;
@@ -65,6 +65,4 @@ async function verifyToken(idToken, userData = null, accessToken = null) {
       body: JSON.stringify({ error: 'Token verification failed', details: error.message }),
     };
   }
-}
-
-module.exports = verifyToken;
+};
