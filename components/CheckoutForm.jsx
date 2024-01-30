@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
-import { Elements, CardNumberElement, CardExpiryElement, CardCvcElement, useStripe, useElements, CardElement } from '@stripe/react-stripe-js';
+import { Elements, CardNumberElement, CardExpiryElement, CardCvcElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { useCart } from '../context/CartContext';
 import { AuthContext } from '../context/AuthContext';
 
@@ -64,16 +64,17 @@ const CheckoutForm = () => {
     setErrorMessage('');
 
     try {
-      // Utilisez CardElement pour collecter les informations de paiement
-      const cardElement = elements.getElement(CardElement);
+      const cardNumberElement = elements.getElement(CardNumberElement);
+      const cardExpiryElement = elements.getElement(CardExpiryElement);
+      const cardCvcElement = elements.getElement(CardCvcElement);
 
-      if (!cardElement) {
+      if (!cardNumberElement || !cardExpiryElement || !cardCvcElement) {
         throw new Error('Élément de carte non trouvé');
       }
 
       const { error, setupIntent } = await stripe.confirmCardSetup(clientSecret, {
         payment_method: {
-          card: cardElement,
+          card: cardNumberElement, // Utilisez cardNumberElement ici
           billing_details: {
             name: user ? user.name : 'Guest User', // Assurez-vous que l'utilisateur a un nom ou utilisez une alternative
           },
