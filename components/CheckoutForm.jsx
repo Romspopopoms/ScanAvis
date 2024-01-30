@@ -37,14 +37,13 @@ const CheckoutFormContent = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  // Fonction pour calculer le total
-  const calculateTotal = () => cartItems.reduce((total, item) => total + item.price, 0);
+  const calculateTotal = () => cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
 
   useEffect(() => {
     const fetchSubscriptionIntent = async () => {
       if (cartItems.length === 0 || !user) return;
 
-      // Exécution de la fonction pour obtenir les éléments formatés
+      // Obtenir les éléments formatés directement sans avoir besoin de l'exécuter en tant que fonction
       const formattedCartItems = formatCartItemsForSubscription();
 
       try {
@@ -150,8 +149,9 @@ const CheckoutFormContent = () => {
             </li>
           ))}
         </ul>
-        <p className="text-lg font-semibold mb-6">Total à payer: ${calculateTotal().toFixed(2)}</p>
+        <p className="text-lg font-semibold mb-6">Total à payer: ${(calculateTotal() / 100).toFixed(2)}</p>
         <form onSubmit={handleSubmit} className="space-y-4">
+          {errorMessage && <div className="error-message">{errorMessage}</div>}
           {errorMessage && <div className="error-message">{errorMessage}</div>}
           <div>
             <label className="block text-sm font-medium text-gray-700">Numéro de la carte</label>

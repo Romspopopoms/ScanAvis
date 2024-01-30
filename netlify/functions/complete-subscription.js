@@ -29,7 +29,7 @@ exports.handler = async (event) => {
     console.log('SetupIntent récupéré:', setupIntent.id);
 
     const paymentMethodId = setupIntent.payment_method;
-    const formattedItems = items.map((item) => ({ price: item.stripePlanId }));
+    const formattedItems = items.map((item) => ({ price: item.plan })); // Assurez-vous que 'plan' est le bon champ attendu par Stripe
     console.log('Items formatés pour la souscription:', formattedItems);
 
     const customer = await findOrCreateStripeCustomer(userUuid);
@@ -45,12 +45,6 @@ exports.handler = async (event) => {
     const insertQuery = 'INSERT INTO Subscriptions (subscriptionId, items, user_uuid) VALUES (?, ?, ?)';
     const result = await conn.execute(insertQuery, [subscription.id, JSON.stringify(items), userUuid]);
     console.log('Items reçus:', items);
-    if (!Array.isArray(items)) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ message: "Invalid 'items' format. 'items' should be an array." }),
-      };
-    }
     const { rows } = result; // Assurez-vous que c'est la structure correcte pour votre implémentation de base de données
     console.log('Souscription enregistrée dans la base de données:', rows);
 

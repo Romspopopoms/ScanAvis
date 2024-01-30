@@ -6,7 +6,7 @@ const CartContext = createContext({
   addToCart: () => {},
   removeFromCart: () => {},
   clearCart: () => {},
-  formatCartItemsForSubscription: () => {},
+  formatCartItemsForSubscription: () => [],
 });
 
 export const useCart = () => useContext(CartContext);
@@ -15,8 +15,8 @@ export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
   const [totalCost, setTotalCost] = useState(0);
 
-  const updateTotalCost = (items) => {
-    const newTotalCost = items.reduce((total, item) => total + item.price, 0);
+  const updateTotalCost = () => {
+    const newTotalCost = cartItems.reduce((total, item) => total + item.price, 0);
     setTotalCost(newTotalCost);
   };
 
@@ -26,7 +26,7 @@ export const CartProvider = ({ children }) => {
       if (existingItemIndex === -1) {
         // Si l'abonnement n'est pas déjà dans le panier, ajoutez-le
         const updatedItems = [...prevItems, newItem];
-        updateTotalCost(updatedItems); // Mettre à jour le coût total
+        updateTotalCost(); // Mettre à jour le coût total
         return updatedItems;
       }
       // Optionnel : Gérer la mise à jour de la quantité ici si nécessaire
@@ -37,7 +37,7 @@ export const CartProvider = ({ children }) => {
   const removeFromCart = (itemId) => {
     setCartItems((prevItems) => {
       const updatedItems = prevItems.filter((item) => item.id !== itemId);
-      updateTotalCost(updatedItems); // Mettre à jour le coût total
+      updateTotalCost(); // Mettre à jour le coût total
       return updatedItems;
     });
   };
@@ -47,9 +47,13 @@ export const CartProvider = ({ children }) => {
     setTotalCost(0);
   };
 
-  const formatCartItemsForSubscription = () => cartItems.map((item) => ({
-    plan: item.stripePlanId, // Utilisez l'identifiant du plan d'abonnement Stripe
-  }));
+  const formatCartItemsForSubscription = () => cartItems.map((item) => {
+    if (!item.stripePlanId) {
+      console.error('Item missing stripePlanId:', item);
+      throw new Error('All cart items must have a valid stripePlanId');
+    }
+    return { price: item.stripePlanId };
+  });
 
   const value = useMemo(
     () => ({
