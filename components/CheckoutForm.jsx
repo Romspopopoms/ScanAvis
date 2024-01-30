@@ -41,14 +41,18 @@ const CheckoutForm = () => {
     fetchSubscriptionIntent();
   }, [cartItems, formatCartItemsForSubscription, user]);
 
-  // const onSuccessfulSubscription = (subscriptionId) => {
-  // clearCart();
-  // router.push(`/subscriptionstatus?subscriptionStatus=succeeded&subscriptionId=${subscriptionId}`);
-  // };
+  const onSuccessfulSubscription = (subscriptionId) => {
+    console.log(`Subscription succeeded with ID: ${subscriptionId}`);
+    clearCart();
+    // Commentez temporairement la redirection pour rester sur la page et voir les logs
+    // router.push(`/subscriptionstatus?subscriptionStatus=succeeded&subscriptionId=${subscriptionId}`);
+  };
 
-  // const onFailedSubscription = (message) => {
-  // router.push(`/subscriptionstatus?subscriptionStatus=failed&message=${encodeURIComponent(message)}`);
-  // };
+  const onFailedSubscription = (message) => {
+    console.error(`Subscription failed with message: ${message}`);
+    // Commentez temporairement la redirection pour rester sur la page et voir les logs
+    // router.push(`/subscriptionstatus?subscriptionStatus=failed&message=${encodeURIComponent(message)}`);
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
