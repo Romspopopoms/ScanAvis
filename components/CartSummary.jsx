@@ -57,7 +57,7 @@ const CartSummary = ({ isCartOpen }) => {
                 >
                   Vider le Panier
                 </button>
-                <Link href="/checkout"
+                <Link href="/paiement"
                   className="inline-block bg-green-500 text-white text-sm px-3 py-1 rounded hover:bg-green-600 transition-colors duration-300 ml-2"
                 >
                   S’abonner
