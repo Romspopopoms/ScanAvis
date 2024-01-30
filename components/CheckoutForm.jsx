@@ -28,7 +28,7 @@ const cardElementOptions = {
   },
 };
 
-const CheckoutForm = () => {
+const CheckoutFormContent = () => {
   const stripe = useStripe();
   const elements = useElements();
   const { cartItems, formatCartItemsForSubscription, clearCart } = useCart();
@@ -135,41 +135,46 @@ const CheckoutForm = () => {
   };
 
   return (
-    <Elements stripe={stripePromise}>
-      <div className="min-h-screen flex justify-center items-center">
-        <div className="bg-white p-8 rounded-lg shadow-xl max-w-md w-full">
-          <h2 className="text-2xl font-semibold mb-6">Détails de l'abonnement</h2>
-          <ul className="mb-6">
-            {cartItems.map((item) => (
-              <li key={item.id} className="flex justify-between text-lg mb-2">
-                <span>{item.name} - Quantité: {item.quantity}</span>
-                <span>${(item.price / 100).toFixed(2)}</span>
-              </li>
-            ))}
-          </ul>
-          <p className="text-lg font-semibold mb-6">Total à payer: ${calculateTotal().toFixed(2)}</p>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {errorMessage && <div className="error-message">{errorMessage}</div>}
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Numéro de la carte</label>
-              <CardNumberElement className="stripe-element p-2 border border-gray-300 rounded mt-1" options={cardElementOptions} />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Date d'expiration</label>
-              <CardExpiryElement className="stripe-element p-2 border border-gray-300 rounded mt-1" options={cardElementOptions} />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">CVC</label>
-              <CardCvcElement className="stripe-element p-2 border border-gray-300 rounded mt-1" options={cardElementOptions} />
-            </div>
-            <button type="submit" disabled={!stripe || !clientSecret || isProcessing} className={`w-full text-white font-bold py-2 px-4 rounded ${!stripe || isProcessing ? 'bg-gray-400' : 'bg-blue-600 hover:bg-blue-700'}`}>
-              {isProcessing ? 'Traitement...' : 'S’abonner'}
-            </button>
-          </form>
-        </div>
+    <div className="min-h-screen flex justify-center items-center">
+      <div className="bg-white p-8 rounded-lg shadow-xl max-w-md w-full">
+        <h2 className="text-2xl font-semibold mb-6">Détails de l'abonnement</h2>
+        <ul className="mb-6">
+          {cartItems.map((item) => (
+            <li key={item.id} className="flex justify-between text-lg mb-2">
+              <span>{item.name} - Quantité: {item.quantity}</span>
+              <span>${(item.price / 100).toFixed(2)}</span>
+            </li>
+          ))}
+        </ul>
+        <p className="text-lg font-semibold mb-6">Total à payer: ${calculateTotal().toFixed(2)}</p>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {errorMessage && <div className="error-message">{errorMessage}</div>}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Numéro de la carte</label>
+            <CardNumberElement className="stripe-element p-2 border border-gray-300 rounded mt-1" options={cardElementOptions} />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Date d'expiration</label>
+            <CardExpiryElement className="stripe-element p-2 border border-gray-300 rounded mt-1" options={cardElementOptions} />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">CVC</label>
+            <CardCvcElement className="stripe-element p-2 border border-gray-300 rounded mt-1" options={cardElementOptions} />
+          </div>
+          <button type="submit" disabled={!stripe || !clientSecret || isProcessing} className={`w-full text-white font-bold py-2 px-4 rounded ${!stripe || isProcessing ? 'bg-gray-400' : 'bg-blue-600 hover:bg-blue-700'}`}>
+            {isProcessing ? 'Traitement...' : 'S’abonner'}
+          </button>
+        </form>
       </div>
-    </Elements>
+    </div>
+
   );
 };
+
+const CheckoutForm = () => (
+  <Elements stripe={stripePromise}>
+    <CheckoutFormContent />
+  </Elements>
+);
 
 export default CheckoutForm;
