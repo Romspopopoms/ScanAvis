@@ -41,14 +41,14 @@ const CheckoutForm = () => {
     fetchSubscriptionIntent();
   }, [cartItems, formatCartItemsForSubscription, user]);
 
-  const onSuccessfulSubscription = (subscriptionId) => {
-    clearCart();
-    router.push(`/subscriptionstatus?subscriptionStatus=succeeded&subscriptionId=${subscriptionId}`);
-  };
+  // const onSuccessfulSubscription = (subscriptionId) => {
+  // clearCart();
+  // router.push(`/subscriptionstatus?subscriptionStatus=succeeded&subscriptionId=${subscriptionId}`);
+  // };
 
-  const onFailedSubscription = (message) => {
-    router.push(`/subscriptionstatus?subscriptionStatus=failed&message=${encodeURIComponent(message)}`);
-  };
+  // const onFailedSubscription = (message) => {
+  // router.push(`/subscriptionstatus?subscriptionStatus=failed&message=${encodeURIComponent(message)}`);
+  // };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
