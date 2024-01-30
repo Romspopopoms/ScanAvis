@@ -18,6 +18,9 @@ exports.handler = async (event) => {
     const { setupIntentId, items, userUuid } = JSON.parse(event.body);
     console.log('Traitement du setupIntentId:', setupIntentId, 'pour l\'utilisateur:', userUuid);
 
+    if (!Array.isArray(items) || items.length === 0) {
+      throw new Error('Items are required and should be an array');
+    }
     const setupIntent = await stripe.setupIntents.retrieve(setupIntentId);
     if (!setupIntent) {
       console.error(`SetupIntent non trouvé pour l'ID: ${setupIntentId}`);
