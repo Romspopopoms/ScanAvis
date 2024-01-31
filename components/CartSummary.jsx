@@ -17,8 +17,7 @@ const CartSummary = ({ isCartOpen }) => {
 
   return (
     <motion.div
-      className={`fixed bottom-0 left-0 z-50 p-4 bg-white rounded-tl-3xl rounded-tr-3xl shadow-xl transform transition-transform ${
-        isCartOpen ? 'translate-x-0' : '-translate-x-full'
+      className={`fixed bottom-0 left-0 z-50 p-4 bg-white rounded-tl-3xl rounded-tr-3xl shadow-xl transform transition-transform ${isCartOpen ? 'translate-x-0' : '-translate-x-full'
       }`}
       initial="closed"
       animate={isCartOpen ? 'open' : 'closed'}
