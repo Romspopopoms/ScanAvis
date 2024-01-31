@@ -46,6 +46,7 @@ export const CartProvider = ({ children }) => {
     removeFromCart,
     clearCart,
     formatCartItemForSubscription,
+    productDetails,
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
