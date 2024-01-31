@@ -97,6 +97,7 @@ export const CartProvider = ({ children }) => {
       console.error('Aucun abonnement sélectionné ou abonnement manquant stripePlanId');
       return null;
     }
+    // Assurez-vous que cette ligne renvoie bien l'objet avec stripePlanId
     return { price: cartItem.stripePlanId };
   };
 
