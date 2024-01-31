@@ -35,7 +35,7 @@ const CheckoutFormContent = () => {
       if (!cartItem || !user) return;
 
       try {
-        const response = await fetch('/.netlify/functions/CreatePaymentIntent', {
+        const response = await fetch('/.netlify/functions/complete-subscription', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ priceId: cartItem.priceId, userUuid: user.uuid }),
