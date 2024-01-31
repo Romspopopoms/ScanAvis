@@ -7,7 +7,7 @@ const productDetails = {
     name: 'Base',
     priceId: 'price_1OekFIDWmnYPaxs1hMaRWF4X',
     imgUrl: '/planet-01.png',
-    productId: '"prod_PThekMi7OB5KkH"',
+    productId: 'prod_PThekMi7OB5KkH',
     features: [
       'Plaque PVC avec QR Code Personnalisé',
       'Augmentez Votre Visibilité Instantanément',
@@ -78,7 +78,7 @@ export const CartProvider = ({ children }) => {
   const addToCart = (productId) => {
     const product = productDetails[productId];
     if (product) {
-      setCartItem(product);
+      setCartItem(product); // Ici, 'product' est déjà l'objet contenant tous les détails
     } else {
       console.error(`Produit non trouvé pour l'ID : ${productId}`);
     }
