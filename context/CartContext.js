@@ -5,9 +5,9 @@ const productDetails = {
   base: {
     id: 'base',
     name: 'Base',
-    price: 'price_1OekFIDWmnYPaxs1hMaRWF4X',
+    priceId: 'price_1OekFIDWmnYPaxs1hMaRWF4X',
     imgUrl: '/planet-01.png',
-    stripePlanId: '"prod_PThekMi7OB5KkH"',
+    productId: '"prod_PThekMi7OB5KkH"',
     features: [
       'Plaque PVC avec QR Code Personnalisé',
       'Augmentez Votre Visibilité Instantanément',
@@ -17,9 +17,9 @@ const productDetails = {
   bronze: {
     id: 'bronze',
     name: 'Bronze',
-    price: 'price_1OekKWDWmnYPaxs1W80kG5a0',
+    priceId: 'price_1OekKWDWmnYPaxs1W80kG5a0',
     imgUrl: '/planet-02.png',
-    stripePlanId: 'prod_PThkckUFRUVnCj',
+    productId: 'prod_PThkckUFRUVnCj',
     features: [
       'Plaque PVC avec QR Code Personnalisé',
       'Augmentez Votre Visibilité Instantanément ',
@@ -31,9 +31,9 @@ const productDetails = {
   silver: {
     id: 'silver',
     name: 'Silver',
-    price: 'price_1Oel3hDWmnYPaxs1k69X7veu',
+    priceId: 'price_1Oel3hDWmnYPaxs1k69X7veu',
     imgUrl: '/planet-03.png',
-    stripePlanId: 'prod_PTiU9653SZEkkH',
+    productId: 'prod_PTiU9653SZEkkH',
     features: [
       'Plaque PVC avec QR Code Personnalisé',
       'Augmentez Votre Visibilité Instantanément ',
@@ -49,9 +49,9 @@ const productDetails = {
   gold: {
     id: 'gold',
     name: 'Gold',
-    price: 'price_1Oel3hDWmnYPaxs1icztOYwU',
+    priceId: 'price_1Oel3hDWmnYPaxs1icztOYwU',
     imgUrl: '/planet-04.png',
-    stripePlanId: 'prod_PTiUNcfl970gAj',
+    productId: 'prod_PTiUNcfl970gAj',
     features: [
       'Plaque PVC avec QR Code Personnalisé',
       'Augmentez Votre Visibilité Instantanément ',
@@ -78,7 +78,7 @@ export const CartProvider = ({ children }) => {
   const addToCart = (productId) => {
     const product = productDetails[productId];
     if (product) {
-      setCartItem(product); // Ici, 'product' est déjà l'objet contenant tous les détails
+      setCartItem(product);
     } else {
       console.error(`Produit non trouvé pour l'ID : ${productId}`);
     }
@@ -92,13 +92,16 @@ export const CartProvider = ({ children }) => {
     setCartItem(null);
   };
 
+  // Utilisez l'ID de prix et l'ID de produit selon les besoins
   const formatCartItemForSubscription = () => {
     if (!cartItem) {
-      console.error('Aucun abonnement sélectionné ou abonnement manquant stripePlanId');
+      console.error('Aucun abonnement sélectionné ou abonnement manquant priceId');
       return null;
     }
-    // Assurez-vous que cette ligne renvoie bien l'objet avec stripePlanId
-    return { price: cartItem.stripePlanId };
+    return {
+      priceId: cartItem.priceId,
+      productId: cartItem.productId, // Ajout de l'ID de produit
+    };
   };
 
   const value = {
@@ -107,7 +110,7 @@ export const CartProvider = ({ children }) => {
     removeFromCart,
     clearCart,
     formatCartItemForSubscription,
-    productDetails, // Ajouté pour accéder aux détails des produits dans les composants
+    productDetails,
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

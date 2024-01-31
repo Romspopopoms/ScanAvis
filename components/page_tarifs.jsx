@@ -5,10 +5,13 @@ import FeatureRow from './FeatureRow';
 const TarifsContent = () => {
   const { addToCart, productDetails } = useCart();
 
-  const handleAddToCart = (serviceKey) => {
-    const product = productDetails[serviceKey];
+  // Modification de la fonction pour ajouter des produits au panier en utilisant leur priceId
+  const handleAddToCart = (productKey) => {
+    // Utilisation de productKey pour récupérer le produit spécifique
+    const product = productDetails[productKey];
     if (product) {
-      addToCart(serviceKey); // Passer l'ID du produit (serviceKey) au lieu de l'objet produit
+      // Ajout du produit au panier en utilisant son priceId
+      addToCart(product.priceId);
     } else {
       alert('Produit non trouvé!');
     }
@@ -20,8 +23,8 @@ const TarifsContent = () => {
         Voici les options disponibles
       </h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {Object.entries(productDetails).map(([serviceKey, product]) => (
-          <div key={serviceKey} className="bg-white rounded-lg shadow overflow-hidden transform transition duration-500 hover:scale-105">
+        {Object.entries(productDetails).map(([productKey, product]) => (
+          <div key={productKey} className="bg-white rounded-lg shadow overflow-hidden transform transition duration-500 hover:scale-105">
             <img src={product.imgUrl} alt={`Service ${product.name}`} className="w-full h-40 object-cover" />
             <div className="p-4 space-y-2">
               {product.features.map((feature, index) => (
@@ -30,7 +33,7 @@ const TarifsContent = () => {
             </div>
             <button
               type="button"
-              onClick={() => handleAddToCart(serviceKey)}
+              onClick={() => handleAddToCart(productKey)}
               className="bg-green-500 text-white text-sm px-4 py-2 rounded hover:bg-green-600 transition-colors duration-300 w-full"
             >
               Ajouter au panier

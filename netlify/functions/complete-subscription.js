@@ -2,6 +2,12 @@ const stripe = require('stripe')('sk_test_51OPtGvDWmnYPaxs1DJZliUMMDttrNP1a4usU0
 const { conn } = require('../../utils/db');
 const findOrCreateStripeCustomer = require('./findOrCreateStripeCustomer');
 
+// Helper function to fetch price amount using the priceId
+async function fetchPriceAmount(priceId) {
+  const price = await stripe.prices.retrieve(priceId);
+  return price.unit_amount; // Return the amount in smallest currency unit (like cents for USD)
+}
+
 exports.handler = async (event) => {
   console.log('Request received:', event);
 
@@ -15,50 +21,40 @@ exports.handler = async (event) => {
   }
 
   try {
-    const { setupIntentId, item, userUuid } = JSON.parse(event.body);
-    console.log('Processing setupIntentId:', setupIntentId, 'for user:', userUuid);
+    const { priceId, userUuid } = JSON.parse(event.body);
+    console.log('Processing payment for priceId:', priceId, 'for user:', userUuid);
 
-    if (!item || !item.stripePlanId) {
-      throw new Error('Item with stripePlanId is required');
+    if (!priceId) {
+      throw new Error('priceId is required');
     }
-    console.log('Received the following item for subscription:', item);
-
-    const setupIntent = await stripe.setupIntents.retrieve(setupIntentId);
-    if (!setupIntent) {
-      console.error(`SetupIntent not found for ID: ${setupIntentId}`);
-      throw new Error(`SetupIntent not found for ID: ${setupIntentId}`);
-    }
-    console.log('SetupIntent retrieved:', setupIntent.id);
-
-    const paymentMethodId = setupIntent.payment_method;
 
     const customer = await findOrCreateStripeCustomer(userUuid);
     console.log('Stripe customer found or created:', customer.id);
 
-    const subscription = await stripe.subscriptions.create({
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: await fetchPriceAmount(priceId),
+      currency: 'eur', // or 'usd' or any other currency
       customer: customer.id,
-      items: [{ price: item.stripePlanId }],
-      default_payment_method: paymentMethodId,
+      payment_method_types: ['card'],
     });
-    console.log('Subscription created successfully:', subscription.id);
+    console.log('PaymentIntent created successfully:', paymentIntent.id);
 
-    const insertQuery = 'INSERT INTO Subscriptions (subscriptionId, item, user_uuid) VALUES (?, ?, ?)';
-    const result = await conn.execute(insertQuery, [subscription.id, JSON.stringify(item), userUuid]);
-    console.log('Item received:', item);
-    const { rows } = result; // Make sure this is the correct structure for your database implementation
-    console.log('Subscription recorded in the database:', rows);
+    // Inserting PaymentIntent ID and related info into the database
+    const insertQuery = 'INSERT INTO Payments (intentId, customerId, priceId, status) VALUES (?, ?, ?, ?)';
+    await conn.execute(insertQuery, [paymentIntent.id, customer.id, priceId, 'created']);
+    console.log('PaymentIntent recorded in the database:', paymentIntent.id);
 
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ subscriptionId: subscription.id }),
+      body: JSON.stringify({ clientSecret: paymentIntent.client_secret }),
     };
   } catch (error) {
-    console.error('Error completing subscription:', error);
+    console.error('Error creating payment intent:', error);
     return {
       statusCode: 500,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ error: `Error completing subscription: ${error.message}` }),
+      body: JSON.stringify({ error: `Error creating payment intent: ${error.message}` }),
     };
   }
 };
