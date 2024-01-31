@@ -5,11 +5,12 @@ import FeatureRow from './FeatureRow';
 const TarifsContent = () => {
   const { addToCart, productDetails } = useCart();
 
-  const handleAddToCart = (productId) => {
-    const product = productDetails[productId];
+  const handleAddToCart = (serviceKey) => {
+    const product = productDetails[serviceKey];
     if (product) {
-      addToCart(productId); // Convertir le prix en centimes si nécessaire
-      alert(`Service ${product.name} ajouté au panier`);
+      addToCart(product);
+    } else {
+      alert('Produit non trouvé!');
     }
   };
 
