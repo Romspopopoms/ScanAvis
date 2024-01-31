@@ -1,5 +1,6 @@
 import React, { createContext, useState, useMemo, useContext } from 'react';
 
+// Détails des produits disponibles pour l'abonnement
 const productDetails = {
   base: { name: 'Base', price: 2000, imgUrl: 'base.png', stripePlanId: 'plan_base' },
   bronze: { name: 'Bronze', price: 4000, imgUrl: 'bronze.png', stripePlanId: 'plan_bronze' },
@@ -8,62 +9,50 @@ const productDetails = {
 };
 
 const CartContext = createContext({
-  cartItem: null,
-  totalCost: 0,
-  addToCart: () => {},
-  removeFromCart: () => {},
-  clearCart: () => {},
-  formatCartItemForSubscription: () => null,
+  abonnement: null,
+  total: 0,
+  ajouterAuPanier: () => {},
+  retirerDuPanier: () => {},
+  viderLePanier: () => {},
+  preparerAbonnementPourStripe: () => {},
 });
 
 export const useCart = () => useContext(CartContext);
 
 export const CartProvider = ({ children }) => {
-  const [cartItem, setCartItem] = useState(null);
-  const [totalCost, setTotalCost] = useState(0);
+  const [abonnement, setAbonnement] = useState(null);
+  const [total, setTotal] = useState(0);
 
-  const addToCart = (newItemId) => {
-    const product = productDetails[newItemId];
-    if (!product) {
-      console.error(`Produit non trouvé pour l'ID : ${newItemId}`);
-      return;
+  const ajouterAuPanier = (id) => {
+    const detailAbonnement = productDetails[id];
+    if (detailAbonnement) {
+      setAbonnement(detailAbonnement);
+      setTotal(detailAbonnement.price);
+    } else {
+      console.error(`Abonnement non trouvé pour l'ID: ${id}`);
     }
-    setCartItem({
-      id: newItemId,
-      ...product,
-    });
-    setTotalCost(product.price);
   };
 
-  const removeFromCart = () => {
-    setCartItem(null);
-    setTotalCost(0);
+  const retirerDuPanier = () => {
+    setAbonnement(null);
+    setTotal(0);
   };
 
-  const clearCart = () => {
-    setCartItem(null);
-    setTotalCost(0);
+  const viderLePanier = () => {
+    setAbonnement(null);
+    setTotal(0);
   };
 
-  const formatCartItemForSubscription = () => {
-    if (!cartItem || !cartItem.stripePlanId) {
-      console.error('Aucun abonnement sélectionné ou abonnement manquant stripePlanId');
-      return null;
-    }
-    return { price: cartItem.stripePlanId };
-  };
+  const preparerAbonnementPourStripe = () => (abonnement ? { price: abonnement.stripePlanId } : null);
 
-  const value = useMemo(
-    () => ({
-      cartItem,
-      totalCost,
-      addToCart,
-      removeFromCart,
-      clearCart,
-      formatCartItemForSubscription,
-    }),
-    [cartItem, totalCost],
-  );
+  const value = useMemo(() => ({
+    abonnement,
+    total,
+    ajouterAuPanier,
+    retirerDuPanier,
+    viderLePanier,
+    preparerAbonnementPourStripe,
+  }), [abonnement, total]);
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 };
