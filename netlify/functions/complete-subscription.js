@@ -3,10 +3,10 @@ const { conn } = require('../../utils/db');
 const findOrCreateStripeCustomer = require('./findOrCreateStripeCustomer');
 
 exports.handler = async (event) => {
-  console.log('Requête reçue:', event);
+  console.log('Request received:', event);
 
   if (event.httpMethod !== 'POST') {
-    console.error('Méthode HTTP non autorisée');
+    console.error('HTTP method not allowed');
     return {
       statusCode: 405,
       headers: { 'Content-Type': 'application/json' },
@@ -15,42 +15,38 @@ exports.handler = async (event) => {
   }
 
   try {
-    const { setupIntentId, items, userUuid } = JSON.parse(event.body);
-    console.log('Traitement du setupIntentId:', setupIntentId, 'pour l\'utilisateur:', userUuid);
+    const { setupIntentId, item, userUuid } = JSON.parse(event.body);
+    console.log('Processing setupIntentId:', setupIntentId, 'for user:', userUuid);
 
-    if (!Array.isArray(items) || items.length === 0) {
-      throw new Error('Items are required and should be an array');
+    if (!item || !item.stripePlanId) {
+      throw new Error('Item with stripePlanId is required');
     }
-    console.log('Received the following items for subscription:', items);
+    console.log('Received the following item for subscription:', item);
 
     const setupIntent = await stripe.setupIntents.retrieve(setupIntentId);
     if (!setupIntent) {
-      console.error(`SetupIntent non trouvé pour l'ID: ${setupIntentId}`);
+      console.error(`SetupIntent not found for ID: ${setupIntentId}`);
       throw new Error(`SetupIntent not found for ID: ${setupIntentId}`);
     }
-    console.log('SetupIntent récupéré:', setupIntent.id);
+    console.log('SetupIntent retrieved:', setupIntent.id);
 
     const paymentMethodId = setupIntent.payment_method;
 
-    // Assurez-vous que 'stripePlanId' est le bon champ attendu par Stripe
-    const formattedItems = items.map((item) => ({ price: item.stripePlanId }));
-    console.log('Items formatés pour la souscription:', formattedItems);
-
     const customer = await findOrCreateStripeCustomer(userUuid);
-    console.log('Client Stripe trouvé ou créé:', customer.id);
+    console.log('Stripe customer found or created:', customer.id);
 
     const subscription = await stripe.subscriptions.create({
       customer: customer.id,
-      items: formattedItems,
+      items: [{ price: item.stripePlanId }],
       default_payment_method: paymentMethodId,
     });
-    console.log('Souscription créée avec succès:', subscription.id);
+    console.log('Subscription created successfully:', subscription.id);
 
-    const insertQuery = 'INSERT INTO Subscriptions (subscriptionId, items, user_uuid) VALUES (?, ?, ?)';
-    const result = await conn.execute(insertQuery, [subscription.id, JSON.stringify(items), userUuid]);
-    console.log('Items reçus:', items);
-    const { rows } = result; // Assurez-vous que c'est la structure correcte pour votre implémentation de base de données
-    console.log('Souscription enregistrée dans la base de données:', rows);
+    const insertQuery = 'INSERT INTO Subscriptions (subscriptionId, item, user_uuid) VALUES (?, ?, ?)';
+    const result = await conn.execute(insertQuery, [subscription.id, JSON.stringify(item), userUuid]);
+    console.log('Item received:', item);
+    const { rows } = result; // Make sure this is the correct structure for your database implementation
+    console.log('Subscription recorded in the database:', rows);
 
     return {
       statusCode: 200,
@@ -58,7 +54,7 @@ exports.handler = async (event) => {
       body: JSON.stringify({ subscriptionId: subscription.id }),
     };
   } catch (error) {
-    console.error('Erreur lors de la complétion de la souscription:', error);
+    console.error('Error completing subscription:', error);
     return {
       statusCode: 500,
       headers: { 'Content-Type': 'application/json' },

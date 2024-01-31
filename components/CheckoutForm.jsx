@@ -105,7 +105,7 @@ const CheckoutFormContent = () => {
           body: JSON.stringify({
             setupIntentId: setupIntent.id,
             userUuid: user ? user.uuid : null,
-            item: { price: cartItem.stripePlanId },
+            item: { stripePlanId: cartItem.stripePlanId }, // Assurez-vous que ceci correspond au format attendu par le backend
           }),
         });
 
