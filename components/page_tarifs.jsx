@@ -1,14 +1,14 @@
 import React from 'react';
-import { useCart } from '../context/CartContext'; // Assurez-vous que ce chemin est correct
+import { useCart } from '../context/CartContext';
 import FeatureRow from './FeatureRow';
 
 const TarifsContent = () => {
-  const { addToCart, productDetails } = useCart(); // Utilisez productDetails depuis useCart
+  const { addToCart, productDetails } = useCart();
 
   const handleAddToCart = (productId) => {
     const product = productDetails[productId];
     if (product) {
-      addToCart({ ...product, id: productId }); // Utilisez productDetails pour obtenir les informations du produit
+      addToCart({ ...product, id: productId });
       alert(`Service ${product.name} ajouté au panier`);
     } else {
       alert('Produit non trouvé!');
@@ -25,7 +25,7 @@ const TarifsContent = () => {
           <div key={productId} className="bg-white rounded-lg shadow overflow-hidden transform transition duration-500 hover:scale-105">
             <img src={product.imgUrl} alt={`Service ${product.name}`} className="w-full h-40 object-cover" />
             <div className="p-4 space-y-2">
-              {product.features.map((feature, index) => (
+              {product.features && product.features.map((feature, index) => (
                 <FeatureRow key={index} title={feature} imgSrc="/check.png" />
               ))}
             </div>
