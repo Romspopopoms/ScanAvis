@@ -5,9 +5,9 @@ const productDetails = {
   base: {
     id: 'base',
     name: 'Base',
-    price: 2000,
+    price: 'price_1OekFIDWmnYPaxs1hMaRWF4X',
     imgUrl: '/planet-01.png',
-    stripePlanId: 'plan_base',
+    stripePlanId: '"prod_PThekMi7OB5KkH"',
     features: [
       'Plaque PVC avec QR Code Personnalisé',
       'Augmentez Votre Visibilité Instantanément',
@@ -17,9 +17,9 @@ const productDetails = {
   bronze: {
     id: 'bronze',
     name: 'Bronze',
-    price: 4000,
+    price: 'price_1OekKWDWmnYPaxs1W80kG5a0',
     imgUrl: '/planet-02.png',
-    stripePlanId: 'plan_bronze',
+    stripePlanId: 'prod_PThkckUFRUVnCj',
     features: [
       'Plaque PVC avec QR Code Personnalisé',
       'Augmentez Votre Visibilité Instantanément ',
@@ -31,9 +31,9 @@ const productDetails = {
   silver: {
     id: 'silver',
     name: 'Silver',
-    price: 6000,
+    price: 'price_1Oel3hDWmnYPaxs1k69X7veu',
     imgUrl: '/planet-03.png',
-    stripePlanId: 'plan_silver',
+    stripePlanId: 'prod_PTiU9653SZEkkH',
     features: [
       'Plaque PVC avec QR Code Personnalisé',
       'Augmentez Votre Visibilité Instantanément ',
@@ -49,9 +49,9 @@ const productDetails = {
   gold: {
     id: 'gold',
     name: 'Gold',
-    price: 10000,
+    price: 'price_1Oel3hDWmnYPaxs1icztOYwU',
     imgUrl: '/planet-04.png',
-    stripePlanId: 'plan_gold',
+    stripePlanId: 'prod_PTiUNcfl970gAj',
     features: [
       'Plaque PVC avec QR Code Personnalisé',
       'Augmentez Votre Visibilité Instantanément ',
