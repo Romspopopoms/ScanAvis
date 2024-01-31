@@ -15,13 +15,13 @@ exports.handler = async (event) => {
   }
 
   try {
-    const { setupIntentId, item, userUuid } = JSON.parse(event.body);
+    const { setupIntentId, items, userUuid } = JSON.parse(event.body);
     console.log('Traitement du setupIntentId:', setupIntentId, 'pour l\'utilisateur:', userUuid);
 
-    if (!item || !item.stripePlanId) {
-      throw new Error('Item with stripePlanId is required');
+    if (!Array.isArray(items) || items.length === 0) {
+      throw new Error('Items are required and should be an array');
     }
-    console.log('Received the following item for subscription:', item);
+    console.log('Received the following items for subscription:', items);
 
     const setupIntent = await stripe.setupIntents.retrieve(setupIntentId);
     if (!setupIntent) {
@@ -32,22 +32,23 @@ exports.handler = async (event) => {
 
     const paymentMethodId = setupIntent.payment_method;
 
-    const formattedItem = { price: item.stripePlanId };
-    console.log('Item formaté pour la souscription:', formattedItem);
+    // Assurez-vous que 'stripePlanId' est le bon champ attendu par Stripe
+    const formattedItems = items.map((item) => ({ price: item.stripePlanId }));
+    console.log('Items formatés pour la souscription:', formattedItems);
 
     const customer = await findOrCreateStripeCustomer(userUuid);
     console.log('Client Stripe trouvé ou créé:', customer.id);
 
     const subscription = await stripe.subscriptions.create({
       customer: customer.id,
-      items: [formattedItem],
+      items: formattedItems,
       default_payment_method: paymentMethodId,
     });
     console.log('Souscription créée avec succès:', subscription.id);
 
-    const insertQuery = 'INSERT INTO Subscriptions (subscriptionId, item, user_uuid) VALUES (?, ?, ?)';
-    const result = await conn.execute(insertQuery, [subscription.id, JSON.stringify(item), userUuid]);
-    console.log('Item reçu:', item);
+    const insertQuery = 'INSERT INTO Subscriptions (subscriptionId, items, user_uuid) VALUES (?, ?, ?)';
+    const result = await conn.execute(insertQuery, [subscription.id, JSON.stringify(items), userUuid]);
+    console.log('Items reçus:', items);
     const { rows } = result; // Assurez-vous que c'est la structure correcte pour votre implémentation de base de données
     console.log('Souscription enregistrée dans la base de données:', rows);
 
