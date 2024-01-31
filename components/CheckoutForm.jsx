@@ -24,26 +24,24 @@ const cardElementOptions = {
 const CheckoutFormContent = () => {
   const stripe = useStripe();
   const elements = useElements();
-  const { cartItems, formatCartItemsForSubscription, clearCart } = useCart();
+  const { cartItem, formatCartItemsForSubscription, clearCart, totalCost } = useCart();
   const { user } = useContext(AuthContext);
   const [clientSecret, setClientSecret] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const calculateTotal = () => cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
-
   useEffect(() => {
     const fetchSubscriptionIntent = async () => {
-      if (cartItems.length === 0 || !user) return;
+      if (!cartItem || !user) return;
 
-      const formattedCartItems = formatCartItemsForSubscription();
-      console.log('Formatted Items for Subscription:', formattedCartItems);
+      const formattedCartItem = formatCartItemsForSubscription();
+      console.log('Formatted Item for Subscription:', formattedCartItem);
 
       try {
         const response = await fetch('/.netlify/functions/SubscriptionIntent', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ items: formattedCartItems, userUuid: user.uuid }),
+          body: JSON.stringify({ item: formattedCartItem, userUuid: user.uuid }),
         });
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || 'Erreur du serveur');
@@ -55,18 +53,18 @@ const CheckoutFormContent = () => {
     };
 
     fetchSubscriptionIntent();
-  }, [cartItems, formatCartItemsForSubscription, user]);
+  }, [cartItem, formatCartItemsForSubscription, user]);
 
   const onSuccessfulSubscription = (subscriptionId) => {
     console.log(`Subscription succeeded with ID: ${subscriptionId}`);
     clearCart();
-    // Commentez temporairement la redirection pour rester sur la page et voir les logs
+    // Redirection à la page de statut d'abonnement (à décommenter)
     // router.push(`/subscriptionstatus?subscriptionStatus=succeeded&subscriptionId=${subscriptionId}`);
   };
 
   const onFailedSubscription = (message) => {
     console.error(`Subscription failed with message: ${message}`);
-    // Commentez temporairement la redirection pour rester sur la page et voir les logs
+    // Redirection à la page de statut d'abonnement (à décommenter)
     // router.push(`/subscriptionstatus?subscriptionStatus=failed&message=${encodeURIComponent(message)}`);
   };
 
@@ -90,9 +88,8 @@ const CheckoutFormContent = () => {
         throw new Error('Élément de carte non trouvé');
       }
 
-      // Assurez-vous que les éléments du panier sont formatés juste avant de les envoyer
-      const formattedCartItems = formatCartItemsForSubscription();
-      console.log('Formatted Items for Subscription:', formattedCartItems);
+      const formattedCartItem = formatCartItemsForSubscription();
+      console.log('Formatted Item for Subscription:', formattedCartItem);
 
       const { error, setupIntent } = await stripe.confirmCardSetup(clientSecret, {
         payment_method: {
@@ -107,11 +104,6 @@ const CheckoutFormContent = () => {
         throw error;
       }
 
-      console.log('Sending the following data to backend:', {
-        setupIntentId: setupIntent.id,
-        userUuid: user ? user.uuid : null,
-        items: formattedCartItems,
-      });
       if (setupIntent.status === 'succeeded') {
         const subscriptionResult = await fetch('/.netlify/functions/complete-subscription', {
           method: 'POST',
@@ -119,7 +111,7 @@ const CheckoutFormContent = () => {
           body: JSON.stringify({
             setupIntentId: setupIntent.id,
             userUuid: user ? user.uuid : null,
-            items: formattedCartItems,
+            item: formattedCartItem,
           }),
         });
 
@@ -146,15 +138,15 @@ const CheckoutFormContent = () => {
     <div className="min-h-screen flex justify-center items-center">
       <div className="bg-white p-8 rounded-lg shadow-xl max-w-md w-full">
         <h2 className="text-2xl font-semibold mb-6">Détails de l'abonnement</h2>
-        <ul className="mb-6">
-          {cartItems.map((item) => (
-            <li key={item.id} className="flex justify-between text-lg mb-2">
-              <span>{item.name} - Quantité: {item.quantity}</span>
-              <span>${(item.price / 100).toFixed(2)}</span>
-            </li>
-          ))}
-        </ul>
-        <p className="text-lg font-semibold mb-6">Total à payer: ${(calculateTotal() / 100).toFixed(2)}</p>
+        {cartItem && (
+          <div className="mb-6">
+            <div className="flex justify-between text-lg mb-2">
+              <span>{cartItem.name}</span>
+              <span>${(cartItem.price / 100).toFixed(2)}</span>
+            </div>
+          </div>
+        )}
+        <p className="text-lg font-semibold mb-6">Total à payer: ${(totalCost / 100).toFixed(2)}</p>
         <form onSubmit={handleSubmit} className="space-y-4">
           {errorMessage && <div className="error-message">{errorMessage}</div>}
           <div>
