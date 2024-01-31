@@ -24,7 +24,7 @@ const cardElementOptions = {
 const CheckoutFormContent = () => {
   const stripe = useStripe();
   const elements = useElements();
-  const { cartItem, formatCartItemsForSubscription, clearCart, totalCost } = useCart();
+  const { cartItem, clearCart, totalCost } = useCart();
   const { user } = useContext(AuthContext);
   const [clientSecret, setClientSecret] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
@@ -34,14 +34,11 @@ const CheckoutFormContent = () => {
     const fetchSubscriptionIntent = async () => {
       if (!cartItem || !user) return;
 
-      const formattedCartItem = formatCartItemsForSubscription();
-      console.log('Formatted Item for Subscription:', formattedCartItem);
-
       try {
         const response = await fetch('/.netlify/functions/SubscriptionIntent', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ item: formattedCartItem, userUuid: user.uuid }),
+          body: JSON.stringify({ item: { price: cartItem.stripePlanId }, userUuid: user.uuid }),
         });
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || 'Erreur du serveur');
@@ -53,7 +50,7 @@ const CheckoutFormContent = () => {
     };
 
     fetchSubscriptionIntent();
-  }, [cartItem, formatCartItemsForSubscription, user]);
+  }, [cartItem, user]);
 
   const onSuccessfulSubscription = (subscriptionId) => {
     console.log(`Subscription succeeded with ID: ${subscriptionId}`);
@@ -88,9 +85,6 @@ const CheckoutFormContent = () => {
         throw new Error('Élément de carte non trouvé');
       }
 
-      const formattedCartItem = formatCartItemsForSubscription();
-      console.log('Formatted Item for Subscription:', formattedCartItem);
-
       const { error, setupIntent } = await stripe.confirmCardSetup(clientSecret, {
         payment_method: {
           card: cardNumberElement,
@@ -111,7 +105,7 @@ const CheckoutFormContent = () => {
           body: JSON.stringify({
             setupIntentId: setupIntent.id,
             userUuid: user ? user.uuid : null,
-            item: formattedCartItem,
+            item: { price: cartItem.stripePlanId },
           }),
         });
 

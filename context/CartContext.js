@@ -6,7 +6,7 @@ const productDetails = {
     id: 'base',
     name: 'Base',
     price: 2000,
-    imgUrl: '/base.png',
+    imgUrl: '/planet-01.png',
     stripePlanId: 'plan_base',
     features: [
       'Plaque PVC avec QR Code Personnalisé',
@@ -18,7 +18,7 @@ const productDetails = {
     id: 'bronze',
     name: 'Bronze',
     price: 4000,
-    imgUrl: '/bronze.png',
+    imgUrl: '/planet-02.png',
     stripePlanId: 'plan_bronze',
     features: [
       'Plaque PVC avec QR Code Personnalisé',
@@ -32,7 +32,7 @@ const productDetails = {
     id: 'silver',
     name: 'Silver',
     price: 6000,
-    imgUrl: '/silver.png',
+    imgUrl: '/planet-03.png',
     stripePlanId: 'plan_silver',
     features: [
       'Plaque PVC avec QR Code Personnalisé',
@@ -50,7 +50,7 @@ const productDetails = {
     id: 'gold',
     name: 'Gold',
     price: 10000,
-    imgUrl: '/gold.png',
+    imgUrl: '/planet-04.png',
     stripePlanId: 'plan_gold',
     features: [
       'Plaque PVC avec QR Code Personnalisé',
