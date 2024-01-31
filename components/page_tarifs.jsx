@@ -20,8 +20,8 @@ const TarifsContent = () => {
         Voici les options disponibles
       </h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {Object.values(productDetails).map((product) => (
-          <div key={product.id} className="bg-white rounded-lg shadow overflow-hidden transform transition duration-500 hover:scale-105">
+        {Object.entries(productDetails).map(([serviceKey, product]) => (
+          <div key={serviceKey} className="bg-white rounded-lg shadow overflow-hidden transform transition duration-500 hover:scale-105">
             <img src={product.imgUrl} alt={`Service ${product.name}`} className="w-full h-40 object-cover" />
             <div className="p-4 space-y-2">
               {product.features.map((feature, index) => (
@@ -30,7 +30,7 @@ const TarifsContent = () => {
             </div>
             <button
               type="button"
-              onClick={() => handleAddToCart(product.id)}
+              onClick={() => handleAddToCart(serviceKey)}
               className="bg-green-500 text-white text-sm px-4 py-2 rounded hover:bg-green-600 transition-colors duration-300 w-full"
             >
               Ajouter au panier
