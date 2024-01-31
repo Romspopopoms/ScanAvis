@@ -1,85 +1,15 @@
 import React from 'react';
-import { useCart } from '../context/CartContext'; // Assurez-vous que ce chemin est correct
+import { useCart } from '../context/CartContext';
 import FeatureRow from './FeatureRow';
 
 const TarifsContent = () => {
-  const { addToCart } = useCart();
+  const { addToCart, productDetails } = useCart();
 
-  const services = [
-    {
-      id: 1,
-      name: 'base',
-      prince: 20,
-      imgUrl: '/planet-01.png',
-      features: [
-        'Plaque PVC avec QR Code Personnalisé',
-        'Augmentez Votre Visibilité Instantanément ',
-        'Engagez Vos Clients Facilement',
-        'Contrôlez Votre E-Réputation',
-        'Améliorez Votre Référencement',
-      ],
-    },
-
-    {
-      id: 2,
-      name: 'bronze',
-      prince: 40,
-      imgUrl: '/planet-02.png',
-      features: [
-        'Plaque PVC avec QR Code Personnalisé',
-        'Augmentez Votre Visibilité Instantanément ',
-        'Engagez Vos Clients Facilement',
-        'Contrôlez Votre E-Réputation',
-        'Améliorez Votre Référencement',
-        'Collectez les adresses emails',
-      ],
-    },
-    {
-      id: 3,
-      name: 'silver',
-      prince: 60,
-      imgUrl: '/planet-03.png',
-
-      features: [
-        'Plaque PVC avec QR Code Personnalisé',
-        'Augmentez Votre Visibilité Instantanément ',
-        'Engagez Vos Clients Facilement',
-        'Contrôlez Votre E-Réputation',
-        'Améliorez Votre Référencement',
-        'Collectez les adresses emails',
-        'Créez une Base de Données Précieuse',
-        'Créez une Base de Données Précieuse',
-        'Interface pour l’envoi de mail à votre base de donnée',
-        'Renforcez le lien avec vos clients et encouragez les visites répétées',
-      ],
-    },
-    {
-      id: 4,
-      name: 'gold',
-      prince: 100,
-      imgUrl: '/planet-04.png',
-      features: [
-        'Plaque PVC avec QR Code Personnalisé',
-        'Augmentez Votre Visibilité Instantanément ',
-        'Engagez Vos Clients Facilement',
-        'Contrôlez Votre E-Réputation',
-        'Améliorez Votre Référencement',
-        'Collectez les adresses emails',
-        'Créez une Base de Données Précieuse',
-        'Créez une Base de Données Précieuse',
-        'Interface pour l’envoi de mail à votre base de donnée',
-        'Renforcez le lien avec vos clients et encouragez les visites répétées',
-        'Personnalisation Poussée : Envoyer des offres sur-mesure qui résonnent avec chaque client.',
-        'Fidélisation Accrue',
-      ],
-    },
-  ];
-
-  const handleAddToCart = (serviceId) => {
-    const item = services.find((service) => service.id === serviceId);
-    if (item) {
-      addToCart({ ...item, id: serviceId, price: item.prince * 100 }); // Convertir le prix en centimes si nécessaire
-      alert(`Service ${item.name} ajouté au panier`);
+  const handleAddToCart = (productId) => {
+    const product = productDetails[productId];
+    if (product) {
+      addToCart(productId); // Convertir le prix en centimes si nécessaire
+      alert(`Service ${product.name} ajouté au panier`);
     }
   };
 
@@ -89,17 +19,17 @@ const TarifsContent = () => {
         Voici les options disponibles
       </h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {services.map((service) => (
-          <div key={service.id} className="bg-white rounded-lg shadow overflow-hidden transform transition duration-500 hover:scale-105">
-            <img src={service.imgUrl} alt={`Service ${service.name}`} className="w-full h-40 object-cover" />
+        {Object.values(productDetails).map((product) => (
+          <div key={product.id} className="bg-white rounded-lg shadow overflow-hidden transform transition duration-500 hover:scale-105">
+            <img src={product.imgUrl} alt={`Service ${product.name}`} className="w-full h-40 object-cover" />
             <div className="p-4 space-y-2">
-              {service.features.map((feature, index) => (
+              {product.features.map((feature, index) => (
                 <FeatureRow key={index} title={feature} imgSrc="/check.png" />
               ))}
             </div>
             <button
               type="button"
-              onClick={() => handleAddToCart(service.id)}
+              onClick={() => handleAddToCart(product.id)}
               className="bg-green-500 text-white text-sm px-4 py-2 rounded hover:bg-green-600 transition-colors duration-300 w-full"
             >
               Ajouter au panier
@@ -112,4 +42,3 @@ const TarifsContent = () => {
 };
 
 export default TarifsContent;
-
