@@ -8,7 +8,7 @@ const TarifsContent = () => {
   const handleAddToCart = (serviceKey) => {
     const product = productDetails[serviceKey];
     if (product) {
-      addToCart(product);
+      addToCart(serviceKey); // Passer l'ID du produit (serviceKey) au lieu de l'objet produit
     } else {
       alert('Produit non trouvé!');
     }

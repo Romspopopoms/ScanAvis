@@ -78,7 +78,7 @@ export const CartProvider = ({ children }) => {
   const addToCart = (productId) => {
     const product = productDetails[productId];
     if (product) {
-      setCartItem(product);
+      setCartItem(product); // Ici, 'product' est déjà l'objet contenant tous les détails
     } else {
       console.error(`Produit non trouvé pour l'ID : ${productId}`);
     }
