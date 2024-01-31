@@ -21,6 +21,7 @@ exports.handler = async (event) => {
     if (!Array.isArray(items) || items.length === 0) {
       throw new Error('Items are required and should be an array');
     }
+    console.log('Received the following items for subscription:', items);
 
     const setupIntent = await stripe.setupIntents.retrieve(setupIntentId);
     if (!setupIntent) {

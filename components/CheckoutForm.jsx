@@ -107,6 +107,11 @@ const CheckoutFormContent = () => {
         throw error;
       }
 
+      console.log('Sending the following data to backend:', {
+        setupIntentId: setupIntent.id,
+        userUuid: user ? user.uuid : null,
+        items: formattedCartItems,
+      });
       if (setupIntent.status === 'succeeded') {
         const subscriptionResult = await fetch('/.netlify/functions/complete-subscription', {
           method: 'POST',
