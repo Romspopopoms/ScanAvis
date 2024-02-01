@@ -36,7 +36,6 @@ const PaymentStatusPage = () => {
                 <p className="font-semibold">ID de souscription : <span className="font-normal">{paymentDetails.subscriptionId}</span></p>
                 <p className="font-semibold">Montant : <span className="font-normal">${paymentDetails.amount.toFixed(2)}</span></p>
                 <p className="font-semibold">Nom du service : <span className="font-normal">{paymentDetails.serviceName}</span></p>
-                <p className="font-semibold">Date de création : <span className="font-normal">{new Date(paymentDetails.createdAt).toLocaleString()}</span></p>
               </div>
             )}
             <Link href="/"

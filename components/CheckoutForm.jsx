@@ -66,7 +66,6 @@ const CheckoutFormContent = () => {
       subscriptionId: subscriptionData.subscriptionId,
       amount: subscriptionData.amount,
       serviceName: subscriptionData.serviceName,
-      createdAt: subscriptionData.createdAt,
       // ... autres détails si nécessaire
     });
     router.push(`/paymentstatus?subscriptionStatus=succeeded&subscriptionId=${subscriptionData.subscriptionId}`);

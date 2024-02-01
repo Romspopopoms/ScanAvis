@@ -63,7 +63,6 @@ exports.handler = async (event) => {
       subscriptionId: subscription.id,
       amount: nextPaymentAmount, // Assurez-vous que cette valeur est définie
       serviceName, // Assurez-vous que cette valeur est obtenue correctement
-      createdAt: subscription.created ? new Date(subscription.created * 1000).toISOString() : null, // Convertissez le timestamp en Date
     };
     console.log(subscriptionDetails);
 
