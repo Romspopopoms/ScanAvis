@@ -42,11 +42,21 @@ exports.handler = async (event) => {
       customer: stripeCustomerId,
       items: [{ price: item.priceId }],
       default_payment_method: paymentMethodId,
+      expand: ['latest_invoice.payment_intent', 'items.data.price.product'], // Expansion to get product details
     });
     console.log('Subscription created successfully:', subscription.id);
 
-    const insertQuery = 'INSERT INTO Subscriptions (subscriptionId, priceId, user_uuid, stripe_customer_id) VALUES (?, ?, ?, ?)';
-    const result = await conn.execute(insertQuery, [subscription.id, item.priceId, userUuid, stripeCustomerId]);
+    // Get the service name from the subscription data
+    const serviceName = subscription.items.data[0].price.product.name;
+
+    const subscriptionStatus = subscription.status; // Get subscription status
+    const nextInvoice = subscription.latest_invoice; // Get the latest invoice
+    const nextPaymentDate = nextInvoice ? new Date(nextInvoice.next_payment_attempt * 1000) : null; // Convert timestamp to Date
+    const nextPaymentAmount = nextInvoice ? nextInvoice.amount_due / 100 : null; // Convert amount from cents to dollars
+    const paymentMethodIdUsed = subscription.default_payment_method; // Get the payment method used
+
+    const insertQuery = 'INSERT INTO Subscriptions (subscriptionId, priceId, items, status, user_uuid, nextPaymentDate, nextPaymentAmount, stripe_customer_id, paymentMethodId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
+    const result = await conn.execute(insertQuery, [subscription.id, item.priceId, serviceName, subscriptionStatus, userUuid, nextPaymentDate, nextPaymentAmount, stripeCustomerId, paymentMethodIdUsed]);
     console.log('Subscription data:', result);
 
     return {
