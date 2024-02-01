@@ -21,6 +21,10 @@ export const PaymentProvider = ({ children }) => {
     console.log('Payment Details set in context:', paymentDetails);
   }, [paymentDetails]);
 
+  const setPaymentDetailsDebug = (details) => {
+    console.log('setPaymentDetails called with:', details);
+    setPaymentDetails(details);
+  };
   const clearPaymentInfo = () => {
     setPaymentStatus(null);
     setPaymentMessage('');
@@ -35,6 +39,8 @@ export const PaymentProvider = ({ children }) => {
     paymentDetails,
     setPaymentDetails,
     clearPaymentInfo,
+    setPaymentDetailsDebug,
+
   };
 
   return (
