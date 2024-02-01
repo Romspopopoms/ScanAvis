@@ -1,7 +1,7 @@
 const stripe = require('stripe')('sk_test_51OPtGvDWmnYPaxs1DJZliUMMDttrNP1a4usU0uBgZgjnfe4Ho3WuCzFivSpwXhqL0YgVl9c41lbsuHI1O4nHAUhz00ibE6rzPX');
 const { conn } = require('../../utils/db');
 
-const findOrCreateStripeCustomer = async (userUuid) => {
+const findOrCreateStripeCustomer = async (userUuid, paymentMethodId) => {
   console.log('Début de findOrCreateStripeCustomer');
 
   const selectSql = 'SELECT stripe_customer_id FROM users WHERE uuid = ?';
@@ -42,9 +42,15 @@ const findOrCreateStripeCustomer = async (userUuid) => {
     console.log('Avec les paramètres:', [stripeCustomerId, userUuid]);
     await conn.execute(updateSql, [stripeCustomerId, userUuid]);
     console.log('Client Stripe mis à jour:', stripeCustomerId);
+  } else if (paymentMethodId) {
+    // Attachement de la méthode de paiement au client
+    await stripe.paymentMethods.attach(paymentMethodId, {
+      customer: stripeCustomerId,
+    });
+    console.log(`Méthode de paiement ${paymentMethodId} attachée au client Stripe ${stripeCustomerId}`);
   }
 
-  return stripeCustomerId; // Retourner directement l'ID du client
+  return stripeCustomerId;
 };
 
 module.exports = findOrCreateStripeCustomer;
