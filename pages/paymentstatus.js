@@ -34,7 +34,7 @@ const PaymentStatusPage = () => {
             {paymentDetails && (
               <div className="text-left">
                 <p className="font-semibold">ID de souscription : <span className="font-normal">{paymentDetails.subscriptionId}</span></p>
-                <p className="font-semibold">Montant : <span className="font-normal">${paymentDetails.amount.toFixed(2)}</span></p>
+                <p className="font-semibold">Montant : <span className="font-normal">${paymentDetails && paymentDetails.amount ? paymentDetails.amount.toFixed(2) : '0.00'}</span></p>
                 <p className="font-semibold">Nom du service : <span className="font-normal">{paymentDetails.serviceName}</span></p>
               </div>
             )}
