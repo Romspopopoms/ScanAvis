@@ -44,7 +44,7 @@ const findOrCreateStripeCustomer = async (userUuid) => {
     console.log('Client Stripe mis à jour:', stripeCustomerId);
   }
 
-  return { id: stripeCustomerId };
+  return stripeCustomerId; // Retourner directement l'ID du client
 };
 
 module.exports = findOrCreateStripeCustomer;
