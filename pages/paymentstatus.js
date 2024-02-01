@@ -37,12 +37,15 @@ const PaymentStatusPage = () => {
               <p className="font-semibold">Montant : <span className="font-normal">${paymentDetails.amount ? paymentDetails.amount.toFixed(2) : 'Non disponible'}</span></p>
               <p className="font-semibold">Nom du service : <span className="font-normal">{paymentDetails.serviceName ?? 'Non disponible'}</span></p>
             </div>
-            <Link href="/" passHref
-              className="inline-block bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600 transition duration-200 mt-4"
-            >
-              Retour à l'accueil
+            <div>
+              <h2 className="text-xl font-bold text-white mb-4">Retrouvez vos informations dans votre page profil !</h2>
+              <Link href="/" passHref
+                className="inline-block bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600 transition duration-200 mt-4"
+              >
+                Retour à l'accueil
 
-            </Link>
+              </Link>
+            </div>
           </div>
         )}
         {paymentStatus !== 'failed' && paymentStatus !== 'succeeded' && (

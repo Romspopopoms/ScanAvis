@@ -14,10 +14,9 @@ const MonProfil = () => {
       setError('');
 
       try {
-        const response = await fetch('/.netlify/functions/getUserSubscriptions', {
-          method: 'POST',
+        const response = await fetch(`/.netlify/functions/getUserSubscriptions?userUuid=${user.uuid}`, {
+          method: 'GET',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userUuid: user.uuid }),
         });
 
         if (!response.ok) {

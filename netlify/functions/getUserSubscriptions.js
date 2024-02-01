@@ -4,7 +4,7 @@ const { conn } = require('../../utils/db');
 exports.handler = async (event) => {
   console.log('Événement reçu:', JSON.stringify(event));
 
-  if (event.httpMethod !== 'GET') {
+  if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
       headers: { 'Content-Type': 'application/json' },
