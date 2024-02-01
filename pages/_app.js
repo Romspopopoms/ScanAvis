@@ -5,7 +5,7 @@ import React from 'react';
 import { useRouter } from 'next/router';
 import { CartProvider } from '../context/CartContext';
 import { AuthProvider } from '../context/AuthContext';
-import { PaymentProvider } from '../context/PaymentContext'; // Importez PaymentProvider
+import { PaymentProvider } from '../context/PaymentContext';
 import CartSummary from '../components/CartSummary';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -15,9 +15,9 @@ const MyApp = ({ Component, pageProps }) => {
   const shouldDisplayCartSummary = router.pathname !== '/paiement';
 
   return (
-    <PaymentProvider> {/* Ajoutez PaymentProvider ici */}
-      <AuthProvider>
-        <CartProvider>
+    <AuthProvider>
+      <CartProvider>
+        <PaymentProvider> {/* Déplacez PaymentProvider ici */}
           <div className="flex flex-col min-h-screen gradient-01">
             <Head>
               <title>Scan'Avis</title>
@@ -36,9 +36,9 @@ const MyApp = ({ Component, pageProps }) => {
 
             <Footer />
           </div>
-        </CartProvider>
-      </AuthProvider>
-    </PaymentProvider>
+        </PaymentProvider>
+      </CartProvider>
+    </AuthProvider>
   );
 };
 
