@@ -60,7 +60,7 @@ const findOrCreateStripeCustomer = async (userUuid, paymentMethodId) => {
     }
   }
 
-  return { stripeCustomerId, paymentMethodId };
+  return stripeCustomerId;
 };
 
 module.exports = findOrCreateStripeCustomer;
