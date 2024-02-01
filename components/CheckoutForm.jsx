@@ -58,12 +58,18 @@ const CheckoutFormContent = () => {
   }, [cartItem, user]);
 
   const onSuccessfulSubscription = (subscriptionData) => {
+    console.log(subscriptionData);
     console.log(`Subscription succeeded with ID: ${subscriptionData.subscriptionId}`);
     clearCart();
     setPaymentStatus('succeeded');
-    setPaymentDetails(subscriptionData); // détails de la souscription
-    // Redirection à la page de statut de paiement avec les informations nécessaires
-    router.push(`/paymentstatus?paymentStatus=succeeded&subscriptionId=${subscriptionData.subscriptionId}`);
+    setPaymentDetails({
+      subscriptionId: subscriptionData.subscriptionId,
+      amount: subscriptionData.amount,
+      serviceName: subscriptionData.serviceName,
+      createdAt: subscriptionData.createdAt,
+      // ... autres détails si nécessaire
+    });
+    router.push(`/subscriptionstatus?subscriptionStatus=succeeded&subscriptionId=${subscriptionData.subscriptionId}`);
   };
 
   const onFailedSubscription = (message) => {

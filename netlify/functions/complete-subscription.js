@@ -65,6 +65,7 @@ exports.handler = async (event) => {
       serviceName, // Assurez-vous que cette valeur est obtenue correctement
       createdAt: subscription.created ? new Date(subscription.created * 1000).toISOString() : null, // Convertissez le timestamp en Date
     };
+    console.log(subscriptionDetails);
 
     return {
       statusCode: 200,

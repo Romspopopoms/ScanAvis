@@ -15,9 +15,9 @@ const MyApp = ({ Component, pageProps }) => {
   const shouldDisplayCartSummary = router.pathname !== '/paiement';
 
   return (
-    <AuthProvider>
-      <CartProvider>
-        <PaymentProvider> {/* Enrober avec PaymentProvider */}
+    <PaymentProvider> {/* Ajoutez PaymentProvider ici */}
+      <AuthProvider>
+        <CartProvider>
           <div className="flex flex-col min-h-screen gradient-01">
             <Head>
               <title>Scan'Avis</title>
@@ -36,9 +36,9 @@ const MyApp = ({ Component, pageProps }) => {
 
             <Footer />
           </div>
-        </PaymentProvider>
-      </CartProvider>
-    </AuthProvider>
+        </CartProvider>
+      </AuthProvider>
+    </PaymentProvider>
   );
 };
 
