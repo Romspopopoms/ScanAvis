@@ -120,6 +120,7 @@ const CheckoutFormContent = () => {
         });
 
         const subscriptionData = await subscriptionResult.json();
+        console.log(subscriptionData);
 
         if (!subscriptionResult.ok) {
           throw new Error(subscriptionData.error || 'Erreur lors de la création de l’abonnement');
