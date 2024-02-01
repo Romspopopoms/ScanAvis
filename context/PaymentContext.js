@@ -1,19 +1,30 @@
-import { createContext, useState, useContext } from 'react';
+import { createContext, useState, useContext, useEffect } from 'react';
 
-const PaymentContext = createContext(null);
+const PaymentContext = createContext({
+  paymentStatus: null,
+  paymentMessage: '',
+  paymentDetails: {},
+  setPaymentStatus: () => {},
+  setPaymentMessage: () => {},
+  setPaymentDetails: () => {},
+  clearPaymentInfo: () => {},
+});
 
 export const usePayment = () => useContext(PaymentContext);
 
 export const PaymentProvider = ({ children }) => {
   const [paymentStatus, setPaymentStatus] = useState(null);
   const [paymentMessage, setPaymentMessage] = useState('');
-  const [paymentDetails, setPaymentDetails] = useState(null);
-  console.log('Payment Details set in context:', paymentDetails);
+  const [paymentDetails, setPaymentDetails] = useState({});
+
+  useEffect(() => {
+    console.log('Payment Details set in context:', paymentDetails);
+  }, [paymentDetails]);
 
   const clearPaymentInfo = () => {
     setPaymentStatus(null);
     setPaymentMessage('');
-    setPaymentDetails(null);
+    setPaymentDetails({});
   };
 
   const contextValue = {

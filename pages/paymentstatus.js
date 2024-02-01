@@ -22,9 +22,8 @@ const PaymentStatusPage = () => {
           <div className="text-center">
             <h2 className="text-xl font-bold text-red-600 mb-4">Oups !</h2>
             <p className="mb-4">Erreur : {paymentMessage}</p>
-            <Link href="/paiement"
-              className="inline-block bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition duration-200"
-            >
+            <Link href="/paiement" passHref>
+              className="inline-block bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition duration-200"{'>'}
               Réessayer le paiement
             </Link>
           </div>
@@ -35,13 +34,14 @@ const PaymentStatusPage = () => {
             <p className="mb-4">Votre transaction a été réalisée avec succès.</p>
             <div className="text-left">
               <p className="font-semibold">ID de souscription : <span className="font-normal">{paymentDetails.subscriptionId ?? 'Non disponible'}</span></p>
-              <p className="font-semibold">Montant : <span className="font-normal">${paymentDetails.amount?.toFixed(2) ?? 'Non disponible'}</span></p>
+              <p className="font-semibold">Montant : <span className="font-normal">${paymentDetails.amount ? paymentDetails.amount.toFixed(2) : 'Non disponible'}</span></p>
               <p className="font-semibold">Nom du service : <span className="font-normal">{paymentDetails.serviceName ?? 'Non disponible'}</span></p>
             </div>
-            <Link href="/"
+            <Link href="/" passHref
               className="inline-block bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600 transition duration-200 mt-4"
             >
               Retour à l'accueil
+
             </Link>
           </div>
         )}
@@ -49,10 +49,11 @@ const PaymentStatusPage = () => {
           <div className="text-center">
             <h2 className="text-xl font-bold text-yellow-500 mb-4">Statut de Paiement Inconnu</h2>
             <p className="mb-4">Accès non autorisé à cette page ou paramètre manquant.</p>
-            <Link href="/"
+            <Link href="/" passHref
               className="inline-block bg-gray-500 text-white px-6 py-2 rounded hover:bg-gray-600 transition duration-200"
             >
               Retour à l'accueil
+
             </Link>
           </div>
         )}
