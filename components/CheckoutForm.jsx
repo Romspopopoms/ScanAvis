@@ -127,7 +127,7 @@ const CheckoutFormContent = () => {
         }
 
         onSuccessfulSubscription(subscriptionData.subscriptionId);
-        console.log(subscriptionData.subscriptionId);
+        console.log('Subscription Data in CheckoutFormContent:', subscriptionData);
       } else {
         throw new Error('La configuration a échoué pour une raison inconnue.');
       }

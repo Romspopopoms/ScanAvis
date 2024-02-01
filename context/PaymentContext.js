@@ -8,6 +8,7 @@ export const PaymentProvider = ({ children }) => {
   const [paymentStatus, setPaymentStatus] = useState(null);
   const [paymentMessage, setPaymentMessage] = useState('');
   const [paymentDetails, setPaymentDetails] = useState(null);
+  console.log('Payment Details set in context:', paymentDetails);
 
   const clearPaymentInfo = () => {
     setPaymentStatus(null);

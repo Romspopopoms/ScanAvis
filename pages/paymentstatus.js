@@ -9,7 +9,7 @@ const PaymentStatusPage = () => {
   // Affichez les logs pour le débogage
   console.log('Payment Status:', paymentStatus);
   console.log('Payment Message:', paymentMessage);
-  console.log('Payment Details:', paymentDetails);
+  console.log('Payment Details in PaymentStatusPage:', paymentDetails);
 
   if (!paymentStatus || paymentStatus === 'loading') {
     return <Spinner />;
