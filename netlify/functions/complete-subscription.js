@@ -61,9 +61,9 @@ exports.handler = async (event) => {
 
     const subscriptionDetails = {
       subscriptionId: subscription.id,
-      amount: nextPaymentAmount,
-      serviceName,
-      createdAt: new Date(subscription.created * 1000), // Convertissez le timestamp en Date
+      amount: nextPaymentAmount, // Assurez-vous que cette valeur est définie
+      serviceName, // Assurez-vous que cette valeur est obtenue correctement
+      createdAt: subscription.created ? new Date(subscription.created * 1000).toISOString() : null, // Convertissez le timestamp en Date
     };
 
     return {
