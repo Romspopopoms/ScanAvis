@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useContext } from 'react';
+import { useRouter } from 'next/router';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, CardNumberElement, CardExpiryElement, CardCvcElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { useCart } from '../context/CartContext';
 import { AuthContext } from '../context/AuthContext';
+import { usePayment } from '../context/PaymentContext';
 
 const stripePromise = loadStripe('pk_test_51OPtGvDWmnYPaxs1gSpLL1WpDyU6gaxOBszqNCSu9iHVeEYuPcjUEvOpKzjwdbF6NUWquoEPf24Y3qMwIDLmeLvl00FwQkUSKx');
 
@@ -24,11 +26,13 @@ const cardElementOptions = {
 const CheckoutFormContent = () => {
   const stripe = useStripe();
   const elements = useElements();
+  const router = useRouter(); // Utiliser le hook useRouter
   const { cartItem, clearCart, totalCost, formatCartItemForSubscription } = useCart();
   const { user } = useContext(AuthContext);
   const [clientSecret, setClientSecret] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const { setPaymentStatus, setPaymentMessage, setPaymentDetails } = usePayment();
 
   useEffect(() => {
     const fetchSubscriptionIntent = async () => {
@@ -53,17 +57,21 @@ const CheckoutFormContent = () => {
     fetchSubscriptionIntent();
   }, [cartItem, user]);
 
-  const onSuccessfulSubscription = (subscriptionId) => {
+  const onSuccessfulSubscription = (subscriptionId, details) => {
     console.log(`Subscription succeeded with ID: ${subscriptionId}`);
     clearCart();
-    // Redirection à la page de statut d'abonnement (à décommenter)
-    // router.push(`/subscriptionstatus?subscriptionStatus=succeeded&subscriptionId=${subscriptionId}`);
+    setPaymentStatus('succeeded');
+    setPaymentDetails(details); // détails de la souscription
+    // Redirection à la page de statut de paiement avec les informations nécessaires
+    router.push(`/paymentstatus?paymentStatus=succeeded&subscriptionId=${subscriptionId}`);
   };
 
   const onFailedSubscription = (message) => {
     console.error(`Subscription failed with message: ${message}`);
-    // Redirection à la page de statut d'abonnement (à décommenter)
-    // router.push(`/subscriptionstatus?subscriptionStatus=failed&message=${encodeURIComponent(message)}`);
+    setPaymentStatus('failed');
+    setPaymentMessage(message);
+    // Redirection à la page de statut de paiement avec le message d'erreur
+    router.push(`/paymentstatus?paymentStatus=failed&message=${encodeURIComponent(message)}`);
   };
 
   const handleSubmit = async (event) => {
