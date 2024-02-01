@@ -1,4 +1,3 @@
-// getUserSubscriptions.js
 const { conn } = require('../../utils/db');
 
 exports.handler = async (event) => {
@@ -45,7 +44,7 @@ exports.handler = async (event) => {
       status: subscription.status,
       createdAt: subscription.createdAt,
       nextPaymentDate: subscription.nextPaymentDate,
-      nextPaymentAmount: subscription.nextPaymentAmount,
+      nextPaymentAmount: subscription.nextPaymentAmount, // Assurez-vous que le champ correspond bien au montant dans votre base de données
       // ... autres champs pertinents
     }));
 
