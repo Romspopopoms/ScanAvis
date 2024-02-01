@@ -50,9 +50,12 @@ exports.handler = async (event) => {
     const serviceName = subscription.items.data[0].price.product.name;
 
     const subscriptionStatus = subscription.status; // Get subscription status
-    const nextInvoice = subscription.latest_invoice; // Get the latest invoice
-    const nextPaymentDate = nextInvoice ? new Date(nextInvoice.next_payment_attempt * 1000) : null; // Convert timestamp to Date
-    const nextPaymentAmount = nextInvoice ? nextInvoice.amount_due / 100 : null; // Convert amount from cents to dollars
+
+    // Utiliser la date actuelle et ajouter 1 mois pour la date du prochain paiement
+    const createdAt = new Date(subscription.created * 1000); // Convertir timestamp Unix en objet Date
+    const nextPaymentDate = new Date(createdAt.setMonth(createdAt.getMonth() + 1)); // Ajouter 1 mois
+
+    const nextPaymentAmount = item.amount; // Utiliser le montant de l'item pour le prochain paiement
     const paymentMethodIdUsed = subscription.default_payment_method; // Get the payment method used
 
     const insertQuery = 'INSERT INTO Subscriptions (subscriptionId, priceId, items, status, user_uuid, nextPaymentDate, nextPaymentAmount, stripe_customer_id, paymentMethodId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
@@ -63,6 +66,7 @@ exports.handler = async (event) => {
       subscriptionId: subscription.id,
       amount: nextPaymentAmount, // Assurez-vous que cette valeur est définie
       serviceName, // Assurez-vous que cette valeur est obtenue correctement
+      nextPaymentDate: nextPaymentDate.toISOString(), // Convertir en string pour l'envoi dans la réponse
     };
     console.log(subscriptionDetails);
 
