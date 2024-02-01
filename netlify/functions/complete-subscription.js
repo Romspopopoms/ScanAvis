@@ -33,8 +33,9 @@ exports.handler = async (event) => {
     const paymentMethodId = setupIntent.payment_method;
 
     // Find or create Stripe customer and attach the payment method
-    const stripeCustomerId = await findOrCreateStripeCustomer(userUuid, paymentMethodId);
+    const { stripeCustomerId } = await findOrCreateStripeCustomer(userUuid, paymentMethodId);
 
+    // Create subscription
     const subscription = await stripe.subscriptions.create({
       customer: stripeCustomerId,
       items: [{ price: item.priceId }],
@@ -42,8 +43,9 @@ exports.handler = async (event) => {
     });
     console.log('Subscription created successfully:', subscription.id);
 
-    const insertQuery = 'INSERT INTO Subscriptions (subscriptionId, priceId, user_uuid) VALUES (?, ?, ?)';
-    const result = await conn.execute(insertQuery, [subscription.id, item.priceId, userUuid]);
+    // Insert subscription data into the database
+    const insertQuery = 'INSERT INTO Subscriptions (subscriptionId, priceId, user_uuid, stripe_customer_id) VALUES (?, ?, ?, ?)';
+    const result = await conn.execute(insertQuery, [subscription.id, item.priceId, userUuid, stripeCustomerId]);
     console.log('Subscription data:', result);
 
     return {
