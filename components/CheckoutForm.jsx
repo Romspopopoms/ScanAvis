@@ -125,7 +125,7 @@ const CheckoutFormContent = () => {
           throw new Error(subscriptionData.error || 'Erreur lors de la création de l’abonnement');
         }
 
-        onSuccessfulSubscription(subscriptionData.subscriptionId);
+        onSuccessfulSubscription(subscriptionData);
         console.log('Subscription Data in CheckoutFormContent:', subscriptionData);
       } else {
         throw new Error('La configuration a échoué pour une raison inconnue.');
