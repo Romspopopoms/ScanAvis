@@ -127,6 +127,7 @@ const CheckoutFormContent = () => {
         }
 
         onSuccessfulSubscription(subscriptionData.subscriptionId);
+        console.log(subscriptionData.subscriptionId);
       } else {
         throw new Error('La configuration a échoué pour une raison inconnue.');
       }
