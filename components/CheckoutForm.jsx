@@ -57,13 +57,12 @@ const CheckoutFormContent = () => {
     fetchSubscriptionIntent();
   }, [cartItem, user]);
 
-  const onSuccessfulSubscription = (subscriptionId, details) => {
-    console.log(`Subscription succeeded with ID: ${subscriptionId}`);
+  const onSuccessfulSubscription = (subscriptionData) => {
+    console.log(`Subscription succeeded with ID: ${subscriptionData.subscriptionId}`);
     clearCart();
     setPaymentStatus('succeeded');
-    setPaymentDetails(details); // détails de la souscription
-    // Redirection à la page de statut de paiement avec les informations nécessaires
-    router.push(`/paymentstatus?paymentStatus=succeeded&subscriptionId=${subscriptionId}`);
+    setPaymentDetails(subscriptionData); // Utilisez les détails de l'abonnement retournés
+    router.push(`/subscriptionstatus?subscriptionStatus=succeeded&subscriptionId=${subscriptionData.subscriptionId}`);
   };
 
   const onFailedSubscription = (message) => {

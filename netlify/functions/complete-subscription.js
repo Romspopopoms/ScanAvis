@@ -59,10 +59,17 @@ exports.handler = async (event) => {
     const result = await conn.execute(insertQuery, [subscription.id, item.priceId, serviceName, subscriptionStatus, userUuid, nextPaymentDate, nextPaymentAmount, stripeCustomerId, paymentMethodIdUsed]);
     console.log('Subscription data:', result);
 
+    const subscriptionDetails = {
+      subscriptionId: subscription.id,
+      amount: nextPaymentAmount,
+      serviceName,
+      createdAt: new Date(subscription.created * 1000), // Convertissez le timestamp en Date
+    };
+
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ subscriptionId: subscription.id }),
+      body: JSON.stringify(subscriptionDetails), // Retournez les détails de l'abonnement
     };
   } catch (error) {
     console.error('Error completing subscription:', error);
