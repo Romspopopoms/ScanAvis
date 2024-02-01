@@ -58,11 +58,10 @@ const CheckoutFormContent = () => {
   }, [cartItem, user]);
 
   const onSuccessfulSubscription = (subscriptionData) => {
-    console.log(subscriptionData);
-    console.log(`Subscription succeeded with ID: ${subscriptionData.subscriptionId}`);
+    console.log('Subscription Data in CheckoutFormContent:', subscriptionData);
     clearCart();
     setPaymentStatus('succeeded');
-    setPaymentDetails(subscriptionData); // Assurez-vous que c'est un objet complet ici
+    setPaymentDetails(subscriptionData); // Assurez-vous que c'est l'objet complet
     router.push(`/paymentstatus?subscriptionStatus=succeeded&subscriptionId=${subscriptionData.subscriptionId}`);
   };
 

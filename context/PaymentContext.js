@@ -17,30 +17,41 @@ export const PaymentProvider = ({ children }) => {
   const [paymentMessage, setPaymentMessage] = useState('');
   const [paymentDetails, setPaymentDetails] = useState({});
 
+  // Log whenever paymentDetails is updated
   useEffect(() => {
     console.log('Payment Details set in context:', paymentDetails);
   }, [paymentDetails]);
 
-  const setPaymentDetailsDebug = (details) => {
-    console.log('setPaymentDetails called with:', details);
-    setPaymentDetails(details);
-  };
   const clearPaymentInfo = () => {
+    console.log('Clearing payment info');
     setPaymentStatus(null);
     setPaymentMessage('');
     setPaymentDetails({});
   };
 
+  const setPaymentStatusDebug = (status) => {
+    console.log('setPaymentStatus called with:', status);
+    setPaymentStatus(status);
+  };
+
+  const setPaymentMessageDebug = (message) => {
+    console.log('setPaymentMessage called with:', message);
+    setPaymentMessage(message);
+  };
+
+  const setPaymentDetailsDebug = (details) => {
+    console.log('setPaymentDetails called with:', details);
+    setPaymentDetails(details);
+  };
+
   const contextValue = {
     paymentStatus,
-    setPaymentStatus,
+    setPaymentStatus: setPaymentStatusDebug,
     paymentMessage,
-    setPaymentMessage,
+    setPaymentMessage: setPaymentMessageDebug,
     paymentDetails,
-    setPaymentDetails,
+    setPaymentDetails: setPaymentDetailsDebug,
     clearPaymentInfo,
-    setPaymentDetailsDebug,
-
   };
 
   return (
