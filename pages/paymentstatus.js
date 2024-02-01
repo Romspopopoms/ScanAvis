@@ -5,6 +5,9 @@ import Spinner from '../components/Spinner';
 
 const PaymentStatusPage = () => {
   const { paymentStatus, paymentMessage, paymentDetails } = usePayment();
+  console.log('Payment Status:', paymentStatus);
+  console.log('Payment Message:', paymentMessage);
+  console.log('Payment Details:', paymentDetails);
 
   if (!paymentStatus || paymentStatus === 'loading') {
     return <Spinner />;
