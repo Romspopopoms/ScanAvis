@@ -69,7 +69,7 @@ const CheckoutFormContent = () => {
       createdAt: subscriptionData.createdAt,
       // ... autres détails si nécessaire
     });
-    router.push(`/subscriptionstatus?subscriptionStatus=succeeded&subscriptionId=${subscriptionData.subscriptionId}`);
+    router.push(`/paymentstatus?subscriptionStatus=succeeded&subscriptionId=${subscriptionData.subscriptionId}`);
   };
 
   const onFailedSubscription = (message) => {
