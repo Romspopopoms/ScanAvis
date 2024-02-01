@@ -2,17 +2,11 @@ const stripe = require('stripe')('sk_test_51OPtGvDWmnYPaxs1DJZliUMMDttrNP1a4usU0
 const { conn } = require('../../utils/db');
 const findOrCreateStripeCustomer = require('./findOrCreateStripeCustomer');
 
-// Helper function to fetch price amount using the priceId
-async function fetchPriceAmount(priceId) {
-  const price = await stripe.prices.retrieve(priceId);
-  return price.unit_amount; // Return the amount in smallest currency unit (like cents for USD)
-}
-
 exports.handler = async (event) => {
-  console.log('Request received:', event);
+  console.log('Requête reçue:', event);
 
   if (event.httpMethod !== 'POST') {
-    console.error('HTTP method not allowed');
+    console.error('Méthode HTTP non autorisée');
     return {
       statusCode: 405,
       headers: { 'Content-Type': 'application/json' },
@@ -21,40 +15,45 @@ exports.handler = async (event) => {
   }
 
   try {
-    const { priceId, userUuid } = JSON.parse(event.body);
-    console.log('Processing payment for priceId:', priceId, 'for user:', userUuid);
+    const { setupIntentId, item, userUuid } = JSON.parse(event.body);
+    console.log('Processing setupIntentId:', setupIntentId, 'for user:', userUuid);
 
-    if (!priceId) {
-      throw new Error('priceId is required');
+    if (!item || !item.priceId) {
+      throw new Error('Item with priceId is required');
     }
+    console.log('Received the following item for subscription:', item);
 
-    const customer = await findOrCreateStripeCustomer(userUuid);
-    console.log('Stripe customer found or created:', customer.id);
+    const setupIntent = await stripe.setupIntents.retrieve(setupIntentId);
+    if (!setupIntent) {
+      console.error(`SetupIntent not found for ID: ${setupIntentId}`);
+      throw new Error(`SetupIntent not found for ID: ${setupIntentId}`);
+    }
+    console.log('SetupIntent retrieved:', setupIntent.id);
 
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: await fetchPriceAmount(priceId),
-      currency: 'eur', // or 'usd' or any other currency
-      customer: customer.id,
-      payment_method_types: ['card'],
+    const paymentMethodId = setupIntent.payment_method;
+
+    const subscription = await stripe.subscriptions.create({
+      customer: await findOrCreateStripeCustomer(userUuid),
+      items: [{ price: item.priceId }],
+      default_payment_method: paymentMethodId,
     });
-    console.log('PaymentIntent created successfully:', paymentIntent.id);
+    console.log('Subscription created successfully:', subscription.id);
 
-    // Inserting PaymentIntent ID and related info into the database
-    const insertQuery = 'INSERT INTO Payments (intentId, customerId, priceId, status) VALUES (?, ?, ?, ?)';
-    await conn.execute(insertQuery, [paymentIntent.id, customer.id, priceId, 'created']);
-    console.log('PaymentIntent recorded in the database:', paymentIntent.id);
+    const insertQuery = 'INSERT INTO Subscriptions (subscriptionId, priceId, user_uuid) VALUES (?, ?, ?)';
+    const result = await conn.execute(insertQuery, [subscription.id, item.priceId, userUuid]);
+    console.log('Subscription data:', result);
 
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ clientSecret: paymentIntent.client_secret }),
+      body: JSON.stringify({ subscriptionId: subscription.id }),
     };
   } catch (error) {
-    console.error('Error creating payment intent:', error);
+    console.error('Error completing subscription:', error);
     return {
       statusCode: 500,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ error: `Error creating payment intent: ${error.message}` }),
+      body: JSON.stringify({ error: `Error completing subscription: ${error.message}` }),
     };
   }
 };

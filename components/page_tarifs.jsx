@@ -5,16 +5,16 @@ import FeatureRow from './FeatureRow';
 const TarifsContent = () => {
   const { addToCart, productDetails } = useCart();
 
-  // Modification de la fonction pour ajouter des produits au panier en utilisant leur priceId
   const handleAddToCart = (productKey) => {
     const product = productDetails[productKey];
     if (product) {
-      // Passer productKey au lieu de product.priceId
+      // Utilisation de productKey pour ajouter le produit au panier
       addToCart(productKey);
     } else {
       alert('Produit non trouvé!');
     }
   };
+
   return (
     <div className="min-h-screen py-8 px-4">
       <h2 className="text-center text-4xl font-extrabold text-white mb-12">

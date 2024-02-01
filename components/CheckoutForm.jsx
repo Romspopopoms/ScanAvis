@@ -24,7 +24,7 @@ const cardElementOptions = {
 const CheckoutFormContent = () => {
   const stripe = useStripe();
   const elements = useElements();
-  const { cartItem, clearCart, totalCost } = useCart();
+  const { cartItem, clearCart, totalCost, formatCartItemForSubscription } = useCart();
   const { user } = useContext(AuthContext);
   const [clientSecret, setClientSecret] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
@@ -35,10 +35,11 @@ const CheckoutFormContent = () => {
       if (!cartItem || !user) return;
 
       try {
+        const formattedItem = formatCartItemForSubscription();
         const response = await fetch('/.netlify/functions/SubscriptionIntent', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ item: { price: cartItem.stripePlanId }, userUuid: user.uuid }),
+          body: JSON.stringify({ item: formattedItem, userUuid: user.uuid }),
         });
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || 'Erreur du serveur');
@@ -99,13 +100,14 @@ const CheckoutFormContent = () => {
       }
 
       if (setupIntent.status === 'succeeded') {
+        const formattedItem = formatCartItemForSubscription();
         const subscriptionResult = await fetch('/.netlify/functions/complete-subscription', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             setupIntentId: setupIntent.id,
             userUuid: user ? user.uuid : null,
-            item: { stripePlanId: cartItem.stripePlanId }, // Assurez-vous que ceci correspond au format attendu par le backend
+            item: formattedItem,
           }),
         });
 
@@ -136,7 +138,7 @@ const CheckoutFormContent = () => {
           <div className="mb-6">
             <div className="flex justify-between text-lg mb-2">
               <span>{cartItem.name}</span>
-              <span>${(cartItem.price / 100).toFixed(2)}</span>
+              <span>${(totalCost / 100).toFixed(2)}</span>
             </div>
           </div>
         )}
