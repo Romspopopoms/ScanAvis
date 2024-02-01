@@ -46,8 +46,9 @@ exports.handler = async (event) => {
     });
     console.log('Subscription created successfully:', subscription.id);
 
-    // Get the service name from the subscription data
+    // Get the service name and amount from the subscription data
     const serviceName = subscription.items.data[0].price.product.name;
+    const amount = subscription.items.data[0].price.unit_amount / 100; // convert from cents to dollars
 
     const subscriptionStatus = subscription.status; // Get subscription status
 
@@ -55,16 +56,15 @@ exports.handler = async (event) => {
     const createdAt = new Date(subscription.created * 1000); // Convertir timestamp Unix en objet Date
     const nextPaymentDate = new Date(createdAt.setMonth(createdAt.getMonth() + 1)); // Ajouter 1 mois
 
-    const nextPaymentAmount = item.amount; // Utiliser le montant de l'item pour le prochain paiement
     const paymentMethodIdUsed = subscription.default_payment_method; // Get the payment method used
 
     const insertQuery = 'INSERT INTO Subscriptions (subscriptionId, priceId, items, status, user_uuid, nextPaymentDate, nextPaymentAmount, stripe_customer_id, paymentMethodId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
-    const result = await conn.execute(insertQuery, [subscription.id, item.priceId, serviceName, subscriptionStatus, userUuid, nextPaymentDate, nextPaymentAmount, stripeCustomerId, paymentMethodIdUsed]);
+    const result = await conn.execute(insertQuery, [subscription.id, item.priceId, serviceName, subscriptionStatus, userUuid, nextPaymentDate, amount, stripeCustomerId, paymentMethodIdUsed]);
     console.log('Subscription data:', result);
 
     const subscriptionDetails = {
       subscriptionId: subscription.id,
-      amount: nextPaymentAmount, // Assurez-vous que cette valeur est définie
+      amount, // Utiliser la valeur récupérée de Stripe
       serviceName, // Assurez-vous que cette valeur est obtenue correctement
       nextPaymentDate: nextPaymentDate.toISOString(), // Convertir en string pour l'envoi dans la réponse
     };

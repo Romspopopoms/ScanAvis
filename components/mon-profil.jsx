@@ -8,6 +8,8 @@ const MonProfil = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  const formatAmount = (amount) => new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(amount);
+
   // Déclaration de fetchSubscriptions avant son utilisation dans cancelSubscription
   const fetchSubscriptions = async () => {
     setLoading(true);
@@ -91,7 +93,7 @@ const MonProfil = () => {
                 <p><span className="font-bold">ID de souscription:</span> {subscription.subscriptionId}</p>
                 <p><span className="font-bold">Produit:</span> {subscription.items}</p>
                 <p><span className="font-bold">Statut:</span> {subscription.status}</p>
-                <p><span className="font-bold">Montant Prochain Paiement:</span> {subscription.nextPaymentAmount}</p>
+                <p><span className="font-bold">Montant Prochain Paiement:</span> {formatAmount(subscription.nextPaymentAmount)}</p>
                 <p><span className="font-bold">Date du Prochain Paiement:</span> {new Date(subscription.nextPaymentDate).toLocaleDateString()}</p>
                 {subscription.status === 'active' && (
                   <button type="button"
