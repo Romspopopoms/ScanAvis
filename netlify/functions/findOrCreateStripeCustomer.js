@@ -43,11 +43,21 @@ const findOrCreateStripeCustomer = async (userUuid, paymentMethodId) => {
     await conn.execute(updateSql, [stripeCustomerId, userUuid]);
     console.log('Client Stripe mis à jour:', stripeCustomerId);
   } else if (paymentMethodId) {
-    // Attachement de la méthode de paiement au client
-    await stripe.paymentMethods.attach(paymentMethodId, {
-      customer: stripeCustomerId,
-    });
-    console.log(`Méthode de paiement ${paymentMethodId} attachée au client Stripe ${stripeCustomerId}`);
+    try {
+      // Vérification si la méthode de paiement est déjà attachée au client
+      const paymentMethod = await stripe.paymentMethods.retrieve(paymentMethodId);
+      if (paymentMethod.customer !== stripeCustomerId) {
+        await stripe.paymentMethods.attach(paymentMethodId, {
+          customer: stripeCustomerId,
+        });
+        console.log(`Méthode de paiement ${paymentMethodId} attachée au client Stripe ${stripeCustomerId}`);
+      } else {
+        console.log(`Méthode de paiement ${paymentMethodId} est déjà attachée au client Stripe ${stripeCustomerId}`);
+      }
+    } catch (error) {
+      console.error(`Erreur lors de l'attachement de la méthode de paiement au client Stripe: ${error.message}`);
+      throw error;
+    }
   }
 
   return stripeCustomerId;

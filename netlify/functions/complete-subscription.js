@@ -3,10 +3,10 @@ const { conn } = require('../../utils/db');
 const findOrCreateStripeCustomer = require('./findOrCreateStripeCustomer');
 
 exports.handler = async (event) => {
-  console.log('Requête reçue:', event);
+  console.log('Request received:', event);
 
   if (event.httpMethod !== 'POST') {
-    console.error('Méthode HTTP non autorisée');
+    console.error('HTTP Method not allowed');
     return {
       statusCode: 405,
       headers: { 'Content-Type': 'application/json' },
@@ -32,8 +32,11 @@ exports.handler = async (event) => {
 
     const paymentMethodId = setupIntent.payment_method;
 
+    // Find or create Stripe customer and attach the payment method
+    const stripeCustomerId = await findOrCreateStripeCustomer(userUuid, paymentMethodId);
+
     const subscription = await stripe.subscriptions.create({
-      customer: await findOrCreateStripeCustomer(userUuid),
+      customer: stripeCustomerId,
       items: [{ price: item.priceId }],
       default_payment_method: paymentMethodId,
     });
