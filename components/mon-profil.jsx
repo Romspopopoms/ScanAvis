@@ -83,7 +83,6 @@ const MonProfil = () => {
           <div className="grid md:grid-cols-2 gap-4">
             {userSubscriptions.map((subscription, index) => (
               <div key={index} className="bg-white shadow-md rounded-lg p-4">
-                <p><span className="font-bold">ID de souscription:</span> {subscription.subscriptionId}</p>
                 <p><span className="font-bold">Produit:</span> {subscription.items}</p>
                 <p><span className="font-bold">Statut:</span> {subscription.status}</p>
                 <p><span className="font-bold">Montant Prochain Paiement:</span> {formatAmount(subscription.nextPaymentAmount)}</p>
