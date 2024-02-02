@@ -33,7 +33,6 @@ const PaymentStatusPage = () => {
             <h1 className="text-2xl font-bold text-green-600 mb-4">Merci pour votre achat !</h1>
             <p className="mb-4">Votre transaction a été réalisée avec succès.</p>
             <div className="text-left">
-              <p className="font-semibold">ID de souscription : <span className="font-normal">{paymentDetails.subscriptionId ?? 'Non disponible'}</span></p>
               <p className="font-semibold">Montant : <span className="font-normal">${paymentDetails.amount ? paymentDetails.amount.toFixed(2) : 'Non disponible'}</span></p>
               <p className="font-semibold">Nom du service : <span className="font-normal">{paymentDetails.serviceName ?? 'Non disponible'}</span></p>
             </div>
