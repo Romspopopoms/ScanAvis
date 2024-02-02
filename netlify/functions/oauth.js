@@ -37,7 +37,7 @@ exports.handler = async (event) => {
       console.log('Échange du code pour des tokens');
       const { tokens } = await oAuth2Client.getToken({
         code: decodeURIComponent(body.code),
-        redirect_uri: `${process.env.URL}/oauth`, // Assurez-vous que cette URL de redirection est correcte
+        redirect_uri: `${process.env.URLL}/oauth`, // Assurez-vous que cette URL de redirection est correcte
       });
       oAuth2Client.setCredentials(tokens);
       console.log('Tokens reçus:', tokens);
