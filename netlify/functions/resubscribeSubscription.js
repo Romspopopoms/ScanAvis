@@ -1,4 +1,4 @@
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const stripe = require('stripe')('sk_test_51OPtGvDWmnYPaxs1DJZliUMMDttrNP1a4usU0uBgZgjnfe4Ho3WuCzFivSpwXhqL0YgVl9c41lbsuHI1O4nHAUhz00ibE6rzPX');
 const { conn } = require('../../utils/db');
 
 exports.handler = async (event) => {
@@ -19,8 +19,8 @@ exports.handler = async (event) => {
 
   try {
     const lastSubscriptionQuery = 'SELECT * FROM Subscriptions WHERE user_uuid = ? AND status = ? ORDER BY createdAt DESC LIMIT 1';
-    const [lastSubscriptionResult] = await conn.execute(lastSubscriptionQuery, [userUuid, 'cancelled']);
-    const lastSubscription = lastSubscriptionResult[0];
+    const lastSubscriptionResult = await conn.execute(lastSubscriptionQuery, [userUuid, 'cancelled']);
+    const lastSubscription = lastSubscriptionResult.rows[0];
 
     if (!lastSubscription) {
       throw new Error('Aucun abonnement annulé précédent trouvé');
