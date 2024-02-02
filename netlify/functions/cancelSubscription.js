@@ -1,4 +1,3 @@
-// cancelSubscription.js (à placer dans votre dossier de fonctions côté serveur)
 const stripe = require('stripe')('sk_test_51OPtGvDWmnYPaxs1DJZliUMMDttrNP1a4usU0uBgZgjnfe4Ho3WuCzFivSpwXhqL0YgVl9c41lbsuHI1O4nHAUhz00ibE6rzPX');
 const { conn } = require('../../utils/db');
 
@@ -20,8 +19,8 @@ exports.handler = async (event) => {
   }
 
   try {
-    // Annuler l'abonnement sur Stripe
-    await stripe.subscriptions.del(subscriptionId);
+    // Annuler l'abonnement sur Stripe immédiatement
+    await stripe.subscriptions.cancel(subscriptionId);
 
     // Mettre à jour l'abonnement dans la base de données
     const query = 'UPDATE Subscriptions SET status = ? WHERE subscriptionId = ?';
