@@ -1,76 +1,73 @@
 const { OAuth2Client } = require('google-auth-library');
 const { v4: uuidv4 } = require('uuid');
-const { conn } = require('../../utils/db');
+const { conn } = require('../../utils/db'); // Assurez-vous que ce chemin est correct et que `conn` est bien configuré
 
-// Cette fonction va maintenant être exportée comme `handler` pour être utilisée par Netlify Functions
 exports.handler = async (event) => {
-  console.log('Début de verifyToken');
-
-  // Assurez-vous d'extraire l'idToken, userData et accessToken du corps de l'événement si nécessaire
-  // Ici, je suppose que ces données sont envoyées dans le corps de la requête
-  const { idToken, userData, accessToken } = JSON.parse(event.body);
-
-  const client = new OAuth2Client(process.env.CLIENT_ID);
-  let payload;
+  console.log('Début de la fonction verifyToken.');
 
   try {
+    // Vérification de la méthode HTTP
+    if (event.httpMethod !== 'POST') {
+      console.error('Méthode HTTP non autorisée:', event.httpMethod);
+      return { statusCode: 405, body: JSON.stringify({ error: 'Method Not Allowed' }) };
+    }
+
+    // Parsing du corps de la requête
+    const { idToken, userData, accessToken } = JSON.parse(event.body);
+    console.log('idToken:', idToken, 'userData:', userData, 'accessToken:', accessToken);
+
+    if (!idToken && (!userData || !accessToken)) {
+      console.error('Données nécessaires non fournies dans le corps de la requête.');
+      return { statusCode: 400, body: JSON.stringify({ error: 'No ID token or user data with access token provided' }) };
+    }
+
+    const client = new OAuth2Client(process.env.CLIENT_ID);
+    let payload;
+
     if (idToken) {
-      console.log('Vérification du ID token');
+      console.log('Vérification de l\'ID token.');
       const ticket = await client.verifyIdToken({ idToken, audience: process.env.CLIENT_ID });
       payload = ticket.getPayload();
-    } else if (userData && typeof userData === 'object' && accessToken) {
-      console.log('Utilisation des données utilisateur et de l\'access token fournis');
-      payload = { ...userData, access_token: accessToken };
+      console.log('ID Token vérifié avec succès:', payload);
     } else {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: 'No ID token or user data provided' }),
-      };
+      console.log('Traitement des données utilisateur fournies avec access token.');
+      payload = { ...userData, access_token: accessToken };
     }
 
-    console.log('Payload:', payload);
-
-    const cleanedPayload = JSON.parse(JSON.stringify(payload));
-    const { email } = cleanedPayload;
+    // Logique de gestion des utilisateurs (extraction, insertion, mise à jour)
+    const { email } = payload;
     const sqlQuery = 'SELECT uuid FROM users WHERE email = ?';
-
-    console.log('Executing SQL Query:', sqlQuery);
-    console.log('With Parameters:', email);
+    console.log('Exécution de la requête SQL pour rechercher l\'utilisateur:', sqlQuery, 'avec email:', email);
 
     const result = await conn.execute(sqlQuery, [email]);
-    console.log('Result from conn.execute:', result);
     const { rows } = result;
-    console.log('Query results:', rows);
+    console.log('Résultat de la requête SQL:', rows);
 
     if (rows.length === 0) {
-      console.log('Aucun utilisateur trouvé, création d\'un nouveau utilisateur');
+      console.log('Aucun utilisateur correspondant trouvé, création d\'un nouveau.');
       const newUuid = uuidv4();
       const insertSql = 'INSERT INTO users (uuid, email, name, access_token) VALUES (?, ?, ?, ?)';
-      const insertParams = [newUuid, cleanedPayload.email, cleanedPayload.name, cleanedPayload.access_token];
-      console.log('Executing SQL Query:', insertSql);
-      console.log('With Parameters:', insertParams);
+      const insertParams = [newUuid, email, payload.name, accessToken];
+      console.log('Exécution de la requête SQL pour insérer un nouvel utilisateur:', insertSql, 'avec paramètres:', insertParams);
+
       await conn.execute(insertSql, insertParams);
-      console.log('New user created:', newUuid);
-      cleanedPayload.uuid = newUuid;
+      console.log('Nouvel utilisateur créé avec UUID:', newUuid);
+      payload.uuid = newUuid;
     } else {
-      console.log('Existing user found:', rows[0].uuid);
-      cleanedPayload.uuid = rows[0].uuid;
+      console.log('Utilisateur existant trouvé avec UUID:', rows[0].uuid);
+      payload.uuid = rows[0].uuid;
     }
 
-    const responseBody = {
-      user: cleanedPayload,
-    };
-
-    console.log('Response Body:', JSON.stringify(responseBody, null, 2));
+    console.log('Préparation de la réponse avec les données de l\'utilisateur:', payload);
     return {
       statusCode: 200,
-      body: JSON.stringify(responseBody),
+      body: JSON.stringify({ user: payload }),
     };
   } catch (error) {
-    console.error('Erreur lors de la vérification du token:', error);
+    console.error('Erreur lors de la fonction verifyToken:', error);
     return {
-      statusCode: 401,
-      body: JSON.stringify({ error: 'Token verification failed', details: error.message }),
+      statusCode: 500,
+      body: JSON.stringify({ error: 'Internal Server Error', details: error.message }),
     };
   }
 };
