@@ -36,9 +36,8 @@ export const AuthProvider = ({ children }) => {
       const data = await response.json();
       if (response.ok) {
         setIsAuthenticated(true);
-        // Assurez-vous que l'`uuid` est également inclus dans la réponse de votre backend
         setUser({
-          uuid: data.user.uuid, // Incluez l'`uuid` ici
+          uuid: data.user.uuid,
           email: data.user.email,
           name: data.user.name,
           access_token: data.user.access_token,
@@ -67,12 +66,35 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const refreshAccessToken = async (refreshToken) => {
+    try {
+      const response = await fetch('/.netlify/functions/refresh-token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refreshToken }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        const { accessToken } = data;
+        localStorage.setItem('authToken', accessToken);
+        setUser((currentUser) => ({ ...currentUser, access_token: accessToken }));
+        setIsAuthenticated(true);
+      } else {
+        logout();
+        handleError(data.error || 'Erreur lors du rafraîchissement du token.');
+      }
+    } catch (error) {
+      logout();
+      handleError(`Erreur lors du rafraîchissement du token: ${error.message}`);
+    }
+  };
+
   const verifyTokenWithServer = async (token) => {
     try {
       const response = await fetch('/.netlify/functions/verifyToken', {
-        method: 'POST', // Assurez-vous que c'est POST
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ idToken: token }), // Assurez-vous d'envoyer le token sous la bonne clé attendue par votre fonction serveur
+        body: JSON.stringify({ idToken: token }),
       });
       const data = await response.json();
       if (response.ok && data.user) {
@@ -105,10 +127,11 @@ export const AuthProvider = ({ children }) => {
     <AuthContext.Provider value={{
       isAuthenticated,
       user,
-      getAuthUrl, // Ajoutez ceci
+      getAuthUrl,
       handleAuthCode,
       logout,
       verifyTokenWithServer,
+      refreshAccessToken,
       errorMessage,
     }}
     >
