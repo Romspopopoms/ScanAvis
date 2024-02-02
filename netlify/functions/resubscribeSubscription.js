@@ -37,7 +37,7 @@ exports.handler = async (event) => {
     }
 
     // Find Stripe customer associated with the user
-    const customerQuery = 'SELECT stripe_customer_id FROM Users WHERE uuid = ?';
+    const customerQuery = 'SELECT stripe_customer_id FROM users WHERE uuid = ?';
     console.log('Executing customerQuery:', customerQuery);
     const customerResult = await conn.execute(customerQuery, [userUuid]);
     const stripeCustomerId = customerResult.rows[0].stripe_customer_id;
