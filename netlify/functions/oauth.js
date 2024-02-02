@@ -1,6 +1,7 @@
+// Importation des modules en haut du fichier
 const { OAuth2Client } = require('google-auth-library');
 const fetch = require('node-fetch');
-const verifyToken = require('./verifyToken'); // Assurez-vous que le chemin d'accès est correct
+const verifyTokenHandler = require('./verifyToken').handler; // Assurez-vous que ce chemin est correct
 
 async function getUserData(accessToken) {
   console.log('Getting user data with access token:', accessToken);
@@ -30,7 +31,6 @@ exports.handler = async (event) => {
       return { statusCode: 400, body: JSON.stringify({ error: 'Code or ID Token is required' }) };
     }
 
-    let verificationResult;
     if (body.code) {
       console.log('Exchanging code for tokens');
       const { tokens } = await oAuth2Client.getToken({
@@ -40,14 +40,24 @@ exports.handler = async (event) => {
       oAuth2Client.setCredentials(tokens);
       console.log('Tokens received:', tokens);
 
-      const userData = await getUserData(tokens.access_token);
-      verificationResult = await verifyToken(null, userData, tokens.access_token);
-    } else if (body.idToken) {
-      console.log('Processing ID token');
-      verificationResult = await verifyToken(body.idToken);
-    }
+      // Simule l'objet événement pour verifyToken
+      const fakeEvent = {
+        body: JSON.stringify({ userData: await getUserData(tokens.access_token), accessToken: tokens.access_token }),
+        httpMethod: 'POST',
+      };
 
-    console.log('Verification result:', verificationResult);
+      // Appelle verifyToken comme si c'était une fonction Netlify
+      const verificationResult = await verifyTokenHandler(fakeEvent);
+      return verificationResult;
+    }
+    // Simule l'objet événement pour verifyToken
+    const fakeEvent = {
+      body: JSON.stringify({ idToken: body.idToken }),
+      httpMethod: 'POST',
+    };
+
+    // Appelle verifyToken comme si c'était une fonction Netlify
+    const verificationResult = await verifyTokenHandler(fakeEvent);
     return verificationResult;
   } catch (err) {
     console.error('Error during authentication:', err);
@@ -57,3 +67,4 @@ exports.handler = async (event) => {
     };
   }
 };
+

@@ -2,8 +2,13 @@ const { OAuth2Client } = require('google-auth-library');
 const { v4: uuidv4 } = require('uuid');
 const { conn } = require('../../utils/db');
 
-async function verifyToken(idToken, userData = null, accessToken = null) {
+// Cette fonction va maintenant être exportée comme `handler` pour être utilisée par Netlify Functions
+exports.handler = async (event) => {
   console.log('Début de verifyToken');
+
+  // Assurez-vous d'extraire l'idToken, userData et accessToken du corps de l'événement si nécessaire
+  // Ici, je suppose que ces données sont envoyées dans le corps de la requête
+  const { idToken, userData, accessToken } = JSON.parse(event.body);
 
   const client = new OAuth2Client(process.env.CLIENT_ID);
   let payload;
@@ -17,7 +22,10 @@ async function verifyToken(idToken, userData = null, accessToken = null) {
       console.log('Utilisation des données utilisateur et de l\'access token fournis');
       payload = { ...userData, access_token: accessToken };
     } else {
-      throw new Error('No ID token or user data provided');
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: 'No ID token or user data provided' }),
+      };
     }
 
     console.log('Payload:', payload);
@@ -31,7 +39,7 @@ async function verifyToken(idToken, userData = null, accessToken = null) {
 
     const result = await conn.execute(sqlQuery, [email]);
     console.log('Result from conn.execute:', result);
-    const { rows } = result; // Assurez-vous que c'est la structure correcte pour les résultats de votre base de données
+    const { rows } = result;
     console.log('Query results:', rows);
 
     if (rows.length === 0) {
@@ -65,6 +73,4 @@ async function verifyToken(idToken, userData = null, accessToken = null) {
       body: JSON.stringify({ error: 'Token verification failed', details: error.message }),
     };
   }
-}
-
-module.exports = verifyToken;
+};

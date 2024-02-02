@@ -99,7 +99,12 @@ export const AuthProvider = ({ children }) => {
       const data = await response.json();
       if (response.ok && data.user) {
         setIsAuthenticated(true);
-        setUser({ email: data.user.email, name: data.user.name, access_token: data.user.access_token });
+        setUser({
+          email: data.user.email,
+          name: data.user.name,
+          access_token: data.user.access_token,
+          uuid: data.user.uuid, // Assurez-vous d'inclure tous les champs pertinents renvoyés par la fonction serverless
+        });
         localStorage.setItem('authToken', data.user.access_token);
       } else {
         logout();
