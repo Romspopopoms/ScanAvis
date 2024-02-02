@@ -40,10 +40,19 @@ exports.handler = async (event) => {
     });
 
     // Ajouter l'abonnement dans la base de données
-    const insertQuery = 'INSERT INTO Subscriptions (subscriptionId, user_uuid, priceId, status, nextPaymentDate, nextPaymentAmount) VALUES (?, ?, ?, ?, ?, ?)';
+    const insertQuery = 'INSERT INTO Subscriptions (subscriptionId, user_uuid, priceId, status, nextPaymentDate, nextPaymentAmount, stripe_customer_id, paymentMethodId) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
     const nextPaymentDate = new Date(subscription.current_period_end * 1000); // Utiliser la date de fin de la période actuelle de l'abonnement
     const amount = subscription.items.data[0].price.unit_amount / 100; // convertir de centimes en euros
-    await conn.execute(insertQuery, [subscription.id, userUuid, lastSubscription.priceId, 'active', nextPaymentDate, amount]);
+    await conn.execute(insertQuery, [
+      subscription.id,
+      userUuid,
+      lastSubscription.priceId,
+      'active',
+      nextPaymentDate,
+      amount,
+      lastSubscription.stripe_customer_id,
+      lastSubscription.paymentMethodId,
+    ]);
 
     return {
       statusCode: 200,
