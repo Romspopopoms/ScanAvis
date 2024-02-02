@@ -10,7 +10,6 @@ exports.handler = async (event) => {
   }
 
   const { userUuid } = JSON.parse(event.body);
-
   if (!userUuid) {
     return {
       statusCode: 400,
@@ -23,7 +22,6 @@ exports.handler = async (event) => {
     const lastSubscriptionQuery = 'SELECT * FROM Subscriptions WHERE user_uuid = ? AND status = ? ORDER BY nextPaymentDate DESC LIMIT 1';
     const lastSubscriptionResult = await conn.execute(lastSubscriptionQuery, [userUuid, 'cancelled']);
     const lastSubscription = lastSubscriptionResult.rows[0];
-
     if (!lastSubscription) {
       throw new Error('Aucun abonnement annulé précédent trouvé');
     }
