@@ -10,7 +10,6 @@ const MonProfil = () => {
 
   const formatAmount = (amount) => new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(amount);
 
-  // Déclaration de fetchSubscriptions avant son utilisation dans cancelSubscription
   const fetchSubscriptions = async () => {
     setLoading(true);
     setError('');
@@ -22,7 +21,7 @@ const MonProfil = () => {
       });
 
       if (response.status === 404) {
-        setUserSubscriptions([]); // Aucune souscription trouvée
+        setUserSubscriptions([]);
       } else if (!response.ok) {
         throw new Error(`Erreur HTTP ! Statut : ${response.status}`);
       } else {
@@ -43,9 +42,9 @@ const MonProfil = () => {
     }
   }, [user]);
 
-  const cancelSubscription = async (subscriptionId) => {
+  const handleSubscriptionAction = async (subscriptionId, action) => {
     try {
-      const response = await fetch('/.netlify/functions/cancelSubscription', {
+      const response = await fetch(`/.netlify/functions/${action}Subscription`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ subscriptionId }),
@@ -57,9 +56,9 @@ const MonProfil = () => {
 
       // Rafraîchir la liste des abonnements pour mettre à jour l'UI
       fetchSubscriptions();
-    } catch (cancelError) { // Renommez 'error' en 'cancelError' pour éviter l'ombre
-      console.error('Erreur lors de l’annulation de l’abonnement:', cancelError);
-      setError(`Erreur lors de l’annulation de l’abonnement: ${cancelError.message}`);
+    } catch (actionError) { // Renommez 'error' en 'actionError' pour éviter l'ombre
+      console.error('Erreur lors de l\'action sur l\'abonnement:', actionError);
+      setError(`Erreur lors de l'action sur l'abonnement: ${actionError.message}`);
     }
   };
 
@@ -68,12 +67,7 @@ const MonProfil = () => {
   }
 
   if (error) {
-    return (
-      <div className="container mx-auto pt-16 p-4">
-        <h1 className="text-2xl font-bold mb-4">Mon Profil</h1>
-        <p className="text-red-500">{error}</p>
-      </div>
-    );
+    return <div className="container mx-auto pt-16 p-4"><h1 className="text-2xl font-bold mb-4">Mon Profil</h1><p className="text-red-500">{error}</p></div>;
   }
 
   return (
@@ -83,7 +77,6 @@ const MonProfil = () => {
         <p><span className="font-bold">Nom:</span> {user.name}</p>
         <p><span className="font-bold">Email:</span> {user.email}</p>
       </div>
-
       {userSubscriptions.length > 0 ? (
         <div>
           <h2 className="text-xl font-bold mb-4">Abonnements</h2>
@@ -95,12 +88,21 @@ const MonProfil = () => {
                 <p><span className="font-bold">Statut:</span> {subscription.status}</p>
                 <p><span className="font-bold">Montant Prochain Paiement:</span> {formatAmount(subscription.nextPaymentAmount)}</p>
                 <p><span className="font-bold">Date du Prochain Paiement:</span> {new Date(subscription.nextPaymentDate).toLocaleDateString()}</p>
-                {subscription.status === 'active' && (
-                  <button type="button"
-                    onClick={() => cancelSubscription(subscription.subscriptionId)}
+                {subscription.status === 'active' ? (
+                  <button
+                    type="button"
+                    onClick={() => handleSubscriptionAction(subscription.subscriptionId, 'cancel')}
                     className="bg-red-500 text-white px-4 py-2 rounded mt-4 hover:bg-red-700"
                   >
                     Se désabonner
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => handleSubscriptionAction(subscription.subscriptionId, 'resubscribe')}
+                    className="bg-green-500 text-white px-4 py-2 rounded mt-4 hover:bg-green-700"
+                  >
+                    Se réabonner
                   </button>
                 )}
               </div>
