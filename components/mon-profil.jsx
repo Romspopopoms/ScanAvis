@@ -42,12 +42,13 @@ const MonProfil = () => {
     }
   }, [user]);
 
-  const handleSubscriptionAction = async (subscriptionId, action) => {
+  const handleSubscriptionAction = async (subscription, action) => {
     try {
+      const payload = action === 'resubscribe' ? { userUuid: user.uuid } : { subscriptionId: subscription.subscriptionId };
       const response = await fetch(`/.netlify/functions/${action}Subscription`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ subscriptionId }),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
@@ -56,7 +57,7 @@ const MonProfil = () => {
 
       // Rafraîchir la liste des abonnements pour mettre à jour l'UI
       fetchSubscriptions();
-    } catch (actionError) { // Renommez 'error' en 'actionError' pour éviter l'ombre
+    } catch (actionError) {
       console.error('Erreur lors de l\'action sur l\'abonnement:', actionError);
       setError(`Erreur lors de l'action sur l'abonnement: ${actionError.message}`);
     }
