@@ -64,21 +64,19 @@ async function uploadFile(file, octokit) {
     throw new Error(`Failed to upload file ${file.filename}`);
   }
 }
-async function getUserUuid(username) {
-  // Cette fonction récupère l'UUID de l'utilisateur basé sur son nom d'utilisateur
+async function getUserUuid(userEmail) {
   try {
-    const query = 'SELECT uuid FROM users WHERE username = ?';
-    const result = await conn.execute(query, [username]);
+    const query = 'SELECT uuid FROM users WHERE email = ?';
+    const result = await conn.execute(query, [userEmail]);
     const [user] = result.rows;
     return user?.uuid;
   } catch (error) {
-    console.error(`Erreur lors de la récupération de l'UUID pour l'utilisateur ${username}:`, error);
+    console.error(`Erreur lors de la récupération de l'UUID pour l'utilisateur avec email ${userEmail}:`, error);
     throw error;
   }
 }
 
 async function getSubscriptionId(userUuid) {
-  // Cette fonction récupère l'ID de la souscription basé sur l'UUID de l'utilisateur
   try {
     const query = 'SELECT subscriptionId FROM Subscriptions WHERE user_uuid = ?';
     const result = await conn.execute(query, [userUuid]);
