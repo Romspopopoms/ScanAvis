@@ -1,5 +1,8 @@
-const formidable = require('formidable-serverless');
+const Busboy = require('busboy');
 const simpleGit = require('simple-git')();
+const path = require('path');
+const os = require('os');
+const fs = require('fs');
 
 exports.handler = async (event) => {
   console.log('Handler started'); // Log au début de la fonction
@@ -8,45 +11,86 @@ exports.handler = async (event) => {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
 
-  return new Promise((resolve) => {
-    const form = new formidable.IncomingForm();
+  return new Promise((outerResolve, outerReject) => {
+    const busboy = new Busboy({ headers: event.headers });
+    const tmpdir = os.tmpdir();
+    const fields = {};
+    const files = [];
+    const fileWrites = [];
 
-    form.parse(event, async (err, fields, files) => {
-      if (err) {
-        console.error('Error parsing form:', err);
-        return resolve({ statusCode: 500, body: 'Server Error' });
-      }
+    // Gérer les fichiers uploadés
+    busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {
+      console.log(`File [${fieldname}]: filename: %j`, filename);
+      const filepath = path.join(tmpdir, filename);
+      const writeStream = fs.createWriteStream(filepath);
+      file.pipe(writeStream);
+
+      // File has been written to os.tmpdir()
+      const fileWrite = new Promise((fileResolve, fileReject) => {
+        file.on('end', () => writeStream.end());
+        writeStream.on('finish', () => fileResolve(filepath));
+        writeStream.on('error', fileReject);
+      });
+
+      files.push({ fieldname, filename, filepath, mimetype });
+      fileWrites.push(fileWrite);
+    });
+
+    // Gérer les champs non-fichier
+    busboy.on('field', (fieldname, value) => {
+      console.log(`Field [${fieldname}]: value: %j`, value);
+      fields[fieldname] = value;
+    });
+
+    // Fin du parsing
+    busboy.on('finish', async () => {
+      console.log('Done parsing form!');
+      await Promise.all(fileWrites);
 
       try {
         const git = simpleGit();
-        console.log('Git config - setting user name and email'); // Log avant de configurer git
+        console.log('Git config - setting user name and email');
         await git.addConfig('user.name', 'Romspopopoms');
         await git.addConfig('user.email', 'roman.2009.fr');
 
-        console.log('Git add - adding files to staging'); // Log avant d'ajouter des fichiers
+        console.log('Git add - adding files to staging');
         await git.add('.'); // Ajoute tous les fichiers modifiés
 
-        console.log('Git commit - committing changes'); // Log avant de commiter
+        console.log('Git commit - committing changes');
         await git.commit('Votre message de commit');
 
-        console.log('Git push - pushing to repository'); // Log avant de push
+        // Ajoutez et commitez chaque fichier image
+        const commitPromises = files.map(async (file) => {
+          console.log('Adding and committing image:', file.filepath);
+          await git.add(file.filepath);
+          await git.commit(`Add new image via serverless function: ${file.filename}`);
+        });
+
+        await Promise.all(commitPromises);
+
+        console.log('Git push - pushing to repository');
         await git.push(['-u', 'origin', 'main', '--force'], {
           GIT_SSH_COMMAND: 'ssh -o StrictHostKeyChecking=no',
           GITHUB_TOKEN: process.env.GITHUB_ACCESS,
         });
 
-        // Assurez-vous que le chemin et le nom du fichier sont corrects
-        console.log('Adding and committing image:', files.image.path); // Log avant d'ajouter l'image
-        await git.add(files.image.path);
-        await git.commit('Add new image via serverless function');
-        await git.push();
-
-        console.log('Image uploaded successfully'); // Log après le succès
-        resolve({ statusCode: 200, body: 'Image uploaded successfully' });
+        console.log('Image uploaded successfully');
+        outerResolve({ statusCode: 200, body: 'Image uploaded successfully' });
       } catch (gitError) {
         console.error('Git operation failed:', gitError);
-        resolve({ statusCode: 500, body: 'Git operation failed' });
+        // Créer un nouvel objet Error pour le rejet de la promesse
+        const error = new Error('Git operation failed');
+        error.statusCode = 500;
+        error.body = 'Git operation failed';
+        outerReject(error);
       }
     });
+
+    // Netlify Functions utilise event.body pour les données POST
+    if (event.isBase64Encoded) {
+      busboy.end(Buffer.from(event.body, 'base64'));
+    } else {
+      busboy.end(event.body);
+    }
   });
 };
