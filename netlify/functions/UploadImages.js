@@ -4,7 +4,6 @@ const path = require('path');
 const os = require('os');
 const fs = require('fs');
 
-// Fonction pour récupérer le SHA actuel d'un fichier dans le dépôt
 async function getCurrentSha(octokit, filePathInRepo) {
   try {
     const response = await octokit.repos.getContent({
@@ -26,31 +25,31 @@ async function uploadFile(file, octokit) {
   const contentEncoded = contentBuffer.toString('base64');
   const filePathInRepo = `uploaded_images/${file.filename}`;
 
-  // Tentative de téléchargement avec gestion des conflits de SHA
   async function attemptUpload(sha) {
+    const params = {
+      owner: 'Romspopopoms',
+      repo: 'ScanAvis',
+      path: filePathInRepo,
+      message: `Add new image via serverless function: ${file.filename}`,
+      content: contentEncoded,
+    };
+
+    // Ajouter le SHA uniquement s'il est défini
+    if (sha) {
+      params.sha = sha;
+    }
+
     try {
-      const params = {
-        owner: 'Romspopopoms',
-        repo: 'ScanAvis',
-        path: filePathInRepo,
-        message: `Add new image via serverless function: ${file.filename}`,
-        content: contentEncoded,
-        sha,
-      };
       await octokit.repos.createOrUpdateFileContents(params);
       console.log(`File ${file.filename} created or updated successfully.`);
     } catch (error) {
-      if (error.status === 409 && !sha) {
-        console.log(`SHA conflict for ${file.filename}, attempting to fetch current SHA and retry.`);
-        const currentSha = await getCurrentSha(octokit, filePathInRepo);
-        return attemptUpload(currentSha);
-      }
       console.error('File upload failed:', error);
       throw new Error(`File upload failed: ${file.filename}`);
     }
   }
 
-  return attemptUpload(); // Start the upload process, initially without a SHA
+  const currentSha = await getCurrentSha(octokit, filePathInRepo);
+  return attemptUpload(currentSha); // Passer le SHA récupéré (peut être undefined, ce qui est acceptable pour un nouveau fichier)
 }
 
 exports.handler = async (event) => {
