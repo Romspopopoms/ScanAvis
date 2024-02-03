@@ -30,7 +30,9 @@ const MonProfilPage = () => {
 
   return (
     <div className="bg-gradient-to-b from-purple-800 to-purple-500">
-      <div className="mt-20 bg-purple-800 shadow-md">
+      {/* Ajustez la marge supérieure ici pour qu'elle corresponde à la hauteur de votre navbar */}
+      {/* Par exemple, si votre navbar fait 5rem de haut, essayez mt-24 pour ajouter un peu plus d'espace */}
+      <div className="mt-24 bg-purple-800 shadow-md">
         <div className="flex justify-center space-x-4 p-4">
           {menuItems.map((item) => (
             <motion.div
