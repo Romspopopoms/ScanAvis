@@ -1,14 +1,20 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { AuthContext } from '../context/AuthContext';
 
 const PageForm = () => {
-  const { isAuthenticated } = useContext(AuthContext);
+  const {
+    isAuthenticated,
+    user,
+    errorMessage,
+    handleError, // Assurez-vous que cette fonction est exposée via AuthContext pour gérer les erreurs
+  } = useContext(AuthContext);
+
   const [titre, setTitre] = useState('');
   const [imageDeFond, setImageDeFond] = useState(null);
   const [logo, setLogo] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState(errorMessage);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -24,27 +30,21 @@ const PageForm = () => {
     formData.append('titre', titre);
     if (imageDeFond) formData.append('imageDeFond', imageDeFond);
     if (logo) formData.append('logo', logo);
+    formData.append('userUuid', user.uuid); // Ajouter l'UUID de l'utilisateur pour l'associer à la page créée
 
     try {
-      const response = await fetch('https://scanavis.netlify.app/.netlify/functions/UploadImages', {
+      const response = await fetch('/.netlify/functions/uploadImages', { // Assurez-vous que l'URL est correcte
         method: 'POST',
         body: formData,
       });
 
+      const result = await response.json(); // Supposer que la réponse est toujours du JSON
+
       if (!response.ok) {
-        throw new Error(`Erreur lors de l'envoi du formulaire: ${response.statusText}`);
+        throw new Error(`Erreur lors de l'envoi du formulaire: ${result.message || response.statusText}`);
       }
 
-      // Vérifier si la réponse est du JSON
-      const contentType = response.headers.get('content-type');
-      if (contentType && contentType.indexOf('application/json') !== -1) {
-        const responseBody = await response.json();
-        setMessage(responseBody.message || 'Formulaire envoyé avec succès.');
-      } else {
-        // Gérer les cas où la réponse n'est pas du JSON
-        const responseText = await response.text();
-        setMessage(responseText || 'Formulaire envoyé avec succès.');
-      }
+      setMessage(result.message || 'Formulaire envoyé avec succès.');
 
       // Réinitialiser le formulaire
       setTitre('');
@@ -52,11 +52,18 @@ const PageForm = () => {
       setLogo(null);
     } catch (error) {
       console.error('Erreur lors de l\'envoi du formulaire:', error);
-      setMessage(error.message);
+      handleError(error.message); // Utiliser la fonction handleError du contexte
     } finally {
       setLoading(false);
     }
   };
+
+  // Écouter les changements du message d'erreur dans le contexte
+  useEffect(() => {
+    if (errorMessage) {
+      setMessage(errorMessage);
+    }
+  }, [errorMessage]);
 
   return (
     <motion.div

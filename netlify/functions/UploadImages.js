@@ -3,12 +3,18 @@ const { Octokit } = require('@octokit/rest');
 const path = require('path');
 const os = require('os');
 const fs = require('fs');
+const { v4: uuidv4 } = require('uuid'); // Pour générer des ID uniques
+const { conn } = require('../../utils/db'); // Assurez-vous que ce chemin correspond à votre structure de projet
+
+const GITHUB_OWNER = 'Romspopopoms';
+const GITHUB_REPO = 'ScanAvis';
+const UPLOAD_PATH = 'uploaded_images';
 
 async function getCurrentSha(octokit, filePathInRepo) {
   try {
     const response = await octokit.repos.getContent({
-      owner: 'Romspopopoms',
-      repo: 'ScanAvis',
+      owner: GITHUB_OWNER,
+      repo: GITHUB_REPO,
       path: filePathInRepo,
     });
     return response.data.sha;
@@ -24,35 +30,21 @@ async function getCurrentSha(octokit, filePathInRepo) {
 async function uploadFile(file, octokit) {
   const contentBuffer = fs.readFileSync(file.filepath);
   const contentEncoded = contentBuffer.toString('base64');
-  const filePathInRepo = `uploaded_images/${file.filename}`;
+  const filePathInRepo = `${UPLOAD_PATH}/${file.filename}`;
 
-  async function attemptUpload(sha) {
-    const params = {
-      owner: 'Romspopopoms',
-      repo: 'ScanAvis',
-      path: filePathInRepo,
-      message: `Add/update image via serverless function: ${file.filename}`,
-      content: contentEncoded,
-      ...(sha && { sha }),
-    };
+  const sha = await getCurrentSha(octokit, filePathInRepo);
+  const params = {
+    owner: GITHUB_OWNER,
+    repo: GITHUB_REPO,
+    path: filePathInRepo,
+    message: `Add/update image via serverless function: ${file.filename}`,
+    content: contentEncoded,
+    ...(sha && { sha }),
+  };
 
-    try {
-      await octokit.repos.createOrUpdateFileContents(params);
-      console.log(`File ${file.filename} uploaded successfully.`);
-    } catch (error) {
-      if (error.status === 409) {
-        console.log(`SHA conflict for ${file.filename}, fetching current SHA and retrying.`);
-        const currentSha = await getCurrentSha(octokit, filePathInRepo);
-        await attemptUpload(currentSha);
-      } else {
-        console.error(`File upload failed for ${file.filename}:`, error);
-        throw new Error(`File upload failed for ${file.filename}`);
-      }
-    }
-  }
-
-  const initialSha = await getCurrentSha(octokit, filePathInRepo);
-  await attemptUpload(initialSha);
+  await octokit.repos.createOrUpdateFileContents(params);
+  console.log(`File ${file.filename} uploaded successfully.`);
+  return `https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/blob/main/${filePathInRepo}?raw=true`;
 }
 
 exports.handler = async (event) => {
@@ -69,8 +61,7 @@ exports.handler = async (event) => {
     const tmpdir = os.tmpdir();
     const fileWrites = [];
 
-    busboy.on('file', (fieldname, file, filename, mimetype) => {
-      console.log(`File [${fieldname}]: filename: ${filename}`);
+    busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {
       const filepath = path.join(tmpdir, filename);
       const writeStream = fs.createWriteStream(filepath);
       file.pipe(writeStream);
@@ -78,22 +69,32 @@ exports.handler = async (event) => {
       const fileWrite = new Promise((innerResolve, innerReject) => {
         file.on('end', () => writeStream.end());
         writeStream.on('finish', () => innerResolve({ fieldname, filename, filepath, mimetype }));
-        writeStream.on('error', innerReject);
+        writeStream.on('error', (error) => innerReject(new Error(error)));
       });
 
       fileWrites.push(fileWrite);
     });
 
     busboy.on('finish', async () => {
-      console.log('Done parsing form!');
       try {
         const writtenFiles = await Promise.all(fileWrites);
-        await Promise.all(writtenFiles.map((file) => uploadFile(file, octokit)));
-        console.log('All files uploaded successfully');
-        outerResolve({ statusCode: 200, body: 'All files uploaded successfully' });
+        const uploadedFiles = await Promise.all(writtenFiles.map((file) => uploadFile(file, octokit)));
+        const pageId = uuidv4(); // Générer un ID unique pour la page
+
+        // Insérer les détails de la page dans la base de données
+        const insertQuery = 'INSERT INTO UserPages (pageId, titre, imageDeFondURL, logoURL, user_uuid) VALUES (?, ?, ?, ?, ?)';
+        uploadedFiles.forEach(async (url, index) => {
+          const { fieldname } = writtenFiles[index];
+          const values = [pageId, 'Titre de la page', null, null, 'userUuid']; // Remplacez "userUuid" par la valeur réelle de l'UUID de l'utilisateur
+          if (fieldname === 'imageDeFond') values[2] = url;
+          if (fieldname === 'logo') values[3] = url;
+          await conn.execute(insertQuery, values);
+        });
+
+        outerResolve({ statusCode: 200, body: JSON.stringify({ message: 'All files uploaded successfully', pageId }) });
       } catch (error) {
         console.error('Operation failed:', error);
-        outerReject(new Error('Operation failed'));
+        outerReject(new Error(`Operation failed: ${error.message}`));
       }
     });
 
@@ -104,3 +105,4 @@ exports.handler = async (event) => {
     }
   });
 };
+
