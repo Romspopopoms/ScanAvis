@@ -29,22 +29,23 @@ const MonProfilPage = () => {
   };
 
   return (
-    <div className="bg-gradient-to-b from-purple-800 to-purple-500 pt-40 lg:pt-48"> {/* Ajustez le padding ici selon la hauteur de votre navbar */}
-      {/* Le contenu de votre page commence ici, ajusté pour ne pas être masqué par la navbar */}
-      <div className="bg-purple-800 shadow-md">
-        <div className="flex justify-center space-x-4 p-4">
-          {menuItems.map((item) => (
-            <motion.div
-              key={item.key}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              className={`cursor-pointer px-4 py-2 rounded-lg text-white shadow-lg 
+    <div className="bg-gradient-to-b from-purple-800 to-purple-500">
+      <div className="pt-16 lg:pt-24">
+        <div className="bg-purple-800 shadow-md">
+          <div className="flex justify-center space-x-4 p-4">
+            {menuItems.map((item) => (
+              <motion.div
+                key={item.key}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                className={`cursor-pointer px-4 py-2 rounded-lg text-white shadow-lg 
                           ${activeSection === item.key ? 'bg-purple-600' : 'bg-purple-700 hover:bg-purple-600'}`}
-              onClick={() => setActiveSection(item.key)}
-            >
-              {item.name}
-            </motion.div>
-          ))}
+                onClick={() => setActiveSection(item.key)}
+              >
+                {item.name}
+              </motion.div>
+            ))}
+          </div>
         </div>
       </div>
 
