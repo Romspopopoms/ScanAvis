@@ -6,7 +6,7 @@ const PageForm = () => {
   const {
     isAuthenticated,
     user,
-    handleError, // Assurez-vous que cette fonction est bien définie et passée dans AuthContext
+    handleError,
   } = useContext(AuthContext);
 
   const [titre, setTitre] = useState('');
@@ -37,7 +37,7 @@ const PageForm = () => {
     formData.append('userUuid', user.uuid); // Inclure l'UUID de l'utilisateur pour l'associer à la page
 
     try {
-      const response = await fetch('/.netlify/functions/uploadImages', {
+      const response = await fetch('/.netlify/functions/UploadImages', {
         method: 'POST',
         body: formData,
       });
@@ -56,6 +56,7 @@ const PageForm = () => {
       setLogo(null);
     } catch (error) {
       handleError(`Erreur lors de l'envoi du formulaire: ${error.message}`);
+      console.log(handleError); // Dans PageForm, pour vérifier ce que vous recevez du contexte.
     } finally {
       setLoading(false);
     }
