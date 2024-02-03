@@ -31,7 +31,7 @@ const MonProfilPage = () => {
   return (
     <>
       <div className="bg-gradient-to-b from-purple-800 to-purple-500">
-        <div className="shadow-md pt-16 lg:pt-24">
+        <div className="pt-32 lg:pt-32 shadow-md">
           <div className="flex justify-center space-x-4 p-4">
             {menuItems.map((item) => (
               <motion.div
