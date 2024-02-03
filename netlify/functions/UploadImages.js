@@ -75,11 +75,12 @@ exports.handler = async (event) => {
   const busboy = new Busboy({ headers: event.headers });
   const tmpdir = os.tmpdir();
   const fileWrites = [];
-  let userUuid; let subscriptionId;
+  let userUuid; let subscriptionId; let titrePage; // Définir la variable titrePage ici
 
   busboy.on('field', (fieldname, val) => {
     if (fieldname === 'userUuid') userUuid = val;
     if (fieldname === 'subscriptionId') subscriptionId = val;
+    if (fieldname === 'titre') titrePage = val; // Stocker la valeur du titre de la page
   });
 
   busboy.on('file', (fieldname, file, filename) => {
@@ -102,7 +103,7 @@ exports.handler = async (event) => {
         const writtenFiles = await Promise.all(fileWrites);
         const pageId = uuidv4();
         const insertPageQuery = 'INSERT INTO UserPages (pageId, titre, user_uuid, subscriptionId) VALUES (?, ?, ?, ?)';
-        await conn.execute(insertPageQuery, [pageId, 'Titre de la page', userUuid, subscriptionId]);
+        await conn.execute(insertPageQuery, [pageId, titrePage, userUuid, subscriptionId]); // Utiliser titrePage ici
 
         const updatePagePromises = writtenFiles.map(async (file) => {
           const url = await uploadFile(file, octokit);
