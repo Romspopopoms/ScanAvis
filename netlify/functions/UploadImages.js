@@ -107,6 +107,7 @@ exports.handler = async (event) => {
           if (fieldname === 'imageDeFond') values[2] = url;
           if (fieldname === 'logo') values[3] = url;
           await conn.execute(insertQuery, values);
+          console.log(insertQuery, values);
         });
 
         outerResolve({ statusCode: 200, body: JSON.stringify({ message: 'All files uploaded successfully', pageId }) });
