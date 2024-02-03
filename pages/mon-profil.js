@@ -1,61 +1,69 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import MonProfil from '../components/mon-profil';
 
-const buttonVariants = {
-  hover: {
-    scale: 1.1,
-    textShadow: '0px 0px 8px rgb(255,255,255)',
-    boxShadow: '0px 0px 8px rgb(255,255,255)',
-    transition: {
-      duration: 0.3,
-    },
-  },
-  initial: {
-    scale: 1,
-  },
+const menuItems = [
+  { name: 'Profil', key: 'profil' },
+  { name: 'Création de votre page', key: 'creation' },
+  // Ajoutez d'autres éléments de menu ici
+];
+
+const variants = {
+  open: { opacity: 1, height: 'auto' },
+  collapsed: { opacity: 0, height: 0 },
 };
 
 const MonProfilPage = () => {
   const [activeSection, setActiveSection] = useState('profil');
 
-  const renderSection = () => {
-    switch (activeSection) {
+  const renderSection = (key) => {
+    switch (key) {
       case 'profil':
         return <MonProfil />;
-      case 'creation de votre page':
-        return <div>{/* contenu de la section création */}</div>;
-      // ... ajoutez d'autres cas ici si nécessaire
+      case 'creation':
+        return <div>Contenu de la section "Création de votre page"</div>;
+      // Ajoutez d'autres sections ici si nécessaire
       default:
         return <div>Section non trouvée</div>;
     }
   };
 
   return (
-    <div className="relative z-10 min-h-screen">
-      <div className="flex justify-start space-x-4 p-4 bg-blue-500 text-white">
-        <motion.button
-          variants={buttonVariants}
-          initial="initial"
-          whileHover="hover"
-          onClick={() => setActiveSection('profil')}
-          className="hover:bg-blue-700"
-        >
-          Profil
-        </motion.button>
-        <motion.button
-          variants={buttonVariants}
-          initial="initial"
-          whileHover="hover"
-          onClick={() => setActiveSection('creation')}
-          className="hover:bg-blue-700"
-        >
-          Création de votre page
-        </motion.button>
-        {/* Ajoutez plus de boutons ici au besoin */}
+    <div className="relative z-10 min-h-screen bg-gradient-to-b from-purple-800 to-purple-500 pt-16">
+      <div className="fixed top-0 left-0 w-full z-30">
+        <div className="flex justify-center space-x-4 p-4 bg-purple-800 shadow-md">
+          {menuItems.map((item) => (
+            <motion.div
+              key={item.key}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+              className={`cursor-pointer px-4 py-2 rounded-lg text-white shadow-lg 
+                          ${activeSection === item.key ? 'bg-purple-600' : 'bg-purple-700 hover:bg-purple-600'}`}
+              onClick={() => setActiveSection(item.key)}
+            >
+              {item.name}
+            </motion.div>
+          ))}
+        </div>
       </div>
 
-      {renderSection()}
+      <div className="pt-24">
+        <AnimatePresence>
+          {menuItems.map((item) => activeSection === item.key && (
+            <motion.div
+              key={item.key}
+              initial="collapsed"
+              animate="open"
+              exit="collapsed"
+              variants={variants}
+              transition={{ duration: 0.8 }}
+              className="overflow-hidden"
+            >
+              {renderSection(item.key)}
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </div>
     </div>
   );
 };
