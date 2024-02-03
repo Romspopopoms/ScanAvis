@@ -30,8 +30,9 @@ const MonProfilPage = () => {
 
   return (
     <div className="relative z-10 bg-gradient-to-b from-purple-800 to-purple-500">
-      {/* Enveloppez tout dans un div avec un padding-top approprié */}
-      <div className="pt-20"> {/* Ajustez cette valeur comme nécessaire */}
+      {/* Ajout de padding-top pour tenir compte de la hauteur du menu */}
+      <div className="pt-16">
+        {/* Menu fixe en haut de la page */}
         <div className="fixed top-0 left-0 w-full z-30">
           <div className="flex justify-center space-x-4 p-4 bg-purple-800 shadow-md">
             {menuItems.map((item) => (
@@ -49,8 +50,8 @@ const MonProfilPage = () => {
           </div>
         </div>
 
-        {/* Ajustez également le padding-top ici si nécessaire pour le contenu */}
-        <div className="pt-24 min-h-screen"> {/* Cette valeur pourrait nécessiter un ajustement en fonction de la hauteur de votre menu */}
+        {/* Ajout de padding-top ici pour pousser le contenu en dessous du menu */}
+        <div className="pt-24"> {/* Ajustez cette valeur si nécessaire */}
           <AnimatePresence>
             {menuItems.map((item) => activeSection === item.key && (
               <motion.div
