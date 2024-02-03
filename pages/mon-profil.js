@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import MonProfil from '../components/mon-profil';
 
@@ -15,15 +15,6 @@ const variants = {
 
 const MonProfilPage = () => {
   const [activeSection, setActiveSection] = useState('profil');
-  const [navbarHeight, setNavbarHeight] = useState(0);
-  const navbarRef = useRef(null);
-
-  useEffect(() => {
-    // À chaque rendu, mettez à jour la hauteur du navbar
-    if (navbarRef.current) {
-      setNavbarHeight(navbarRef.current.offsetHeight);
-    }
-  }, []); // Le tableau vide garantit que l'effet ne s'exécute qu'après le premier montage
 
   const renderSection = (key) => {
     switch (key) {
@@ -38,13 +29,9 @@ const MonProfilPage = () => {
   };
 
   return (
-    <div className="bg-gradient-to-b from-purple-800 to-purple-500">
-      {/* Supposons que c'est votre barre de navigation et qu'elle a une ref attachée */}
-      {/* Assurez-vous que cette référence est attachée à votre barre de navigation réelle */}
-      <div ref={navbarRef} className="fixed top-0 left-0 w-full z-50 ..."> {/* Contenu de la barre de navigation ici */}</div>
-
-      {/* Ajoutez le style en ligne pour la marge supérieure ici */}
-      <div style={{ marginTop: `${navbarHeight}px` }} className="bg-purple-800 shadow-md">
+    <div className="bg-gradient-to-b from-purple-800 to-purple-500 pt-16 lg:pt-24"> {/* Ajustez le padding ici selon la hauteur de votre navbar */}
+      {/* Le contenu de votre page commence ici, ajusté pour ne pas être masqué par la navbar */}
+      <div className="bg-purple-800 shadow-md">
         <div className="flex justify-center space-x-4 p-4">
           {menuItems.map((item) => (
             <motion.div
@@ -61,7 +48,6 @@ const MonProfilPage = () => {
         </div>
       </div>
 
-      {/* Le contenu de la page en dessous du menu */}
       <AnimatePresence>
         {menuItems.map((item) => activeSection === item.key && (
           <motion.div
