@@ -37,7 +37,7 @@ const MonProfilPage = () => {
   return (
     <div className="bg-gradient-to-b from-purple-800 to-purple-500 min-h-screen">
       <div style={{ paddingTop: adjustedPaddingTop }}>
-        <div className="flex justify-center space-x-4 p-4">
+        <div className="mt-[-20px] flex justify-center space-x-4 p-4">
           {menuItems.map((item) => (
             <motion.div
               key={item.key}
