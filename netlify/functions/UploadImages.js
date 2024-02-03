@@ -64,29 +64,6 @@ async function uploadFile(file, octokit) {
     throw new Error(`Failed to upload file ${file.filename}`);
   }
 }
-async function getUserUuid(userEmail) {
-  try {
-    const query = 'SELECT uuid FROM users WHERE email = ?';
-    const result = await conn.execute(query, [userEmail]);
-    const [user] = result.rows;
-    return user?.uuid;
-  } catch (error) {
-    console.error(`Erreur lors de la récupération de l'UUID pour l'utilisateur avec email ${userEmail}:`, error);
-    throw error;
-  }
-}
-
-async function getSubscriptionId(userUuid) {
-  try {
-    const query = 'SELECT subscriptionId FROM Subscriptions WHERE user_uuid = ?';
-    const result = await conn.execute(query, [userUuid]);
-    const [subscription] = result.rows;
-    return subscription?.subscriptionId;
-  } catch (error) {
-    console.error(`Erreur lors de la récupération de l'ID de la souscription pour userUuid ${userUuid}:`, error);
-    throw error;
-  }
-}
 
 exports.handler = async (event) => {
   console.log('Handler started');
@@ -122,16 +99,14 @@ exports.handler = async (event) => {
         const uploadedFiles = await Promise.all(writtenFiles.map((file) => uploadFile(file, octokit)));
         const pageId = uuidv4();
 
-        const userEmail = 'user@example.com'; // Remplacez par la récupération réelle de l'email
-        const userUuid = await getUserUuid(userEmail);
-        console.log('User UUID:', userUuid); // Log pour débogage
-        const subscriptionId = await getSubscriptionId(userUuid);
-        console.log('Subscription ID:', subscriptionId); // Log pour débogage
+        // Récupérez l'UUID de l'utilisateur et l'ID de la souscription depuis les données du formulaire
+        const { userUuid } = event.body;
+        const { subscriptionId } = event.body;
 
         if (!userUuid || !subscriptionId) {
           console.error('UUID de l’utilisateur ou ID de souscription non trouvé.');
-          outerReject(new Error('User UUID or Subscription ID not found')); // Utilisez outerReject pour arrêter le processus
-          return; // Arrêtez l'exécution de la fonction ici
+          outerReject(new Error('User UUID or Subscription ID not found'));
+          return;
         }
 
         const insertQuery = 'INSERT INTO UserPages (pageId, titre, imageDeFondURL, logoURL, user_uuid, subscriptionId) VALUES (?, ?, ?, ?, ?, ?)';
@@ -148,14 +123,13 @@ exports.handler = async (event) => {
             console.log('Successfully inserted', values);
           } catch (error) {
             console.error('Failed to insert', values, error);
-            // Ne relancez pas l'erreur ici, sinon cela arrêtera la boucle avant de traiter tous les fichiers
           }
         }
 
-        outerResolve({ statusCode: 200, body: JSON.stringify({ message: 'All files uploaded successfully', pageId }) }); // Utilisez outerResolve ici
+        outerResolve({ statusCode: 200, body: JSON.stringify({ message: 'All files uploaded successfully', pageId }) });
       } catch (error) {
         console.error('Operation failed:', error);
-        outerReject(new Error(`Operation failed: ${error.message}`)); // Utilisez outerReject ici
+        outerReject(new Error(`Operation failed: ${error.message}`));
       }
     });
 

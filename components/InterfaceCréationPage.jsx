@@ -6,6 +6,7 @@ const PageForm = () => {
   const {
     isAuthenticated,
     user,
+    userSubscriptions,
     handleError,
   } = useContext(AuthContext);
 
@@ -16,7 +17,6 @@ const PageForm = () => {
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    // S'assure que le message est réinitialisé chaque fois que le composant est monté
     setMessage('');
   }, []);
 
@@ -35,6 +35,11 @@ const PageForm = () => {
     if (imageDeFond) formData.append('imageDeFond', imageDeFond);
     if (logo) formData.append('logo', logo);
     formData.append('userUuid', user.uuid); // Inclure l'UUID de l'utilisateur pour l'associer à la page
+    // Assurez-vous de choisir la bonne souscription si l'utilisateur en a plusieurs
+    const userSubscriptionId = userSubscriptions[0]?.subscriptionId; // Exemple: récupérer l'ID de la première souscription
+    if (userSubscriptionId) {
+      formData.append('subscriptionId', userSubscriptionId); // Inclure l'ID de la souscription pour l'associer à la page
+    }
 
     try {
       const response = await fetch('/.netlify/functions/UploadImages', {
@@ -50,13 +55,11 @@ const PageForm = () => {
       const result = await response.json();
       setMessage(result.message || 'Formulaire envoyé avec succès.');
 
-      // Réinitialiser le formulaire après la soumission réussie
       setTitre('');
       setImageDeFond(null);
       setLogo(null);
     } catch (error) {
       handleError(`Erreur lors de l'envoi du formulaire: ${error.message}`);
-      console.log(handleError); // Dans PageForm, pour vérifier ce que vous recevez du contexte.
     } finally {
       setLoading(false);
     }
