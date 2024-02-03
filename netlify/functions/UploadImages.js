@@ -17,8 +17,6 @@ async function getCurrentSha(octokit, filePathInRepo) {
       console.error(`Failed to fetch current SHA for ${filePathInRepo}:`, error);
       throw new Error(`Failed to fetch current SHA for ${filePathInRepo}`);
     }
-    // Pour les fichiers non trouvés (404), retourner null pour indiquer l'absence de SHA
-    return null;
   }
 }
 
@@ -34,27 +32,31 @@ async function uploadFile(file, octokit) {
       path: filePathInRepo,
       message: `Add/update image via serverless function: ${file.filename}`,
       content: contentEncoded,
+      ...(sha && { sha }),
     };
-
-    // Inclure le SHA seulement s'il est disponible
-    if (sha) {
-      params.sha = sha;
-    }
 
     try {
       await octokit.repos.createOrUpdateFileContents(params);
       console.log(`File ${file.filename} uploaded successfully.`);
     } catch (error) {
-      console.error(`File upload failed for ${file.filename}:`, error);
-      throw new Error(`File upload failed for ${file.filename}`);
+      if (error.status === 409) {
+        console.log(`SHA conflict for ${file.filename}, fetching current SHA and retrying.`);
+        const currentSha = await getCurrentSha(octokit, filePathInRepo);
+        if (currentSha) {
+          await attemptUpload(currentSha);
+        } else {
+          console.error(`Failed to fetch current SHA for retry: ${file.filename}`, error);
+          throw new Error(`Failed to fetch current SHA for retry: ${file.filename}`);
+        }
+      } else {
+        console.error(`File upload failed for ${file.filename}:`, error);
+        throw new Error(`File upload failed for ${file.filename}`);
+      }
     }
   }
 
-  const currentSha = await getCurrentSha(octokit, filePathInRepo);
-  // Passer le SHA récupéré à attemptUpload, ou ne rien passer si null (fichier nouveau)
-  await attemptUpload(currentSha);
+  await attemptUpload();
 }
-
 exports.handler = async (event) => {
   console.log('Handler started');
   if (event.httpMethod !== 'POST') {
