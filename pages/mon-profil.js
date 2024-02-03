@@ -29,42 +29,44 @@ const MonProfilPage = () => {
   };
 
   return (
-    <div className="relative z-10 min-h-screen bg-gradient-to-b from-purple-800 to-purple-500">
-      {/* Ajoutez un padding-top ici pour descendre le menu */}
-      <div className="fixed top-0 left-0 w-full z-30 pt-20"> {/* La valeur de pt-20 est un exemple, ajustez-la selon vos besoins */}
-        <div className="flex justify-center space-x-4 p-4 bg-purple-800 shadow-md">
-          {menuItems.map((item) => (
-            <motion.div
-              key={item.key}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              className={`cursor-pointer px-4 py-2 rounded-lg text-white shadow-lg 
-                          ${activeSection === item.key ? 'bg-purple-600' : 'bg-purple-700 hover:bg-purple-600'}`}
-              onClick={() => setActiveSection(item.key)}
-            >
-              {item.name}
-            </motion.div>
-          ))}
+    <div className="relative z-10 bg-gradient-to-b from-purple-800 to-purple-500">
+      {/* Enveloppez tout dans un div avec un padding-top approprié */}
+      <div className="pt-20"> {/* Ajustez cette valeur comme nécessaire */}
+        <div className="fixed top-0 left-0 w-full z-30">
+          <div className="flex justify-center space-x-4 p-4 bg-purple-800 shadow-md">
+            {menuItems.map((item) => (
+              <motion.div
+                key={item.key}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                className={`cursor-pointer px-4 py-2 rounded-lg text-white shadow-lg 
+                            ${activeSection === item.key ? 'bg-purple-600' : 'bg-purple-700 hover:bg-purple-600'}`}
+                onClick={() => setActiveSection(item.key)}
+              >
+                {item.name}
+              </motion.div>
+            ))}
+          </div>
         </div>
-      </div>
 
-      {/* Augmentez le padding-top ici pour descendre le contenu du profil */}
-      <div className="pt-32"> {/* La valeur de pt-32 est un exemple, ajustez-la en fonction de la hauteur de votre menu */}
-        <AnimatePresence>
-          {menuItems.map((item) => activeSection === item.key && (
-            <motion.div
-              key={item.key}
-              initial="collapsed"
-              animate="open"
-              exit="collapsed"
-              variants={variants}
-              transition={{ duration: 0.8 }}
-              className="overflow-hidden"
-            >
-              {renderSection(item.key)}
-            </motion.div>
-          ))}
-        </AnimatePresence>
+        {/* Ajustez également le padding-top ici si nécessaire pour le contenu */}
+        <div className="pt-24 min-h-screen"> {/* Cette valeur pourrait nécessiter un ajustement en fonction de la hauteur de votre menu */}
+          <AnimatePresence>
+            {menuItems.map((item) => activeSection === item.key && (
+              <motion.div
+                key={item.key}
+                initial="collapsed"
+                animate="open"
+                exit="collapsed"
+                variants={variants}
+                transition={{ duration: 0.8 }}
+                className="overflow-hidden"
+              >
+                {renderSection(item.key)}
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </div>
       </div>
     </div>
   );
