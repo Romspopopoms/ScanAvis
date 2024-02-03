@@ -4,18 +4,31 @@ const path = require('path');
 const os = require('os');
 const fs = require('fs');
 
-// Définir uploadFile avant son utilisation
 async function uploadFile(file, octokit) {
   try {
     const contentBuffer = fs.readFileSync(file.filepath);
     const contentEncoded = contentBuffer.toString('base64');
 
+    // Récupérez le SHA du fichier s'il existe déjà
+    let sha = null;
+    try {
+      const response = await octokit.repos.getContent({
+        owner: 'Romspopopoms',
+        repo: 'ScanAvis',
+        path: `uploaded_images/${file.filename}`,
+      });
+      sha = response.data.sha;
+    } catch (error) {
+      console.log(`File does not exist or other error: ${error}`);
+    }
+
     await octokit.repos.createOrUpdateFileContents({
       owner: 'Romspopopoms',
       repo: 'ScanAvis',
-      path: `uploaded_images/${file.filename}`, // Adjust the path according to your directory structure
+      path: `uploaded_images/${file.filename}`,
       message: `Add new image via serverless function: ${file.filename}`,
       content: contentEncoded,
+      sha, // Fournissez le SHA ici pour mettre à jour le fichier si nécessaire
     });
     console.log(`File created: ${file.filename}`);
   } catch (error) {
