@@ -20,7 +20,7 @@ const MonProfilPage = () => {
 
   // Determine the correct top padding to ensure it's not too close to the navbar
   // Assuming navbarHeight is at least 64px, we can safely remove an offset of 20px
-  const adjustedPaddingTop = navbarHeight > 64 ? `${navbarHeight - 20}px` : '44px'; // '44px' as a default if navbarHeight is too small
+  const adjustedPaddingTop = navbarHeight > 64 ? `${navbarHeight - 30}px` : '44px'; // '44px' as a default if navbarHeight is too small
 
   const renderSection = (key) => {
     switch (key) {
