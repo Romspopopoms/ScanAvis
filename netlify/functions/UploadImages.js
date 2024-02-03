@@ -97,7 +97,7 @@ exports.handler = async (event) => {
 
   const octokit = new Octokit({ auth: process.env.GITHUB_ACCESS });
 
-  return new Promise((outerResolve, outerReject) => {
+  return new Promise((outerResolve, outerReject) => { // Utilisez outerResolve et outerReject pour résoudre ou rejeter la promesse
     const busboy = new Busboy({ headers: event.headers });
     const tmpdir = os.tmpdir();
     const fileWrites = [];
@@ -120,20 +120,23 @@ exports.handler = async (event) => {
       try {
         const writtenFiles = await Promise.all(fileWrites);
         const uploadedFiles = await Promise.all(writtenFiles.map((file) => uploadFile(file, octokit)));
-        const pageId = uuidv4(); // Générer un ID unique pour la page
+        const pageId = uuidv4();
 
-        // Récupérer l'UUID de l'utilisateur et l'ID de la souscription
-        const username = 'username'; // Remplacez ceci par le nom d'utilisateur réel récupéré de la requête
-        const userUuid = await getUserUuid(username);
+        const userEmail = 'user@example.com'; // Remplacez par la récupération réelle de l'email
+        const userUuid = await getUserUuid(userEmail);
         const subscriptionId = await getSubscriptionId(userUuid);
 
-        // Insérer les détails de la page dans la base de données
+        if (!userUuid || !subscriptionId) {
+          console.error('UUID de l’utilisateur ou ID de souscription non trouvé.');
+          throw new Error('User UUID or Subscription ID not found');
+        }
+
         const insertQuery = 'INSERT INTO UserPages (pageId, titre, imageDeFondURL, logoURL, user_uuid, subscriptionId) VALUES (?, ?, ?, ?, ?, ?)';
-        /* eslint-disable no-await-in-loop */
         for (const [index, url] of uploadedFiles.entries()) {
+          let values;
           try {
             const { fieldname } = writtenFiles[index];
-            const values = [pageId, 'Titre de la page', null, null, userUuid, subscriptionId];
+            values = [pageId, 'Titre de la page', null, null, userUuid, subscriptionId];
             if (fieldname === 'imageDeFond') values[2] = url;
             if (fieldname === 'logo') values[3] = url;
 
@@ -142,14 +145,14 @@ exports.handler = async (event) => {
             console.log('Successfully inserted', values);
           } catch (error) {
             console.error('Failed to insert', values, error);
+            // Ne relancez pas l'erreur ici, sinon cela arrêtera la boucle avant de traiter tous les fichiers
           }
         }
-        /* eslint-enable no-await-in-loop */
 
-        outerResolve({ statusCode: 200, body: JSON.stringify({ message: 'All files uploaded successfully', pageId }) });
+        outerResolve({ statusCode: 200, body: JSON.stringify({ message: 'All files uploaded successfully', pageId }) }); // Utilisez outerResolve ici
       } catch (error) {
         console.error('Operation failed:', error);
-        outerReject(new Error(`Operation failed: ${error.message}`));
+        outerReject(new Error(`Operation failed: ${error.message}`)); // Utilisez outerReject ici
       }
     });
 
@@ -160,4 +163,3 @@ exports.handler = async (event) => {
     }
   });
 };
-
