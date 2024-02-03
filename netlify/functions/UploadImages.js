@@ -17,6 +17,7 @@ async function getCurrentSha(octokit, filePathInRepo) {
       console.error(`Failed to fetch current SHA for ${filePathInRepo}:`, error);
       throw new Error(`Failed to fetch current SHA for ${filePathInRepo}`);
     }
+    return null;
   }
 }
 
@@ -42,12 +43,7 @@ async function uploadFile(file, octokit) {
       if (error.status === 409) {
         console.log(`SHA conflict for ${file.filename}, fetching current SHA and retrying.`);
         const currentSha = await getCurrentSha(octokit, filePathInRepo);
-        if (currentSha) {
-          await attemptUpload(currentSha);
-        } else {
-          console.error(`Failed to fetch current SHA for retry: ${file.filename}`, error);
-          throw new Error(`Failed to fetch current SHA for retry: ${file.filename}`);
-        }
+        await attemptUpload(currentSha);
       } else {
         console.error(`File upload failed for ${file.filename}:`, error);
         throw new Error(`File upload failed for ${file.filename}`);
@@ -55,8 +51,10 @@ async function uploadFile(file, octokit) {
     }
   }
 
-  await attemptUpload();
+  const initialSha = await getCurrentSha(octokit, filePathInRepo);
+  await attemptUpload(initialSha);
 }
+
 exports.handler = async (event) => {
   console.log('Handler started');
   if (event.httpMethod !== 'POST') {
@@ -77,10 +75,10 @@ exports.handler = async (event) => {
       const writeStream = fs.createWriteStream(filepath);
       file.pipe(writeStream);
 
-      const fileWrite = new Promise((resolve, reject) => {
+      const fileWrite = new Promise((innerResolve, innerReject) => {
         file.on('end', () => writeStream.end());
-        writeStream.on('finish', () => resolve({ fieldname, filename, filepath, mimetype }));
-        writeStream.on('error', (error) => reject(new Error(error)));
+        writeStream.on('finish', () => innerResolve({ fieldname, filename, filepath, mimetype }));
+        writeStream.on('error', innerReject);
       });
 
       fileWrites.push(fileWrite);
