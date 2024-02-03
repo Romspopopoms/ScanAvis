@@ -1,5 +1,5 @@
 const Busboy = require('busboy');
-const simpleGit = require('simple-git')();
+const simpleGit = require('simple-git'); // Correction ici
 const path = require('path');
 const os = require('os');
 const fs = require('fs');
@@ -18,7 +18,7 @@ exports.handler = async (event) => {
     const files = [];
     const fileWrites = [];
 
-    busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {
+    busboy.on('file', (fieldname, file, filename, mimetype) => {
       console.log(`File [${fieldname}]: filename: ${filename}`);
       const filepath = path.join(tmpdir, filename);
       const writeStream = fs.createWriteStream(filepath);
