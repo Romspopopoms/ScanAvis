@@ -12,7 +12,7 @@ exports.handler = async (event) => {
   }
 
   return new Promise((outerResolve, outerReject) => {
-    const busboy = new Busboy({ headers: event.headers, highWaterMark: 2 * 1024 * 1024 });
+    const busboy = new Busboy({ headers: event.headers });
     const tmpdir = os.tmpdir();
     const fields = {};
     const files = [];
