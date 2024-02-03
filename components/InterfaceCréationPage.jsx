@@ -6,64 +6,60 @@ const PageForm = () => {
   const {
     isAuthenticated,
     user,
-    errorMessage,
-    handleError, // Assurez-vous que cette fonction est exposée via AuthContext pour gérer les erreurs
+    handleError, // Assurez-vous que cette fonction est bien définie et passée dans AuthContext
   } = useContext(AuthContext);
 
   const [titre, setTitre] = useState('');
   const [imageDeFond, setImageDeFond] = useState(null);
   const [logo, setLogo] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState(errorMessage);
+  const [message, setMessage] = useState('');
+
+  useEffect(() => {
+    // S'assure que le message est réinitialisé chaque fois que le composant est monté
+    setMessage('');
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!isAuthenticated) {
       setMessage('Veuillez vous connecter pour créer une page.');
       return;
     }
 
     setLoading(true);
-    setMessage('');
 
     const formData = new FormData();
     formData.append('titre', titre);
     if (imageDeFond) formData.append('imageDeFond', imageDeFond);
     if (logo) formData.append('logo', logo);
-    formData.append('userUuid', user.uuid); // Ajouter l'UUID de l'utilisateur pour l'associer à la page créée
+    formData.append('userUuid', user.uuid); // Inclure l'UUID de l'utilisateur pour l'associer à la page
 
     try {
-      const response = await fetch('/.netlify/functions/uploadImages', { // Assurez-vous que l'URL est correcte
+      const response = await fetch('/.netlify/functions/uploadImages', {
         method: 'POST',
         body: formData,
       });
 
-      const result = await response.json(); // Supposer que la réponse est toujours du JSON
-
       if (!response.ok) {
-        throw new Error(`Erreur lors de l'envoi du formulaire: ${result.message || response.statusText}`);
+        const errorText = await response.text();
+        throw new Error(errorText);
       }
 
+      const result = await response.json();
       setMessage(result.message || 'Formulaire envoyé avec succès.');
 
-      // Réinitialiser le formulaire
+      // Réinitialiser le formulaire après la soumission réussie
       setTitre('');
       setImageDeFond(null);
       setLogo(null);
     } catch (error) {
-      console.error('Erreur lors de l\'envoi du formulaire:', error);
-      handleError(error.message); // Utiliser la fonction handleError du contexte
+      handleError(`Erreur lors de l'envoi du formulaire: ${error.message}`);
     } finally {
       setLoading(false);
     }
   };
-
-  // Écouter les changements du message d'erreur dans le contexte
-  useEffect(() => {
-    if (errorMessage) {
-      setMessage(errorMessage);
-    }
-  }, [errorMessage]);
 
   return (
     <motion.div
@@ -76,6 +72,7 @@ const PageForm = () => {
       <form onSubmit={handleSubmit} className="space-y-6">
         <h2 className="text-2xl font-bold text-center text-purple-800">Créer votre page</h2>
 
+        {/* Titre */}
         <div className="space-y-2">
           <label htmlFor="titre" className="block text-lg font-semibold text-gray-700">Nom de la société</label>
           <input
@@ -84,11 +81,13 @@ const PageForm = () => {
             name="titre"
             value={titre}
             onChange={(e) => setTitre(e.target.value)}
+            required
             className="mt-1 block w-full px-4 py-3 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
             placeholder="Entrez le nom de votre société"
           />
         </div>
 
+        {/* Image de fond */}
         <div className="space-y-2">
           <label htmlFor="imageDeFond" className="block text-lg font-semibold text-gray-700">Image de fond (JPG, PNG)</label>
           <input
@@ -101,6 +100,7 @@ const PageForm = () => {
           />
         </div>
 
+        {/* Logo */}
         <div className="space-y-2">
           <label htmlFor="logo" className="block text-lg font-semibold text-gray-700">Logo (JPG, PNG)</label>
           <input
@@ -113,6 +113,7 @@ const PageForm = () => {
           />
         </div>
 
+        {/* Bouton de soumission */}
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
