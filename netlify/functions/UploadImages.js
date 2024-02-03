@@ -124,11 +124,14 @@ exports.handler = async (event) => {
 
         const userEmail = 'user@example.com'; // Remplacez par la récupération réelle de l'email
         const userUuid = await getUserUuid(userEmail);
+        console.log('User UUID:', userUuid); // Log pour débogage
         const subscriptionId = await getSubscriptionId(userUuid);
+        console.log('Subscription ID:', subscriptionId); // Log pour débogage
 
         if (!userUuid || !subscriptionId) {
           console.error('UUID de l’utilisateur ou ID de souscription non trouvé.');
-          throw new Error('User UUID or Subscription ID not found');
+          outerReject(new Error('User UUID or Subscription ID not found')); // Utilisez outerReject pour arrêter le processus
+          return; // Arrêtez l'exécution de la fonction ici
         }
 
         const insertQuery = 'INSERT INTO UserPages (pageId, titre, imageDeFondURL, logoURL, user_uuid, subscriptionId) VALUES (?, ?, ?, ?, ?, ?)';
