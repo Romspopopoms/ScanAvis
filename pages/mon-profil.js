@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import MonProfil from '../components/mon-profil';
-import { useNavbarHeight } from '../context/NavbarContext'; // Importez le hook que nous avons créé précédemment
+import { useNavbarHeight } from '../context/NavbarContext';
 
 const menuItems = [
   { name: 'Profil', key: 'profil' },
@@ -30,10 +30,12 @@ const MonProfilPage = () => {
     }
   };
 
+  // Ensure the padding-top is not zero
+  const paddingTop = navbarHeight > 0 ? navbarHeight : '64px';
+
   return (
     <div className="bg-gradient-to-b from-purple-800 to-purple-500 min-h-screen">
-      {/* Utilisez le padding-top avec la valeur de navbarHeight */}
-      <div style={{ paddingTop: navbarHeight }}>
+      <div style={{ paddingTop }}>
         <div className="flex justify-center space-x-4 p-4">
           {menuItems.map((item) => (
             <motion.div
