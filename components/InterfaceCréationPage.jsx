@@ -7,8 +7,8 @@ const PageForm = () => {
   const [titre, setTitre] = useState('');
   const [imageDeFond, setImageDeFond] = useState(null);
   const [logo, setLogo] = useState(null);
-  const [loading, setLoading] = useState(false); // État pour gérer l'indicateur de chargement
-  const [message, setMessage] = useState(''); // État pour gérer les messages de feedback
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -16,8 +16,10 @@ const PageForm = () => {
       setMessage('Veuillez vous connecter pour créer une page.');
       return;
     }
+
     setLoading(true);
     setMessage('');
+
     const formData = new FormData();
     formData.append('titre', titre);
     if (imageDeFond) formData.append('imageDeFond', imageDeFond);
@@ -30,19 +32,30 @@ const PageForm = () => {
       });
 
       if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Erreur lors de l'envoi du formulaire: ${errorText}`);
+        throw new Error(`Erreur lors de l'envoi du formulaire: ${response.statusText}`);
       }
-      const responseBody = await response.json();
-      setMessage(responseBody.message || 'Formulaire envoyé avec succès.');
-      setTitre(''); // Réinitialiser le titre
-      setImageDeFond(null); // Réinitialiser l'image de fond
-      setLogo(null); // Réinitialiser le logo
+
+      // Vérifier si la réponse est du JSON
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.indexOf('application/json') !== -1) {
+        const responseBody = await response.json();
+        setMessage(responseBody.message || 'Formulaire envoyé avec succès.');
+      } else {
+        // Gérer les cas où la réponse n'est pas du JSON
+        const responseText = await response.text();
+        setMessage(responseText || 'Formulaire envoyé avec succès.');
+      }
+
+      // Réinitialiser le formulaire
+      setTitre('');
+      setImageDeFond(null);
+      setLogo(null);
     } catch (error) {
       console.error('Erreur lors de l\'envoi du formulaire:', error);
-      setMessage(error.message || 'Erreur lors de l\'envoi du formulaire.');
+      setMessage(error.message);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
