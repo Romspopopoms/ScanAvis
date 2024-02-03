@@ -1,4 +1,4 @@
-const { Busboy } = require('busboy');
+const Busboy = require('busboy');
 const simpleGit = require('simple-git')();
 const path = require('path');
 const os = require('os');
