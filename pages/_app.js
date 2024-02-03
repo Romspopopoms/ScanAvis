@@ -6,6 +6,7 @@ import { useRouter } from 'next/router';
 import { CartProvider } from '../context/CartContext';
 import { AuthProvider } from '../context/AuthContext';
 import { PaymentProvider } from '../context/PaymentContext';
+import { NavbarHeightProvider } from '../context/NavbarContext'; // Assurez-vous d'importer le NavbarHeightProvider
 import CartSummary from '../components/CartSummary';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -17,25 +18,27 @@ const MyApp = ({ Component, pageProps }) => {
   return (
     <AuthProvider>
       <CartProvider>
-        <PaymentProvider> {/* Déplacez PaymentProvider ici */}
-          <div className="flex flex-col min-h-screen gradient-01">
-            <Head>
-              <title>Scan'Avis</title>
-              <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-              <link rel="icon" href="/favicon.ico" />
-              <link rel="preconnect" href="https://stijndv.com" />
-              <link rel="stylesheet" href="https://stijndv.com/fonts/Eudoxus-Sans.css" />
-            </Head>
+        <PaymentProvider>
+          <NavbarHeightProvider> {/* Enveloppez votre application dans NavbarHeightProvider */}
+            <div className="flex flex-col min-h-screen gradient-01">
+              <Head>
+                <title>Scan'Avis</title>
+                <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+                <link rel="icon" href="/favicon.ico" />
+                <link rel="preconnect" href="https://stijndv.com" />
+                <link rel="stylesheet" href="https://stijndv.com/fonts/Eudoxus-Sans.css" />
+              </Head>
 
-            <Navbar />
+              <Navbar />
 
-            <main className="flex-grow">
-              {shouldDisplayCartSummary && <CartSummary />}
-              <Component {...pageProps} />
-            </main>
+              <main className="flex-grow">
+                {shouldDisplayCartSummary && <CartSummary />}
+                <Component {...pageProps} />
+              </main>
 
-            <Footer />
-          </div>
+              <Footer />
+            </div>
+          </NavbarHeightProvider>
         </PaymentProvider>
       </CartProvider>
     </AuthProvider>

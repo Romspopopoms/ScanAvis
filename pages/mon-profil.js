@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import MonProfil from '../components/mon-profil';
+import { useNavbarHeight } from '../context/NavbarContext'; // Importez le hook que nous avons créé précédemment
 
 const menuItems = [
   { name: 'Profil', key: 'profil' },
@@ -15,6 +16,7 @@ const variants = {
 
 const MonProfilPage = () => {
   const [activeSection, setActiveSection] = useState('profil');
+  const { navbarHeight } = useNavbarHeight(); // Utilisez le hook pour obtenir la hauteur de la navbar
 
   const renderSection = (key) => {
     switch (key) {
@@ -30,8 +32,8 @@ const MonProfilPage = () => {
 
   return (
     <div className="bg-gradient-to-b from-purple-800 to-purple-500 min-h-screen">
-      {/* Appliquez une marge supérieure fixe au lieu de compter sur la hauteur calculée de la navbar */}
-      <div className="pt-20 lg:pt-24">
+      {/* Utilisez le padding-top avec la valeur de navbarHeight */}
+      <div style={{ paddingTop: navbarHeight }}>
         <div className="flex justify-center space-x-4 p-4">
           {menuItems.map((item) => (
             <motion.div
@@ -39,7 +41,7 @@ const MonProfilPage = () => {
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
               className={`cursor-pointer px-4 py-2 rounded-lg text-white 
-                            ${activeSection === item.key ? 'bg-purple-600' : 'bg-purple-700 hover:bg-purple-600'}`}
+                          ${activeSection === item.key ? 'bg-purple-600' : 'bg-purple-700 hover:bg-purple-600'}`}
               onClick={() => setActiveSection(item.key)}
             >
               {item.name}
