@@ -64,6 +64,31 @@ async function uploadFile(file, octokit) {
     throw new Error(`Failed to upload file ${file.filename}`);
   }
 }
+async function getUserUuid(username) {
+  // Cette fonction récupère l'UUID de l'utilisateur basé sur son nom d'utilisateur
+  try {
+    const query = 'SELECT uuid FROM Users WHERE username = ?';
+    const result = await conn.execute(query, [username]);
+    const [user] = result.rows;
+    return user?.uuid;
+  } catch (error) {
+    console.error(`Erreur lors de la récupération de l'UUID pour l'utilisateur ${username}:`, error);
+    throw error;
+  }
+}
+
+async function getSubscriptionId(userUuid) {
+  // Cette fonction récupère l'ID de la souscription basé sur l'UUID de l'utilisateur
+  try {
+    const query = 'SELECT subscriptionId FROM Subscriptions WHERE user_uuid = ?';
+    const result = await conn.execute(query, [userUuid]);
+    const [subscription] = result.rows;
+    return subscription?.subscriptionId;
+  } catch (error) {
+    console.error(`Erreur lors de la récupération de l'ID de la souscription pour userUuid ${userUuid}:`, error);
+    throw error;
+  }
+}
 
 exports.handler = async (event) => {
   console.log('Handler started');
@@ -99,17 +124,29 @@ exports.handler = async (event) => {
         const uploadedFiles = await Promise.all(writtenFiles.map((file) => uploadFile(file, octokit)));
         const pageId = uuidv4(); // Générer un ID unique pour la page
 
+        // Récupérer l'UUID de l'utilisateur et l'ID de la souscription
+        const username = 'username'; // Remplacez ceci par le nom d'utilisateur réel récupéré de la requête
+        const userUuid = await getUserUuid(username);
+        const subscriptionId = await getSubscriptionId(userUuid);
+
         // Insérer les détails de la page dans la base de données
-        const insertQuery = 'INSERT INTO UserPages (pageId, titre, imageDeFondURL, logoURL, user_uuid) VALUES (?, ?, ?, ?, ?)';
-        uploadedFiles.forEach(async (url, index) => {
-          const { fieldname } = writtenFiles[index];
-          const values = [pageId, 'Titre de la page', null, null, 'userUuid']; // Remplacez "userUuid" par la valeur réelle de l'UUID de l'utilisateur
-          if (fieldname === 'imageDeFond') values[2] = url;
-          if (fieldname === 'logo') values[3] = url;
-          console.log('Attempting to insert into database', insertQuery, values);
-          await conn.execute(insertQuery, values);
-          console.log('Successfully inserted', values);
-        });
+        const insertQuery = 'INSERT INTO UserPages (pageId, titre, imageDeFondURL, logoURL, user_uuid, subscriptionId) VALUES (?, ?, ?, ?, ?, ?)';
+        /* eslint-disable no-await-in-loop */
+        for (const [index, url] of uploadedFiles.entries()) {
+          try {
+            const { fieldname } = writtenFiles[index];
+            const values = [pageId, 'Titre de la page', null, null, userUuid, subscriptionId];
+            if (fieldname === 'imageDeFond') values[2] = url;
+            if (fieldname === 'logo') values[3] = url;
+
+            console.log('Attempting to insert into database', insertQuery, values);
+            await conn.execute(insertQuery, values);
+            console.log('Successfully inserted', values);
+          } catch (error) {
+            console.error('Failed to insert', values, error);
+          }
+        }
+        /* eslint-enable no-await-in-loop */
 
         outerResolve({ statusCode: 200, body: JSON.stringify({ message: 'All files uploaded successfully', pageId }) });
       } catch (error) {
