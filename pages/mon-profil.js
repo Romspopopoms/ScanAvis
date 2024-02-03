@@ -40,9 +40,10 @@ const MonProfilPage = () => {
   return (
     <div className="bg-gradient-to-b from-purple-800 to-purple-500">
       {/* Supposons que c'est votre barre de navigation et qu'elle a une ref attachée */}
-      <div ref={navbarRef} className="fixed top-0 left-0 w-full z-50 ..."> {/* Barre de navigation ici */}</div>
+      {/* Assurez-vous que cette référence est attachée à votre barre de navigation réelle */}
+      <div ref={navbarRef} className="fixed top-0 left-0 w-full z-50 ..."> {/* Contenu de la barre de navigation ici */}</div>
 
-      {/* Ajoutez du style en ligne ici pour la marge supérieure équivalente à la hauteur de la barre de navigation */}
+      {/* Ajoutez le style en ligne pour la marge supérieure ici */}
       <div style={{ marginTop: `${navbarHeight}px` }} className="bg-purple-800 shadow-md">
         <div className="flex justify-center space-x-4 p-4">
           {menuItems.map((item) => (
