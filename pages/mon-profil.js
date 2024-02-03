@@ -18,6 +18,10 @@ const MonProfilPage = () => {
   const [activeSection, setActiveSection] = useState('profil');
   const { navbarHeight } = useNavbarHeight(); // Utilisez le hook pour obtenir la hauteur de la navbar
 
+  // Determine the correct top padding to ensure it's not too close to the navbar
+  // Assuming navbarHeight is at least 64px, we can safely remove an offset of 20px
+  const adjustedPaddingTop = navbarHeight > 64 ? `${navbarHeight - 20}px` : '44px'; // '44px' as a default if navbarHeight is too small
+
   const renderSection = (key) => {
     switch (key) {
       case 'profil':
@@ -30,12 +34,9 @@ const MonProfilPage = () => {
     }
   };
 
-  // Ensure the padding-top is not zero
-  const paddingTop = navbarHeight > 0 ? navbarHeight : '64px';
-
   return (
     <div className="bg-gradient-to-b from-purple-800 to-purple-500 min-h-screen">
-      <div style={{ paddingTop }}>
+      <div style={{ paddingTop: adjustedPaddingTop }}>
         <div className="flex justify-center space-x-4 p-4">
           {menuItems.map((item) => (
             <motion.div
