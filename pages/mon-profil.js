@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import MonProfil from '../components/mon-profil';
+// ... (importez d'autres composants si nécessaire)
 
 const menuItems = [
   { name: 'Profil', key: 'profil' },
