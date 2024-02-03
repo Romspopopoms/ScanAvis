@@ -7,28 +7,41 @@ const PageForm = () => {
   const [titre, setTitre] = useState('');
   const [imageDeFond, setImageDeFond] = useState(null);
   const [logo, setLogo] = useState(null);
+  const [loading, setLoading] = useState(false); // État pour gérer l'indicateur de chargement
+  const [message, setMessage] = useState(''); // État pour gérer les messages de feedback
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!isAuthenticated) {
-      alert('Veuillez vous connecter pour créer une page.');
+      setMessage('Veuillez vous connecter pour créer une page.');
+      return;
     }
+    setLoading(true);
+    setMessage('');
     const formData = new FormData();
     formData.append('titre', titre);
     if (imageDeFond) formData.append('imageDeFond', imageDeFond);
     if (logo) formData.append('logo', logo);
 
     try {
-      const response = await fetch('/chemin/vers/votre/endpoint', {
+      const response = await fetch('https://scanavis.netlify.app/.netlify/functions/UploadImages', {
         method: 'POST',
         body: formData,
       });
 
-      if (!response.ok) throw new Error('Erreur lors de l\'envoi du formulaire.');
-      console.log('Formulaire envoyé avec succès.');
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Erreur lors de l'envoi du formulaire: ${errorText}`);
+      }
+      setMessage('Formulaire envoyé avec succès.');
+      setTitre(''); // Réinitialiser le titre
+      setImageDeFond(null); // Réinitialiser l'image de fond
+      setLogo(null); // Réinitialiser le logo
     } catch (error) {
       console.error('Erreur lors de l\'envoi du formulaire:', error);
+      setMessage('Erreur lors de l\'envoi du formulaire.');
     }
+    setLoading(false);
   };
 
   return (
@@ -38,6 +51,7 @@ const PageForm = () => {
       transition={{ duration: 0.5 }}
       className="max-w-lg mx-auto my-12 bg-white p-8 rounded-xl shadow-xl border border-gray-200"
     >
+      {message && <div className="my-3 p-3 text-center text-white bg-purple-600 rounded-md">{message}</div>} {/* Affiche les messages de feedback */}
       <form onSubmit={handleSubmit} className="space-y-6">
         <h2 className="text-2xl font-bold text-center text-purple-800">Créer votre page</h2>
 
@@ -83,8 +97,9 @@ const PageForm = () => {
           whileTap={{ scale: 0.95 }}
           type="submit"
           className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+          disabled={loading} // Désactive le bouton pendant le chargement
         >
-          Créer la page
+          {loading ? 'Envoi en cours...' : 'Créer la page'}
         </motion.button>
       </form>
     </motion.div>
