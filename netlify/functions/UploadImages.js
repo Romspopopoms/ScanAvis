@@ -67,7 +67,7 @@ async function uploadFile(file, octokit) {
 async function getUserUuid(username) {
   // Cette fonction récupère l'UUID de l'utilisateur basé sur son nom d'utilisateur
   try {
-    const query = 'SELECT uuid FROM Users WHERE username = ?';
+    const query = 'SELECT uuid FROM users WHERE username = ?';
     const result = await conn.execute(query, [username]);
     const [user] = result.rows;
     return user?.uuid;
