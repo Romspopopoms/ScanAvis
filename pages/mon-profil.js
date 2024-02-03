@@ -30,9 +30,8 @@ const MonProfilPage = () => {
 
   return (
     <div className="bg-gradient-to-b from-purple-800 to-purple-500">
-      {/* Navbar fixed en haut de la page */}
-      <div className="fixed top-0 w-full z-10">
-        <div className="flex justify-center space-x-4 p-4 bg-purple-800 shadow-md">
+      <div className="mt-20 bg-purple-800 shadow-md">
+        <div className="flex justify-center space-x-4 p-4">
           {menuItems.map((item) => (
             <motion.div
               key={item.key}
@@ -48,24 +47,22 @@ const MonProfilPage = () => {
         </div>
       </div>
 
-      {/* Ajouter du padding en haut égal à la hauteur de la navbar pour éviter que le contenu soit caché derrière */}
-      <div className="pt-[4rem]"> {/* Ajustez cette valeur en fonction de la hauteur de votre navbar */}
-        <AnimatePresence>
-          {menuItems.map((item) => activeSection === item.key && (
-            <motion.div
-              key={item.key}
-              initial="collapsed"
-              animate="open"
-              exit="collapsed"
-              variants={variants}
-              transition={{ duration: 0.8 }}
-              className="overflow-hidden"
-            >
-              {renderSection(item.key)}
-            </motion.div>
-          ))}
-        </AnimatePresence>
-      </div>
+      {/* Le contenu de la page en dessous du menu */}
+      <AnimatePresence>
+        {menuItems.map((item) => activeSection === item.key && (
+          <motion.div
+            key={item.key}
+            initial="collapsed"
+            animate="open"
+            exit="collapsed"
+            variants={variants}
+            transition={{ duration: 0.8 }}
+            className="overflow-hidden"
+          >
+            {renderSection(item.key)}
+          </motion.div>
+        ))}
+      </AnimatePresence>
     </div>
   );
 };
