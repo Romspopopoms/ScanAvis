@@ -68,7 +68,6 @@ async function uploadFile(file, octokit) {
 exports.handler = async (event) => {
   console.log('Handler started');
   if (event.httpMethod !== 'POST') {
-    console.log('Invalid HTTP method');
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
 
@@ -76,10 +75,11 @@ exports.handler = async (event) => {
   const busboy = new Busboy({ headers: event.headers });
   const tmpdir = os.tmpdir();
   const fileWrites = [];
-  const formFields = {};
+  let userUuid; let subscriptionId;
 
   busboy.on('field', (fieldname, val) => {
-    formFields[fieldname] = val;
+    if (fieldname === 'userUuid') userUuid = val;
+    if (fieldname === 'subscriptionId') subscriptionId = val;
   });
 
   busboy.on('file', (fieldname, file, filename) => {
@@ -100,16 +100,18 @@ exports.handler = async (event) => {
     busboy.on('finish', async () => {
       try {
         const writtenFiles = await Promise.all(fileWrites);
-        const uploadedFilesInfo = await Promise.all(writtenFiles.map((file) => uploadFile(file, octokit)));
-
         const pageId = uuidv4();
-        const insertQuery = 'INSERT INTO UserPages (pageId, titre, imageDeFondURL, logoURL, user_uuid, subscriptionId) VALUES (?, ?, ?, ?, ?, ?)';
+        const insertPageQuery = 'INSERT INTO UserPages (pageId, titre, user_uuid, subscriptionId) VALUES (?, ?, ?, ?)';
+        await conn.execute(insertPageQuery, [pageId, 'Titre de la page', userUuid, subscriptionId]);
 
-        await Promise.all(uploadedFilesInfo.map(({ fieldname, url }) => {
-          const values = [pageId, 'Titre de la page', fieldname === 'imageDeFond' ? url : null, fieldname === 'logo' ? url : null, formFields.userUuid, formFields.subscriptionId];
-          console.log('Attempting to insert into database:', values);
-          return conn.execute(insertQuery, values);
-        }));
+        const updatePagePromises = writtenFiles.map(async (file) => {
+          const url = await uploadFile(file, octokit);
+          const field = file.fieldname === 'imageDeFond' ? 'imageDeFondURL' : 'logoURL';
+          const updatePageQuery = `UPDATE UserPages SET ${field} = ? WHERE pageId = ?`;
+          await conn.execute(updatePageQuery, [url, pageId]);
+        });
+
+        await Promise.all(updatePagePromises);
 
         console.log('All files uploaded successfully and database updated');
         resolve({ statusCode: 200, body: JSON.stringify({ message: 'All files uploaded successfully', pageId }) });
