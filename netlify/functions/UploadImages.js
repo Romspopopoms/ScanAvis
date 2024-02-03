@@ -17,10 +17,12 @@ async function uploadFile(file, octokit) {
         repo: 'ScanAvis',
         path: `uploaded_images/${file.filename}`,
       });
-      sha = response.data.sha;
+      sha = response.data.sha; // Si le fichier existe, enregistrer le SHA pour la mise à jour
     } catch (error) {
-      // Le fichier n'existe pas encore ou autre erreur
-      if (error.status !== 404) {
+      if (error.status === 404) {
+        console.log(`File ${file.filename} does not exist, will be created.`);
+      } else {
+        // En cas d'erreur autre que 404, log l'erreur et lancez une exception
         console.error('Error fetching file:', error);
         throw new Error(`Error fetching file: ${file.filename}`);
       }
@@ -32,9 +34,9 @@ async function uploadFile(file, octokit) {
       path: `uploaded_images/${file.filename}`,
       message: `Add new image via serverless function: ${file.filename}`,
       content: contentEncoded,
-      sha, // Fournissez le SHA ici pour mettre à jour le fichier si nécessaire
+      sha, // Si sha est null (fichier n'existe pas), GitHub créera le fichier. Sinon, il mettra à jour le fichier existant.
     });
-    console.log(`File created or updated: ${file.filename}`);
+    console.log(`File ${file.filename} created or updated successfully.`);
   } catch (error) {
     console.error('File upload failed:', error);
     throw new Error(`File upload failed: ${file.filename}`);
