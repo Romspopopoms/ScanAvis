@@ -76,11 +76,10 @@ exports.handler = async (event) => {
   const busboy = new Busboy({ headers: event.headers });
   const tmpdir = os.tmpdir();
   const fileWrites = [];
-  let userUuid; let subscriptionId;
+  const formFields = {};
 
   busboy.on('field', (fieldname, val) => {
-    if (fieldname === 'userUuid') userUuid = val;
-    if (fieldname === 'subscriptionId') subscriptionId = val;
+    formFields[fieldname] = val;
   });
 
   busboy.on('file', (fieldname, file, filename) => {
@@ -106,10 +105,11 @@ exports.handler = async (event) => {
         const pageId = uuidv4();
         const insertQuery = 'INSERT INTO UserPages (pageId, titre, imageDeFondURL, logoURL, user_uuid, subscriptionId) VALUES (?, ?, ?, ?, ?, ?)';
 
-        uploadedFilesInfo.forEach(async ({ fieldname, url }) => {
-          const values = [pageId, 'Titre de la page', fieldname === 'imageDeFond' ? url : null, fieldname === 'logo' ? url : null, userUuid, subscriptionId];
-          await conn.execute(insertQuery, values);
-        });
+        await Promise.all(uploadedFilesInfo.map(({ fieldname, url }) => {
+          const values = [pageId, 'Titre de la page', fieldname === 'imageDeFond' ? url : null, fieldname === 'logo' ? url : null, formFields.userUuid, formFields.subscriptionId];
+          console.log('Attempting to insert into database:', values);
+          return conn.execute(insertQuery, values);
+        }));
 
         console.log('All files uploaded successfully and database updated');
         resolve({ statusCode: 200, body: JSON.stringify({ message: 'All files uploaded successfully', pageId }) });
