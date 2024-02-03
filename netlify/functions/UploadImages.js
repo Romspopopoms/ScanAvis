@@ -106,8 +106,9 @@ exports.handler = async (event) => {
           const values = [pageId, 'Titre de la page', null, null, 'userUuid']; // Remplacez "userUuid" par la valeur réelle de l'UUID de l'utilisateur
           if (fieldname === 'imageDeFond') values[2] = url;
           if (fieldname === 'logo') values[3] = url;
+          console.log('Attempting to insert into database', insertQuery, values);
           await conn.execute(insertQuery, values);
-          console.log(insertQuery, values);
+          console.log('Successfully inserted', values);
         });
 
         outerResolve({ statusCode: 200, body: JSON.stringify({ message: 'All files uploaded successfully', pageId }) });
