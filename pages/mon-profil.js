@@ -29,7 +29,7 @@ const MonProfilPage = () => {
   };
 
   return (
-    <div className="relative z-10 min-h-screen bg-gradient-to-b from-purple-800 to-purple-500 pt-16">
+    <div className="relative z-10 min-h-screen bg-gradient-to-b from-purple-800 to-purple-500 pt-[4rem]"> {/* Ajustez la valeur pt-[4rem] si nécessaire */}
       <div className="fixed top-0 left-0 w-full z-30">
         <div className="flex justify-center space-x-4 p-4 bg-purple-800 shadow-md">
           {menuItems.map((item) => (
@@ -47,7 +47,7 @@ const MonProfilPage = () => {
         </div>
       </div>
 
-      <div className="pt-24">
+      <div className="pt-[5rem]"> {/* Ajustez également cette valeur en fonction de la hauteur de votre navbar */}
         <AnimatePresence>
           {menuItems.map((item) => activeSection === item.key && (
             <motion.div
