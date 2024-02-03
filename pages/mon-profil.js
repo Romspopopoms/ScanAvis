@@ -19,7 +19,7 @@ const MonProfilPage = () => {
 
   useEffect(() => {
     // Assurez-vous que l'ID ou la classe ciblée correspond à votre barre de navigation
-    const navbar = document.getElementById('navbar'); // Utilisez l'ID ou la classe de votre barre de navigation
+    const navbar = document.getElementById('Navbar'); // Utilisez l'ID ou la classe de votre barre de navigation
     if (navbar) {
       setNavbarHeight(navbar.offsetHeight);
     }
