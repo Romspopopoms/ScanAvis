@@ -30,25 +30,24 @@ const MonProfilPage = () => {
 
   return (
     <div className="bg-gradient-to-b from-purple-800 to-purple-500">
-      {/* Ajustez la marge supérieure ici pour qu'elle corresponde à la hauteur de votre navbar */}
-      {/* Par exemple, si votre navbar fait 5rem de haut, essayez mt-24 pour ajouter un peu plus d'espace */}
-      <div className="mt-24 bg-purple-800 shadow-md">
-        <div className="flex justify-center space-x-4 p-4">
-          {menuItems.map((item) => (
-            <motion.div
-              key={item.key}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              className={`cursor-pointer px-4 py-2 rounded-lg text-white shadow-lg 
-                          ${activeSection === item.key ? 'bg-purple-600' : 'bg-purple-700 hover:bg-purple-600'}`}
-              onClick={() => setActiveSection(item.key)}
-            >
-              {item.name}
-            </motion.div>
-          ))}
+      <div className="relative"> {/* `relative` s'assure que le menu est positionné relativement à ce conteneur */}
+        <div className="mt-24 bg-purple-800 shadow-md">
+          <div className="flex justify-center space-x-4 p-4">
+            {menuItems.map((item) => (
+              <motion.div
+                key={item.key}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                className={`cursor-pointer px-4 py-2 rounded-lg text-white shadow-lg 
+                            ${activeSection === item.key ? 'bg-purple-600' : 'bg-purple-700 hover:bg-purple-600'}`}
+                onClick={() => setActiveSection(item.key)}
+              >
+                {item.name}
+              </motion.div>
+            ))}
+          </div>
         </div>
       </div>
-
       {/* Le contenu de la page en dessous du menu */}
       <AnimatePresence>
         {menuItems.map((item) => activeSection === item.key && (
