@@ -25,7 +25,7 @@ const MonProfil = () => {
 
   return (
     <motion.div
-      className="min-h-screen flex flex-col items-center justify-center"
+      className="min-h-screen flex flex-col items-center justify-center mt-[-20px]"
       variants={containerVariants}
       initial="hidden"
       animate="visible"
