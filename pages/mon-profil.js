@@ -31,7 +31,8 @@ const MonProfilPage = () => {
   return (
     <div className="bg-gradient-to-b from-purple-800 to-purple-500">
       <div className="pt-16 lg:pt-24">
-        <div className="bg-purple-800 shadow-md">
+        {/* Enlever le background de la div qui contient le menu des sections */}
+        <div className="shadow-md">
           <div className="flex justify-center space-x-4 p-4">
             {menuItems.map((item) => (
               <motion.div
