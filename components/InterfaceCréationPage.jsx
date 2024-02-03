@@ -34,12 +34,10 @@ const PageForm = () => {
     formData.append('titre', titre);
     if (imageDeFond) formData.append('imageDeFond', imageDeFond);
     if (logo) formData.append('logo', logo);
-    formData.append('userUuid', user.uuid); // Inclure l'UUID de l'utilisateur pour l'associer à la page
-    // Assurez-vous de choisir la bonne souscription si l'utilisateur en a plusieurs
-    const userSubscriptionId = userSubscriptions[0]?.subscriptionId; // Exemple: récupérer l'ID de la première souscription
-    if (userSubscriptionId) {
-      formData.append('subscriptionId', userSubscriptionId); // Inclure l'ID de la souscription pour l'associer à la page
-    }
+    formData.append('userUuid', user.uuid);
+
+    const userSubscriptionId = userSubscriptions.length > 0 ? userSubscriptions[0].subscriptionId : '';
+    formData.append('subscriptionId', userSubscriptionId);
 
     try {
       const response = await fetch('/.netlify/functions/UploadImages', {
@@ -49,12 +47,11 @@ const PageForm = () => {
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(errorText);
+        throw new Error(`Erreur lors de l'envoi du formulaire: ${errorText}`);
       }
 
       const result = await response.json();
       setMessage(result.message || 'Formulaire envoyé avec succès.');
-
       setTitre('');
       setImageDeFond(null);
       setLogo(null);
@@ -75,8 +72,6 @@ const PageForm = () => {
       {message && <div className="my-3 p-3 text-center text-white bg-purple-600 rounded-md">{message}</div>}
       <form onSubmit={handleSubmit} className="space-y-6">
         <h2 className="text-2xl font-bold text-center text-purple-800">Créer votre page</h2>
-
-        {/* Titre */}
         <div className="space-y-2">
           <label htmlFor="titre" className="block text-lg font-semibold text-gray-700">Nom de la société</label>
           <input
@@ -90,8 +85,6 @@ const PageForm = () => {
             placeholder="Entrez le nom de votre société"
           />
         </div>
-
-        {/* Image de fond */}
         <div className="space-y-2">
           <label htmlFor="imageDeFond" className="block text-lg font-semibold text-gray-700">Image de fond (JPG, PNG)</label>
           <input
@@ -103,8 +96,6 @@ const PageForm = () => {
             className="mt-1 block w-full file:px-4 file:py-2 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
           />
         </div>
-
-        {/* Logo */}
         <div className="space-y-2">
           <label htmlFor="logo" className="block text-lg font-semibold text-gray-700">Logo (JPG, PNG)</label>
           <input
@@ -116,8 +107,6 @@ const PageForm = () => {
             className="mt-1 block w-full file:px-4 file:py-2 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
           />
         </div>
-
-        {/* Bouton de soumission */}
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}

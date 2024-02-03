@@ -73,63 +73,49 @@ exports.handler = async (event) => {
   }
 
   const octokit = new Octokit({ auth: process.env.GITHUB_ACCESS });
+  const busboy = new Busboy({ headers: event.headers });
+  const tmpdir = os.tmpdir();
+  const fileWrites = [];
+  let userUuid; let subscriptionId;
 
-  return new Promise((outerResolve, outerReject) => { // Utilisez outerResolve et outerReject pour résoudre ou rejeter la promesse
-    const busboy = new Busboy({ headers: event.headers });
-    const tmpdir = os.tmpdir();
-    const fileWrites = [];
+  busboy.on('field', (fieldname, val) => {
+    if (fieldname === 'userUuid') userUuid = val;
+    if (fieldname === 'subscriptionId') subscriptionId = val;
+  });
 
-    busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {
-      const filepath = path.join(tmpdir, filename);
-      const writeStream = fs.createWriteStream(filepath);
-      file.pipe(writeStream);
+  busboy.on('file', (fieldname, file, filename) => {
+    const filepath = path.join(tmpdir, filename);
+    const writeStream = fs.createWriteStream(filepath);
+    file.pipe(writeStream);
 
-      const fileWrite = new Promise((innerResolve, innerReject) => {
-        file.on('end', () => writeStream.end());
-        writeStream.on('finish', () => innerResolve({ fieldname, filename, filepath, mimetype }));
-        writeStream.on('error', (error) => innerReject(new Error(error)));
-      });
-
-      fileWrites.push(fileWrite);
+    const fileWrite = new Promise((resolve, reject) => {
+      file.on('end', () => writeStream.end());
+      writeStream.on('finish', () => resolve({ fieldname, filename, filepath }));
+      writeStream.on('error', reject);
     });
 
+    fileWrites.push(fileWrite);
+  });
+
+  return new Promise((resolve, reject) => {
     busboy.on('finish', async () => {
       try {
         const writtenFiles = await Promise.all(fileWrites);
-        const uploadedFiles = await Promise.all(writtenFiles.map((file) => uploadFile(file, octokit)));
+        const uploadedFilesInfo = await Promise.all(writtenFiles.map((file) => uploadFile(file, octokit)));
+
         const pageId = uuidv4();
-
-        // Récupérez l'UUID de l'utilisateur et l'ID de la souscription depuis les données du formulaire
-        const { userUuid } = event.body;
-        const { subscriptionId } = event.body;
-
-        if (!userUuid || !subscriptionId) {
-          console.error('UUID de l’utilisateur ou ID de souscription non trouvé.');
-          outerReject(new Error('User UUID or Subscription ID not found'));
-          return;
-        }
-
         const insertQuery = 'INSERT INTO UserPages (pageId, titre, imageDeFondURL, logoURL, user_uuid, subscriptionId) VALUES (?, ?, ?, ?, ?, ?)';
-        for (const [index, url] of uploadedFiles.entries()) {
-          let values;
-          try {
-            const { fieldname } = writtenFiles[index];
-            values = [pageId, 'Titre de la page', null, null, userUuid, subscriptionId];
-            if (fieldname === 'imageDeFond') values[2] = url;
-            if (fieldname === 'logo') values[3] = url;
 
-            console.log('Attempting to insert into database', insertQuery, values);
-            await conn.execute(insertQuery, values);
-            console.log('Successfully inserted', values);
-          } catch (error) {
-            console.error('Failed to insert', values, error);
-          }
-        }
+        uploadedFilesInfo.forEach(async ({ fieldname, url }) => {
+          const values = [pageId, 'Titre de la page', fieldname === 'imageDeFond' ? url : null, fieldname === 'logo' ? url : null, userUuid, subscriptionId];
+          await conn.execute(insertQuery, values);
+        });
 
-        outerResolve({ statusCode: 200, body: JSON.stringify({ message: 'All files uploaded successfully', pageId }) });
+        console.log('All files uploaded successfully and database updated');
+        resolve({ statusCode: 200, body: JSON.stringify({ message: 'All files uploaded successfully', pageId }) });
       } catch (error) {
         console.error('Operation failed:', error);
-        outerReject(new Error(`Operation failed: ${error.message}`));
+        reject(new Error(`Operation failed: ${error.message}`));
       }
     });
 
