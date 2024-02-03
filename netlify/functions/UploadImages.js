@@ -32,19 +32,37 @@ async function uploadFile(file, octokit) {
   const contentEncoded = contentBuffer.toString('base64');
   const filePathInRepo = `${UPLOAD_PATH}/${file.filename}`;
 
-  const sha = await getCurrentSha(octokit, filePathInRepo);
-  const params = {
-    owner: GITHUB_OWNER,
-    repo: GITHUB_REPO,
-    path: filePathInRepo,
-    message: `Add/update image via serverless function: ${file.filename}`,
-    content: contentEncoded,
-    ...(sha && { sha }),
-  };
+  try {
+    let sha = await getCurrentSha(octokit, filePathInRepo);
+    const params = {
+      owner: GITHUB_OWNER,
+      repo: GITHUB_REPO,
+      path: filePathInRepo,
+      message: `Add/update image via serverless function: ${file.filename}`,
+      content: contentEncoded,
+      ...(sha && { sha }),
+    };
 
-  await octokit.repos.createOrUpdateFileContents(params);
-  console.log(`File ${file.filename} uploaded successfully.`);
-  return `https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/blob/main/${filePathInRepo}?raw=true`;
+    try {
+      await octokit.repos.createOrUpdateFileContents(params);
+    } catch (error) {
+      if (error.status === 409) {
+        // Conflit de SHA, récupérez le SHA actuel et réessayez
+        console.log(`SHA conflict detected for ${filePathInRepo}. Retrieving the latest SHA and retrying...`);
+        sha = await getCurrentSha(octokit, filePathInRepo);
+        params.sha = sha; // Mettez à jour le SHA dans les paramètres
+        await octokit.repos.createOrUpdateFileContents(params); // Réessayez avec le nouveau SHA
+      } else {
+        throw error; // S'il s'agit d'une autre erreur, la transmettre
+      }
+    }
+
+    console.log(`File ${file.filename} uploaded successfully.`);
+    return `https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/blob/main/${filePathInRepo}?raw=true`;
+  } catch (error) {
+    console.error(`Failed to upload file ${file.filename}:`, error);
+    throw new Error(`Failed to upload file ${file.filename}`);
+  }
 }
 
 exports.handler = async (event) => {
