@@ -19,7 +19,11 @@ async function uploadFile(file, octokit) {
       });
       sha = response.data.sha;
     } catch (error) {
-      console.log(`File does not exist or other error: ${error}`);
+      // Le fichier n'existe pas encore ou autre erreur
+      if (error.status !== 404) {
+        console.error('Error fetching file:', error);
+        throw new Error(`Error fetching file: ${file.filename}`);
+      }
     }
 
     await octokit.repos.createOrUpdateFileContents({
@@ -30,7 +34,7 @@ async function uploadFile(file, octokit) {
       content: contentEncoded,
       sha, // Fournissez le SHA ici pour mettre à jour le fichier si nécessaire
     });
-    console.log(`File created: ${file.filename}`);
+    console.log(`File created or updated: ${file.filename}`);
   } catch (error) {
     console.error('File upload failed:', error);
     throw new Error(`File upload failed: ${file.filename}`);
