@@ -196,6 +196,7 @@ export const AuthProvider = ({ children }) => {
       verifyTokenWithServer,
       refreshAccessToken,
       errorMessage,
+      handleError,
     }}
     >
       {children}
