@@ -31,7 +31,7 @@ const MonProfilPage = () => {
   return (
     <div className="relative z-10 bg-gradient-to-b from-purple-800 to-purple-500">
       {/* Ajout de padding-top pour créer de l'espace pour le menu */}
-      <div className="pt-4"> {/* Ajustez cette valeur comme nécessaire pour l'espace du menu */}
+      <div className="pt-8"> {/* Ajustez cette valeur comme nécessaire pour l'espace du menu */}
         <div className="flex justify-center space-x-4 p-4 bg-purple-800 shadow-md">
           {menuItems.map((item) => (
             <motion.div
