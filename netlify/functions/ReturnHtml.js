@@ -40,10 +40,12 @@ async function generateHtmlPage(pageId) {
       export default Page;
     `;
 
-    // Définir le chemin où le fichier React sera stocké
-    const filePath = path.join(__dirname, 'generated', `${pageId}.js`);
+    const generatedDirPath = path.join(__dirname, 'generated');
+    if (!fs.existsSync(generatedDirPath)) {
+      fs.mkdirSync(generatedDirPath, { recursive: true });
+    }
 
-    // Écrire le contenu dans le fichier
+    const filePath = path.join(generatedDirPath, `${pageId}.js`);
     fs.writeFileSync(filePath, reactContent);
 
     return filePath;
