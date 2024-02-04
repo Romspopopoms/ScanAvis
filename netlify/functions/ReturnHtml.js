@@ -32,8 +32,12 @@ async function generateHtmlPage(pageId) {
                 className="appearance-none rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               />
             </div>
+            <button type="button" className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-full transition ease-in-out duration-300">
+          Envoyer
+        </button>
           </div>
         </div>
+      </div>
       );
       
       export default Page;
