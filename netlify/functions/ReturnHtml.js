@@ -37,9 +37,8 @@ async function generateHtmlPage(pageId) {
         </button>
           </div>
         </div>
-      </div>
       );
-      
+
       export default Page;
     `;
 
