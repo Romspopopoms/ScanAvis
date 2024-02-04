@@ -4,6 +4,7 @@ const path = require('path');
 const os = require('os');
 const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
+const slugify = require('slugify');
 const { conn } = require('../../utils/db');
 const { generateHtmlPage } = require('./ReturnHtml');
 const { pushHtmlToRepoAndTriggerNetlify } = require('./PushDeployHtml');
@@ -108,12 +109,7 @@ exports.handler = async (event) => {
         const writtenFiles = await Promise.all(fileWrites);
         const pageId = uuidv4();
         const insertPageQuery = 'INSERT INTO UserPages (pageId, titre, user_uuid, subscriptionId) VALUES (?, ?, ?, ?)';
-        await conn.execute(insertPageQuery, [
-          pageId,
-          titrePage,
-          userUuid,
-          subscriptionId,
-        ]); // Utiliser titrePage ici
+        await conn.execute(insertPageQuery, [pageId, titrePage, userUuid, subscriptionId]);
 
         const updatePagePromises = writtenFiles.map(async (file) => {
           const url = await uploadFile(file, octokit);
@@ -126,39 +122,24 @@ exports.handler = async (event) => {
 
         console.log('All files uploaded successfully and database updated');
 
-        // Générez la page HTML et renvoyez-la en réponse
-        try {
-          const htmlResponse = await generateHtmlPage(pageId);
-          console.log('HTML page generated successfully');
+        const filePath = await generateHtmlPage(pageId);
+        const reactContent = fs.readFileSync(filePath, 'utf8');
 
-          // Définir le chemin où le fichier HTML sera stocké dans le dépôt GitHub
-          const htmlFilePath = `pages/${pageId}.html`;
-          await pushHtmlToRepoAndTriggerNetlify(htmlResponse, htmlFilePath);
+        await pushHtmlToRepoAndTriggerNetlify(reactContent, titrePage);
 
-          // Construire l'URL complète de la page HTML déployée
-          const deployedHtmlUrl = `${NETLIFY_SITE_URL}/${htmlFilePath}`;
+        const deployedPageUrl = `${NETLIFY_SITE_URL}/pages/${slugify(titrePage, { lower: true })}`;
 
-          resolve({
-            statusCode: 200,
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              message: 'Page created and deployment initiated.',
-              pageUrl: deployedHtmlUrl, // Renvoyer l'URL complète de la page déployée
-            }),
-          });
-        } catch (error) {
-          console.error('Operation failed:', error);
-          const rejectionError = new Error(
-            `Operation failed: ${error.message}`,
-          );
-          rejectionError.statusCode = 500;
-          reject(rejectionError);
-        }
+        resolve({
+          statusCode: 200,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message: 'Page created and deployment initiated.',
+            pageUrl: deployedPageUrl,
+          }),
+        });
       } catch (error) {
         console.error('Operation failed:', error);
-        const rejectionError = new Error(`Operation failed: ${error.message}`);
-        rejectionError.statusCode = 500;
-        reject(rejectionError);
+        reject(new Error(`Operation failed: ${error.message}`)); // Utiliser un objet Error pour le rejet
       }
     });
 

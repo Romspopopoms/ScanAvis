@@ -8,11 +8,6 @@ const containerVariants = {
   exit: { opacity: 0, scale: 0.95, transition: { duration: 0.5 } },
 };
 
-const iframeVariants = {
-  hidden: { opacity: 0, y: 50 },
-  visible: { opacity: 1, y: 0, transition: { delay: 0.5, duration: 0.5 } },
-};
-
 const PageForm = () => {
   const {
     isAuthenticated,
@@ -77,8 +72,7 @@ const PageForm = () => {
   };
 
   if (formSubmitted && htmlResponse) {
-    console.log('Rendu de la page avec l\'HTML:', htmlResponse); // Log pour voir le rendu de l'iframe avec le HTML
-
+    // Instead of rendering the HTML response in an iframe, provide a link to the generated page
     return (
       <motion.div
         className="max-w-4xl mx-auto my-12 p-8"
@@ -87,15 +81,16 @@ const PageForm = () => {
         animate="visible"
         exit="exit"
       >
-        <h2 className="text-3xl font-bold text-center mb-8" style={{ color: '#6D28D9' }}>Votre page est prête !</h2>
-        <motion.iframe
-          className="w-full h-screen border-none"
-          srcDoc={htmlResponse}
-          title="Aperçu de la page générée"
-          variants={iframeVariants}
-          initial="hidden"
-          animate="visible"
-        />
+        <h2 className="text-3xl font-bold text-center mb-8">Votre page est prête !</h2>
+        <p className="text-center">Voici le lien vers votre nouvelle page :</p>
+        <a
+          href={htmlResponse.pageUrl}
+          className="block text-center mt-4 text-purple-600 hover:text-purple-800"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Accéder à la page
+        </a>
       </motion.div>
     );
   }
