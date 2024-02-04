@@ -7,9 +7,9 @@
   directory = "netlify/functions" # Chemin relatif vers le répertoire de vos fonctions Netlify
 
 [[redirects]]
-  from = "/pages/*"
-  to = "/pages/:splat"
-  status = 200
+from = "/generated/*"
+to = "/generated/:splat"
+status = 200
 
 [[redirects]]
   from = "/*"
