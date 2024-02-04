@@ -13,7 +13,7 @@ const octokit = new Octokit({ auth: GITHUB_ACCESS });
 async function pushReactPageToRepoAndTriggerNetlify(reactContent, pageTitle) {
   // Nettoyer le titre de la page pour créer un chemin sûr
   const pageSlug = slugify(pageTitle, { lower: true, remove: /[*+~.()'"!:@]/g });
-  const filePath = `pages/${pageSlug}.js`; // Chemin adapté pour les composants React
+  const filePath = `pages/${pageSlug}.js`; // Chemin dans le dépôt GitHub où le fichier doit être stocké
 
   try {
     const contentEncoded = Buffer.from(reactContent).toString('base64');
@@ -41,7 +41,7 @@ async function pushReactPageToRepoAndTriggerNetlify(reactContent, pageTitle) {
       owner: GITHUB_OWNER,
       repo: GITHUB_REPO,
       path: filePath,
-      message: `Mise à jour du composant React: ${filePath}`,
+      message: `Mise à jour du composant React: ${pageTitle}`,
       content: contentEncoded,
       sha, // S'il y a un SHA, le fichier sera mis à jour. Sinon, un nouveau fichier sera créé.
       branch: GITHUB_BRANCH,
@@ -53,7 +53,7 @@ async function pushReactPageToRepoAndTriggerNetlify(reactContent, pageTitle) {
       throw new Error(`Échec de la requête de build Netlify: ${response.statusText}`);
     }
 
-    console.log(`Le build Netlify a été déclenché avec succès pour le composant ${filePath}`);
+    console.log(`Le build Netlify a été déclenché avec succès pour le composant ${pageTitle}`);
   } catch (error) {
     console.error('Échec de la mise à jour du composant React et du déclenchement du build:', error);
     throw error;

@@ -106,6 +106,7 @@ exports.handler = async (event) => {
   return new Promise((resolve, reject) => {
     busboy.on('finish', async () => {
       try {
+        // Upload files and insert page details into the database
         const writtenFiles = await Promise.all(fileWrites);
         const pageId = uuidv4();
         const insertPageQuery = 'INSERT INTO UserPages (pageId, titre, user_uuid, subscriptionId) VALUES (?, ?, ?, ?)';
@@ -119,18 +120,21 @@ exports.handler = async (event) => {
         });
 
         await Promise.all(updatePagePromises);
-
         console.log('All files uploaded successfully and database updated');
 
-        const filePath = await generateHtmlPage(pageId);
-        const reactContent = fs.readFileSync(filePath, 'utf8');
-        const clientPagePath = `pages/${slugify(titrePage, { lower: true })}.js`; // Chemin dans le dépôt GitHub où le fichier doit être stocké
+        // Generate the HTML page content
+        const htmlContent = await generateHtmlPage(pageId);
 
-        await pushHtmlToRepoAndTriggerNetlify(reactContent, clientPagePath);
+        // Generate the slug for the page title
+        const pageSlug = slugify(titrePage, { lower: true });
 
-        // Construire l'URL de la page déployée
-        const deployedPageUrl = `${NETLIFY_SITE_URL}/${clientPagePath.replace('.js', '')}`;
+        // Push the HTML content to the GitHub repository and trigger a Netlify build
+        await pushHtmlToRepoAndTriggerNetlify(htmlContent, titrePage);
 
+        // Build the deployed page URL
+        const deployedPageUrl = `${NETLIFY_SITE_URL}/${pageSlug}`;
+
+        // Resolve the promise with the deployment details
         resolve({
           statusCode: 200,
           headers: { 'Content-Type': 'application/json' },
@@ -141,7 +145,7 @@ exports.handler = async (event) => {
         });
       } catch (error) {
         console.error('Operation failed:', error);
-        reject(new Error(`Operation failed: ${error.message}`)); // Utiliser un objet Error pour le rejet
+        reject(new Error(`Operation failed: ${error.message}`)); // Use an Error object for rejection
       }
     });
 
