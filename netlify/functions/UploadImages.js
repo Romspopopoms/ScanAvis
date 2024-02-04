@@ -132,7 +132,7 @@ exports.handler = async (event) => {
         await pushHtmlToRepoAndTriggerNetlify(htmlContent, titrePage);
 
         // Build the deployed page URL
-        const deployedPageUrl = `${NETLIFY_SITE_URL}/${pageSlug}`;
+        const deployedPageUrl = `${NETLIFY_SITE_URL}/pages/${pageSlug}`;
 
         // Resolve the promise with the deployment details
         resolve({
