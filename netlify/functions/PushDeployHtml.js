@@ -10,7 +10,7 @@ const { NETLIFY_BUILD_HOOK_URL } = process.env;
 
 const octokit = new Octokit({ auth: GITHUB_ACCESS });
 
-async function pushReactPageToRepoAndTriggerNetlify(reactContent, pageTitle) {
+async function pushHtmlToRepoAndTriggerNetlify(reactContent, pageTitle) {
   // Nettoyer le titre de la page pour créer un chemin sûr
   const pageSlug = slugify(pageTitle, { lower: true, remove: /[*+~.()'"!:@]/g });
   const filePath = `pages/${pageSlug}.js`; // Chemin dans le dépôt GitHub où le fichier doit être stocké
@@ -60,4 +60,4 @@ async function pushReactPageToRepoAndTriggerNetlify(reactContent, pageTitle) {
   }
 }
 
-module.exports = { pushReactPageToRepoAndTriggerNetlify };
+module.exports = { pushHtmlToRepoAndTriggerNetlify };
