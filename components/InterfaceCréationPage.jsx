@@ -61,9 +61,10 @@ const PageForm = () => {
       }
 
       const result = await response.json();
+      console.log('Réponse du serveur:', result); // Log pour voir la réponse du serveur
       setMessage(result.message || 'Formulaire envoyé avec succès.');
       setHtmlResponse(result.htmlResponse); // Enregistrez la réponse HTML générée
-      console.log('Réponse du backend:', result);
+      console.log('HTML reçu:', result.htmlResponse);
       setFormSubmitted(true); // Marquez le formulaire comme soumis
       setTitre('');
       setImageDeFond(null);
@@ -76,6 +77,8 @@ const PageForm = () => {
   };
 
   if (formSubmitted && htmlResponse) {
+    console.log('Rendu de la page avec l\'HTML:', htmlResponse); // Log pour voir le rendu de l'iframe avec le HTML
+
     return (
       <motion.div
         className="max-w-4xl mx-auto my-12 p-8"
