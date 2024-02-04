@@ -3,7 +3,7 @@ const path = require('path');
 const slugify = require('slugify');
 const { conn } = require('../../utils/db');
 
-const CLIENT_PAGE_PATH = process.env.CLIENT_PAGE_PATH || path.join(__dirname, '..', 'ClientPage');
+const CLIENT_PAGE_PATH = process.env.CLIENT_PAGE_PATH || path.join(__dirname, '..', 'Page');
 
 async function generateHtmlPage(pageId) {
   if (!pageId) {

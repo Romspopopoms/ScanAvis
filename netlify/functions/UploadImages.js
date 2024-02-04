@@ -124,10 +124,12 @@ exports.handler = async (event) => {
 
         const filePath = await generateHtmlPage(pageId);
         const reactContent = fs.readFileSync(filePath, 'utf8');
+        const clientPagePath = `pages/${slugify(titrePage, { lower: true })}.js`; // Chemin dans le dépôt GitHub où le fichier doit être stocké
 
-        await pushHtmlToRepoAndTriggerNetlify(reactContent, titrePage);
+        await pushHtmlToRepoAndTriggerNetlify(reactContent, clientPagePath);
 
-        const deployedPageUrl = `${NETLIFY_SITE_URL}/pages/${slugify(titrePage, { lower: true })}`;
+        // Construisez l'URL de la page déployée
+        const deployedPageUrl = `${NETLIFY_SITE_URL}/${clientPagePath.replace('.js', '')}`;
 
         resolve({
           statusCode: 200,
