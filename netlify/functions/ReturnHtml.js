@@ -1,5 +1,4 @@
-// generateHtmlPage.js
-const { conn } = require('../../utils/db'); // Assurez-vous que ce chemin correspond à votre structure de projet
+const { conn } = require('../../utils/db');
 
 async function generateHtmlPage(pageId) {
   if (!pageId) {
@@ -8,14 +7,15 @@ async function generateHtmlPage(pageId) {
 
   try {
     const query = 'SELECT titre, imageDeFondURL, logoURL FROM UserPages WHERE pageId = ? LIMIT 1';
-    const [result] = await conn.execute(query, [pageId]);
+    const result = await conn.execute(query, [pageId]);
+    console.log('Résultat de la requête:', result);
+    const { rows } = result;
 
-    if (result.length === 0) {
+    if (rows.length === 0) {
       throw new Error('Page not found');
     }
 
-    // Utilisation de la syntaxe destructurée pour accéder directement au premier élément du tableau 'rows'
-    const { titre, imageDeFondURL, logoURL } = result[0];
+    const { titre, imageDeFondURL, logoURL } = rows[0];
 
     // Générer le HTML personnalisé en utilisant les données de la page
     const html = `
