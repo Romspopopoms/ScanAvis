@@ -5,6 +5,7 @@ const os = require('os');
 const fs = require('fs');
 const { v4: uuidv4 } = require('uuid'); // Pour générer des ID uniques
 const { conn } = require('../../utils/db'); // Assurez-vous que ce chemin correspond à votre structure de projet
+const { generateHtmlPage } = require('./ReturnHtml'); // Assurez-vous que le chemin est correct
 
 const GITHUB_OWNER = 'Romspopopoms';
 const GITHUB_REPO = 'ScanAvis';
@@ -115,10 +116,27 @@ exports.handler = async (event) => {
         await Promise.all(updatePagePromises);
 
         console.log('All files uploaded successfully and database updated');
-        resolve({ statusCode: 200, body: JSON.stringify({ message: 'All files uploaded successfully', pageId }) });
+
+        // Générez la page HTML et renvoyez-la en réponse
+        try {
+          const htmlResponse = await generateHtmlPage(pageId);
+          console.log('HTML page generated successfully');
+          resolve({
+            statusCode: 200,
+            headers: { 'Content-Type': 'text/html' },
+            body: htmlResponse, // Renvoyer le HTML généré
+          });
+        } catch (error) {
+          console.error('Failed to generate HTML page:', error);
+          const rejectionError = new Error(`Failed to generate HTML page: ${error.message}`);
+          rejectionError.statusCode = 500;
+          reject(rejectionError);
+        }
       } catch (error) {
         console.error('Operation failed:', error);
-        reject(new Error(`Operation failed: ${error.message}`));
+        const rejectionError = new Error(`Operation failed: ${error.message}`);
+        rejectionError.statusCode = 500;
+        reject(rejectionError);
       }
     });
 

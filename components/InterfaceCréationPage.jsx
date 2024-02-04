@@ -15,6 +15,8 @@ const PageForm = () => {
   const [logo, setLogo] = useState(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [formSubmitted, setFormSubmitted] = useState(false);
+  const [htmlResponse, setHtmlResponse] = useState(''); // Renommé pour correspondre à la réponse du backend
 
   useEffect(() => {
     setMessage('');
@@ -22,12 +24,10 @@ const PageForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!isAuthenticated) {
       setMessage('Veuillez vous connecter pour créer une page.');
       return;
     }
-
     setLoading(true);
 
     const formData = new FormData();
@@ -35,7 +35,6 @@ const PageForm = () => {
     if (imageDeFond) formData.append('imageDeFond', imageDeFond);
     if (logo) formData.append('logo', logo);
     formData.append('userUuid', user.uuid);
-
     const userSubscriptionId = userSubscriptions.length > 0 ? userSubscriptions[0].subscriptionId : '';
     formData.append('subscriptionId', userSubscriptionId);
 
@@ -52,6 +51,8 @@ const PageForm = () => {
 
       const result = await response.json();
       setMessage(result.message || 'Formulaire envoyé avec succès.');
+      setHtmlResponse(result.htmlResponse); // Enregistrez la réponse HTML générée
+      setFormSubmitted(true); // Marquez le formulaire comme soumis
       setTitre('');
       setImageDeFond(null);
       setLogo(null);
@@ -61,6 +62,22 @@ const PageForm = () => {
       setLoading(false);
     }
   };
+
+  if (formSubmitted) {
+    return (
+      <div className="max-w-lg mx-auto my-12 p-8">
+        <h2 className="text-2xl font-bold text-center text-purple-800">Votre page est prête !</h2>
+        <div className="text-center mt-4">
+          {/* Affichez la réponse HTML directement dans une balise iframe */}
+          <iframe
+            srcDoc={htmlResponse}
+            style={{ width: '100%', height: '500px', border: 'none' }}
+            title="Aperçu de la page générée"
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <motion.div
