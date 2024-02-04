@@ -63,7 +63,7 @@ const PageForm = () => {
     }
   };
 
-  if (formSubmitted) {
+  if (formSubmitted && htmlResponse) {
     return (
       <div className="max-w-lg mx-auto my-12 p-8">
         <h2 className="text-2xl font-bold text-center text-purple-800">Votre page est prête !</h2>
