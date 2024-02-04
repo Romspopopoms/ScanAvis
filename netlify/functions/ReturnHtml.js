@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const slugify = require('slugify');
 const { conn } = require('../../utils/db');
 
 async function generateHtmlPage(pageId) {
@@ -14,6 +15,9 @@ async function generateHtmlPage(pageId) {
     if (result.rows.length === 0) {
       throw new Error('Page not found');
     }
+
+    const titrePage = 'Votre Titre de Page ici'; // Assumer que vous avez le titre de la page ici
+    const pageTitleSlug = slugify(titrePage, { lower: true, remove: /[*+~.()'"!:@]/g });
 
     const { titre, imageDeFondURL, logoURL } = result.rows[0];
 
@@ -40,15 +44,12 @@ async function generateHtmlPage(pageId) {
       export default Page;
     `;
 
-    const generatedDirPath = path.join(__dirname, 'generated');
-    if (!fs.existsSync(generatedDirPath)) {
-      fs.mkdirSync(generatedDirPath, { recursive: true });
-    }
+    const clientPagePath = path.join(__dirname, '..', 'ClientPage', `${pageTitleSlug}.js`);
 
-    const filePath = path.join(generatedDirPath, `${pageId}.js`);
-    fs.writeFileSync(filePath, reactContent);
+    // Écrire le contenu dans le fichier
+    fs.writeFileSync(clientPagePath, reactContent);
 
-    return filePath;
+    return clientPagePath;
   } catch (error) {
     console.error('Database query failed:', error);
     throw error;
