@@ -7,16 +7,15 @@ async function generateHtmlPage(pageId) {
   }
 
   try {
-    // Récupérer les données de la page depuis la base de données en utilisant pageId
     const query = 'SELECT titre, imageDeFondURL, logoURL FROM UserPages WHERE pageId = ? LIMIT 1';
-    const rows = await conn.execute(query, [pageId]);
+    const [result] = await conn.execute(query, [pageId]);
 
-    if (rows.length === 0) {
+    if (result.length === 0) {
       throw new Error('Page not found');
     }
 
     // Utilisation de la syntaxe destructurée pour accéder directement au premier élément du tableau 'rows'
-    const { titre, imageDeFondURL, logoURL } = rows[0];
+    const { titre, imageDeFondURL, logoURL } = result[0];
 
     // Générer le HTML personnalisé en utilisant les données de la page
     const html = `
