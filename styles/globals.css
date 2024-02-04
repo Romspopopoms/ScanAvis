@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-:not(.no-global-styles) * {
+ * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -10,7 +10,7 @@
   scroll-behavior: smooth;
 }
 
-:not(.no-global-styles) .gradient-01 {
+ .gradient-01 {
   background-image: linear-gradient(
     270deg,
     hsl(249, 64%, 58%) 0%,
@@ -23,7 +23,7 @@
 }
 
 
-:not(.no-global-styles) .hero-gradient {
+.hero-gradient {
   background: linear-gradient(
     97.86deg,
     #a509ff 0%,
@@ -32,7 +32,7 @@
   );
 }
 
-:not(.no-global-styles) .gradient-02 {
+.gradient-02 {
   position: absolute;
   width: 200px;
   height: 438px;
@@ -43,7 +43,7 @@
   filter: blur(190px);
 }
 
-:not(.no-global-styles) .glassmorphism {
+.glassmorphism {
   background: rgba(255, 255, 255, 0.25);
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
   backdrop-filter: blur(4px);
@@ -51,7 +51,7 @@
   border: 1px solid rgba(255, 255, 255, 0.18);
 }
 
-:not(.no-global-styles) .gradient-03 {
+.gradient-03 {
   position: absolute;
   width: 404px;
   height: 800px;
@@ -63,7 +63,7 @@
   transform: rotate(-114.2deg);
 }
 
-:not(.no-global-styles) .gradient-04 {
+.gradient-04 {
   position: absolute;
   width: 304px;
   height: 100vh;
@@ -75,7 +75,7 @@
   transform: rotate(-53.13deg);
 }
 
-:not(.no-global-styles) .gradient-05 {
+.gradient-05 {
   background: linear-gradient(
     180deg,
     rgba(255, 255, 255, 0.04) 0%,
@@ -83,7 +83,7 @@
   );
 }
 
-:not(.no-global-styles) .feedback-gradient {
+.feedback-gradient {
   position: absolute;
   width: 200px;
   height: 316px;
@@ -95,12 +95,12 @@
 }
 
 /* Ensure that the parent of your footer has a relative position */
-:not(.no-global-styles) .page-container {
+.page-container {
   position: relative;
   min-height: 100vh; /* Full height of the viewport */
 }
 
-:not(.no-global-styles) .footer-gradient {
+.footer-gradient {
   position: absolute;
   left: 0;
   right: 0;
