@@ -40,7 +40,8 @@ async function generateHtmlPage(pageId) {
     `;
 
     // Utiliser Prettier pour formater le code généré
-    const formattedReactContent = prettier.format(reactContent, { parser: 'babel' });
+    const formattedReactContent = prettier.format(reactContent, { parser: 'babel', singleQuote: true, // force l'utilisation de guillemets simples
+    });
 
     return formattedReactContent; // Renvoie le contenu HTML / JSX formaté
   } catch (error) {
