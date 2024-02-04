@@ -1,19 +1,19 @@
+# netlify.toml
 [build]
-command = "npm run build"
-publish = "out"
-
-# Exclure les chemins qui commencent par /pages/ de la redirection globale
-[[redirects]]
-from = "/pages/*"
-to = "/pages/:splat"
-status = 200
-
-[[redirects]]
-from = "/*"
-to = "/index.html"
-status = 200
-force = false
-
+  base = "ScanAvis/"        # Chemin vers le répertoire de base de votre projet
+  publish = "ScanAvis/out/" # Chemin vers le répertoire où les fichiers de build sont générés
+  command = "npm run build" # La commande pour construire votre site
 
 [functions]
-directory = "netlify/functions"
+  directory = "ScanAvis/functions" # Chemin relatif vers le répertoire de vos fonctions Netlify
+
+[[redirects]]
+  from = "/pages/*"
+  to = "/pages/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  force = false
