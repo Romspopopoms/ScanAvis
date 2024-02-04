@@ -14,6 +14,7 @@ import Footer from '../components/Footer';
 const MyApp = ({ Component, pageProps }) => {
   const router = useRouter();
   const shouldDisplayCartSummary = router.pathname !== '/paiement';
+  const showGlobalComponents = !router.pathname.startsWith('/generated/');
 
   return (
     <AuthProvider>
@@ -29,14 +30,14 @@ const MyApp = ({ Component, pageProps }) => {
                 <link rel="stylesheet" href="https://stijndv.com/fonts/Eudoxus-Sans.css" />
               </Head>
 
-              <Navbar />
+              {showGlobalComponents && <Navbar />}
 
               <main className="flex-grow">
                 {shouldDisplayCartSummary && <CartSummary />}
                 <Component {...pageProps} />
               </main>
 
-              <Footer />
+              {showGlobalComponents && <Footer />}
             </div>
           </NavbarHeightProvider>
         </PaymentProvider>
