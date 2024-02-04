@@ -4,10 +4,10 @@ const fetch = require('node-fetch');
 const GITHUB_OWNER = 'Romspopopoms';
 const GITHUB_REPO = 'ScanAvis';
 const GITHUB_BRANCH = 'main';
+const { GITHUB_ACCESS } = process.env;
 const { NETLIFY_BUILD_HOOK_URL } = process.env;
-const { GITHUB_ACCESS_TOKEN } = process.env;
 
-const octokit = new Octokit({ auth: GITHUB_ACCESS_TOKEN });
+const octokit = new Octokit({ auth: GITHUB_ACCESS });
 
 async function pushHtmlToRepoAndTriggerNetlify(htmlContent, filePath) {
   try {
