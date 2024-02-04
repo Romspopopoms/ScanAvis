@@ -2,10 +2,18 @@
 command = "npm run build"
 publish = "out"
 
+# Exclure les chemins qui commencent par /pages/ de la redirection globale
+[[redirects]]
+from = "/pages/*"
+to = "/pages/:splat"
+status = 200
+
 [[redirects]]
 from = "/*"
 to = "/index.html"
 status = 200
+force = false
+
 
 [functions]
 directory = "netlify/functions"
