@@ -21,12 +21,11 @@ async function generateHtmlPage(pageId) {
       import React from 'react';
       
       const Page = () => (
-        <div className= "relative bg-cover bg-center h-screen" style={{ backgroundImage: 'url("${imageDeFondURL}")' }}>
+        <div className="bg-cover bg-center h-screen" style={{ backgroundImage: 'url("${imageDeFondURL}")' }}>
           <div className="flex flex-col items-center justify-center h-full">
-          <div className="absolute top-0 mt-10">
-            <img src="${logoURL}" alt="Logo" className="mb-4" />
+            <img src="${logoURL}" alt="Logo" className="mb-6 w-20 h-auto" />
             <h1 className="text-4xl text-white mb-4">${titre}</h1>
-            <div className="bg-white opacity-75 rounded p-4">
+            <div className="bg-white bg-opacity-75 rounded-lg p-4 shadow-lg mb-6">
               <input
                 type="email"
                 placeholder="Entrez votre email"
