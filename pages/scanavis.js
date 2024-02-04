@@ -4,7 +4,7 @@
       const Page = () => (
         <div className="bg-cover bg-center h-screen" style={{ backgroundImage: 'url("https://github.com/Romspopopoms/ScanAvis/blob/main/uploaded_images/get-started.jpg?raw=true")' }}>
           <div className="flex flex-col items-center justify-center h-full">
-            <img src="https://github.com/Romspopopoms/ScanAvis/blob/main/uploaded_images/check.png?raw=true" alt="Logo" className="mb-4" />
+            <img src="https://github.com/Romspopopoms/ScanAvis/blob/main/uploaded_images/get-started.png?raw=true" alt="Logo" className="mb-4" />
             <h1 className="text-4xl text-white mb-4">Scan'Avis</h1>
             <div className="bg-white opacity-75 rounded p-4">
               <input
