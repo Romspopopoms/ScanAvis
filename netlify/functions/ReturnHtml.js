@@ -3,6 +3,8 @@ const path = require('path');
 const slugify = require('slugify');
 const { conn } = require('../../utils/db');
 
+const CLIENT_PAGE_PATH = process.env.CLIENT_PAGE_PATH || path.join(__dirname, '..', 'ClientPage');
+
 async function generateHtmlPage(pageId) {
   if (!pageId) {
     throw new Error('Page ID is required');
@@ -44,9 +46,8 @@ async function generateHtmlPage(pageId) {
       export default Page;
     `;
 
-    const clientPagePath = path.join(__dirname, '..', 'ClientPage', `${pageTitleSlug}.js`);
+    const clientPagePath = path.join(CLIENT_PAGE_PATH, `${pageTitleSlug}.js`);
 
-    // Écrire le contenu dans le fichier
     fs.writeFileSync(clientPagePath, reactContent);
 
     return clientPagePath;
