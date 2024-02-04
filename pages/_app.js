@@ -14,14 +14,14 @@ import Footer from '../components/Footer';
 const MyApp = ({ Component, pageProps }) => {
   const router = useRouter();
   const shouldDisplayCartSummary = router.pathname !== '/paiement';
-  const showGlobalComponents = !router.pathname.startsWith('/generated/');
+  const showGlobalComponents = !router.pathname.startsWith('/generated/') ? 'no-global-styles' : '';
 
   return (
     <AuthProvider>
       <CartProvider>
         <PaymentProvider>
           <NavbarHeightProvider> {/* Enveloppez votre application dans NavbarHeightProvider */}
-            <div className="flex flex-col min-h-screen gradient-01">
+            <div className={`flex flex-col min-h-screen gradient-01 ${showGlobalComponents}`}>
               <Head>
                 <title>Scan'Avis</title>
                 <meta name="viewport" content="initial-scale=1.0, width=device-width" />
