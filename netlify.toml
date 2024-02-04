@@ -1,5 +1,5 @@
 [build]
-command = "npm run"
+command = "npm run build"
 publish = "out"
 
 # Exclure les chemins qui commencent par /pages/ de la redirection globale
