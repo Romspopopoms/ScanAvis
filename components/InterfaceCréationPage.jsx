@@ -9,12 +9,7 @@ const containerVariants = {
 };
 
 const PageForm = () => {
-  const {
-    isAuthenticated,
-    user,
-    userSubscriptions,
-    handleError,
-  } = useContext(AuthContext);
+  const { isAuthenticated, user, userSubscriptions, handleError } = useContext(AuthContext);
 
   const [titre, setTitre] = useState('');
   const [imageDeFond, setImageDeFond] = useState(null);
@@ -31,7 +26,6 @@ const PageForm = () => {
 
   const checkPageAvailability = async () => {
     console.log(`Vérification de la disponibilité de la page: ${pageUrl}`);
-
     try {
       const response = await fetch(pageUrl);
       if (response.ok) {
@@ -46,7 +40,7 @@ const PageForm = () => {
   };
 
   useEffect(() => {
-    if (isCheckingPage) {
+    if (isCheckingPage && pageUrl) {
       const intervalId = setInterval(checkPageAvailability, 10000); // Vérifie toutes les 10 secondes
       return () => clearInterval(intervalId);
     }
@@ -59,8 +53,6 @@ const PageForm = () => {
       return;
     }
     setLoading(true);
-    setFormSubmitted(true);
-    setIsCheckingPage(true);
     setMessage('Votre page est en cours de préparation. Veuillez patienter...');
 
     const formData = new FormData();
@@ -85,7 +77,6 @@ const PageForm = () => {
       const result = await response.json();
       console.log('Réponse du serveur:', result);
       console.log('URL reçue du serveur:', result.pageUrl);
-
       setMessage(result.message || 'Formulaire envoyé avec succès.');
       setPageUrl(result.pageUrl); // Enregistrez l'URL de la page générée
       setFormSubmitted(true);
