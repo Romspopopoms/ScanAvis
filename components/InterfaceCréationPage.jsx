@@ -30,6 +30,8 @@ const PageForm = () => {
   }, []);
 
   const checkPageAvailability = async () => {
+    console.log(`Vérification de la disponibilité de la page: ${pageUrl}`);
+
     try {
       const response = await fetch(pageUrl);
       if (response.ok) {
@@ -82,6 +84,8 @@ const PageForm = () => {
 
       const result = await response.json();
       console.log('Réponse du serveur:', result);
+      console.log('URL reçue du serveur:', result.pageUrl);
+
       setMessage(result.message || 'Formulaire envoyé avec succès.');
       setPageUrl(result.pageUrl); // Enregistrez l'URL de la page générée
       setFormSubmitted(true);

@@ -134,6 +134,8 @@ exports.handler = async (event) => {
         // Build the deployed page URL
         const deployedPageUrl = `${NETLIFY_SITE_URL}/pages/${pageSlug}`;
 
+        console.log(`URL générée et envoyée au client: ${deployedPageUrl}`);
+
         // Resolve the promise with the deployment details
         resolve({
           statusCode: 200,
