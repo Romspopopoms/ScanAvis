@@ -22,11 +22,33 @@ const PageForm = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [formSubmitted, setFormSubmitted] = useState(false);
-  const [htmlResponse, setHtmlResponse] = useState(''); // Renommé pour correspondre à la réponse du backend
+  const [isCheckingPage, setIsCheckingPage] = useState(false);
+  const [pageUrl, setPageUrl] = useState('');
 
   useEffect(() => {
     setMessage('');
   }, []);
+
+  const checkPageAvailability = async () => {
+    try {
+      const response = await fetch(pageUrl);
+      if (response.ok) {
+        setIsCheckingPage(false);
+        setMessage('Votre page est prête !');
+      } else {
+        console.log('La page n\'est pas encore disponible.');
+      }
+    } catch (error) {
+      console.error('Erreur lors de la vérification de la disponibilité de la page:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (isCheckingPage) {
+      const intervalId = setInterval(checkPageAvailability, 10000); // Vérifie toutes les 10 secondes
+      return () => clearInterval(intervalId);
+    }
+  }, [isCheckingPage, pageUrl]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -35,6 +57,9 @@ const PageForm = () => {
       return;
     }
     setLoading(true);
+    setFormSubmitted(true);
+    setIsCheckingPage(true);
+    setMessage('Votre page est en cours de préparation. Veuillez patienter...');
 
     const formData = new FormData();
     formData.append('titre', titre);
@@ -56,14 +81,11 @@ const PageForm = () => {
       }
 
       const result = await response.json();
-      console.log('Réponse du serveur:', result); // Log pour voir la réponse du serveur
+      console.log('Réponse du serveur:', result);
       setMessage(result.message || 'Formulaire envoyé avec succès.');
-      setHtmlResponse(result.htmlResponse); // Enregistrez la réponse HTML générée
-      console.log('HTML reçu:', result.htmlResponse);
-      setFormSubmitted(true); // Marquez le formulaire comme soumis
-      setTitre('');
-      setImageDeFond(null);
-      setLogo(null);
+      setPageUrl(result.pageUrl); // Enregistrez l'URL de la page générée
+      setFormSubmitted(true);
+      setIsCheckingPage(true); // Commencer à vérifier la disponibilité de la page
     } catch (error) {
       handleError(`Erreur lors de l'envoi du formulaire: ${error.message}`);
     } finally {
@@ -71,8 +93,15 @@ const PageForm = () => {
     }
   };
 
-  if (formSubmitted && htmlResponse) {
-    // Instead of rendering the HTML response in an iframe, provide a link to the generated page
+  if (isCheckingPage) {
+    return (
+      <div className="text-center p-5">
+        <p>La page est en cours de préparation. Veuillez patienter...</p>
+      </div>
+    );
+  }
+
+  if (formSubmitted && !isCheckingPage && pageUrl) {
     return (
       <motion.div
         className="max-w-4xl mx-auto my-12 p-8"
@@ -84,7 +113,7 @@ const PageForm = () => {
         <h2 className="text-3xl font-bold text-center mb-8">Votre page est prête !</h2>
         <p className="text-center">Voici le lien vers votre nouvelle page :</p>
         <a
-          href={htmlResponse.pageUrl}
+          href={pageUrl}
           className="block text-center mt-4 text-purple-600 hover:text-purple-800"
           target="_blank"
           rel="noopener noreferrer"
