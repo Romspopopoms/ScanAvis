@@ -1,11 +1,10 @@
 # netlify.toml
 [build]
-  base = "ScanAvis/"        # Chemin vers le répertoire de base de votre projet
-  publish = "ScanAvis/out/" # Chemin vers le répertoire où les fichiers de build sont générés
+  publish = "out" # Chemin vers le répertoire où les fichiers de build sont générés
   command = "npm run build" # La commande pour construire votre site
 
 [functions]
-  directory = "ScanAvis/functions" # Chemin relatif vers le répertoire de vos fonctions Netlify
+  directory = "functions" # Chemin relatif vers le répertoire de vos fonctions Netlify
 
 [[redirects]]
   from = "/pages/*"
