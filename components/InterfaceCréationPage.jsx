@@ -2,12 +2,6 @@ import React, { useState, useContext, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { AuthContext } from '../context/AuthContext';
 
-const containerVariants = {
-  hidden: { opacity: 0, scale: 0.95 },
-  visible: { opacity: 1, scale: 1, transition: { delay: 0.3, duration: 0.5 } },
-  exit: { opacity: 0, scale: 0.95, transition: { duration: 0.5 } },
-};
-
 const PageForm = () => {
   const { isAuthenticated, user, userSubscriptions, handleError } = useContext(AuthContext);
 
@@ -131,22 +125,34 @@ const PageForm = () => {
   if (pageReady && userPageUrl) {
     return (
       <motion.div
-        className="max-w-4xl mx-auto my-12 p-8"
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-        exit="exit"
+        initial={{ scale: 0.95, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="max-w-lg mx-auto my-12 bg-white p-8 rounded-xl shadow-xl border border-gray-200"
       >
-        <h2 className="text-3xl font-bold text-center mb-8">Votre page est déjà créée !</h2>
-        <p className="text-center">Voici le lien vers votre page :</p>
-        <a
-          href={userPageUrl}
-          className="block text-center mt-4 text-purple-600 hover:text-purple-800"
-          target="_blank"
-          rel="noopener noreferrer"
+        <motion.div
+          className="text-2xl font-bold text-center text-purple-800 mb-4"
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.5 }}
         >
-          Accéder à la page
-        </a>
+          Votre page est déjà créée !
+        </motion.div>
+        <motion.div
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.2, duration: 0.5 }}
+        >
+          <p className="text-center text-gray-700">Voici le lien vers votre page :</p>
+          <a
+            href={userPageUrl}
+            className="block text-center mt-4 text-purple-600 hover:text-purple-800 text-lg font-semibold"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Accéder à la page
+          </a>
+        </motion.div>
       </motion.div>
     );
   }
