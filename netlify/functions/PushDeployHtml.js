@@ -13,7 +13,7 @@ const octokit = new Octokit({ auth: GITHUB_ACCESS });
 async function pushReactPageToRepoAndTriggerNetlify(reactContent, pageTitle) {
   // Nettoyer le titre de la page pour créer un chemin sûr
   const pageSlug = slugify(pageTitle, { lower: true, remove: /[*+~.()'"!:@]/g });
-  const filePath = `src/pages/${pageSlug}.js`; // Chemin adapté pour les composants React
+  const filePath = `pages/${pageSlug}.js`; // Chemin adapté pour les composants React
 
   try {
     const contentEncoded = Buffer.from(reactContent).toString('base64');

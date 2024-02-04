@@ -128,7 +128,7 @@ exports.handler = async (event) => {
 
         await pushHtmlToRepoAndTriggerNetlify(reactContent, clientPagePath);
 
-        // Construisez l'URL de la page déployée
+        // Construire l'URL de la page déployée
         const deployedPageUrl = `${NETLIFY_SITE_URL}/${clientPagePath.replace('.js', '')}`;
 
         resolve({

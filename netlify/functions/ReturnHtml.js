@@ -1,9 +1,4 @@
-const fs = require('fs');
-const path = require('path');
-const slugify = require('slugify');
 const { conn } = require('../../utils/db');
-
-const CLIENT_PAGE_PATH = process.env.CLIENT_PAGE_PATH || path.join(__dirname, '..', 'Page');
 
 async function generateHtmlPage(pageId) {
   if (!pageId) {
@@ -18,12 +13,9 @@ async function generateHtmlPage(pageId) {
       throw new Error('Page not found');
     }
 
-    const titrePage = 'Votre Titre de Page ici'; // Assumer que vous avez le titre de la page ici
-    const pageTitleSlug = slugify(titrePage, { lower: true, remove: /[*+~.()'"!:@]/g });
-
     const { titre, imageDeFondURL, logoURL } = result.rows[0];
 
-    // Créer le contenu du fichier React
+    // Générer le contenu HTML (ou React JSX)
     const reactContent = `
       import React from 'react';
       
@@ -46,11 +38,7 @@ async function generateHtmlPage(pageId) {
       export default Page;
     `;
 
-    const clientPagePath = path.join(CLIENT_PAGE_PATH, `${pageTitleSlug}.js`);
-
-    fs.writeFileSync(clientPagePath, reactContent);
-
-    return clientPagePath;
+    return reactContent; // Renvoie uniquement le contenu HTML / JSX généré
   } catch (error) {
     console.error('Database query failed:', error);
     throw error;
