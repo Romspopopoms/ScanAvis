@@ -1,161 +1,19 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
-import { AuthContext } from '../context/AuthContext';
+import { useHtml } from '../context/HtmlContext'; // Assurez-vous que le chemin est correct
 
 const PageForm = () => {
-  const { isAuthenticated, user, userSubscriptions, handleError } = useContext(AuthContext);
-
-  const [titre, setTitre] = useState('');
-  const [imageDeFond, setImageDeFond] = useState(null);
-  const [logo, setLogo] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
-  const [formSubmitted, setFormSubmitted] = useState(false);
-  const [isCheckingPage, setIsCheckingPage] = useState(false);
-  const [pageUrl, setPageUrl] = useState('');
-  const [pageReady, setPageReady] = useState(false);
-  const [userPageUrl, setUserPageUrl] = useState(null); // URL de la page de l'utilisateur, s'il en a une
-
-  useEffect(() => {
-    // Simulez la vérification de l'existence d'une page pour cet utilisateur
-    const checkUserPage = async () => {
-      try {
-        // Ajoutez ici votre logique pour vérifier si l'utilisateur a déjà une page
-        const response = await fetch(`/.netlify/functions/checkPageUrl?userId=${user.uuid}`);
-        if (response.ok) {
-          const data = await response.json();
-          if (data.hasPage) {
-            setUserPageUrl(data.pageUrl); // Mettre à jour l'état avec l'URL de la page de l'utilisateur
-            setPageReady(true); // Indiquer que la page est prête
-          }
-        } else {
-          // Gérer les erreurs de réponse ici
-          console.error("Erreur lors de la vérification de la page de l'utilisateur");
-        }
-      } catch (error) {
-        console.error("Erreur lors de la vérification de la page de l'utilisateur", error);
-      }
-    };
-
-    if (user) {
-      checkUserPage();
-    }
-  }, [user]);
-
-  useEffect(() => {
-    setMessage('');
-  }, []);
-
-  const checkPageAvailability = async () => {
-    console.log(`Vérification de la disponibilité de la page: ${pageUrl}`);
-    try {
-      const response = await fetch(pageUrl);
-      if (response.ok) {
-        setIsCheckingPage(false);
-        setPageReady(true);
-        setMessage('Votre page est prête !');
-      } else {
-        console.log('La page n\'est pas encore disponible.');
-        // Après un certain nombre de tentatives, arrêtez de vérifier et montrez un message d'erreur ou un bouton de rechargement.
-      }
-    } catch (error) {
-      console.error('Erreur lors de la vérification de la disponibilité de la page:', error);
-      setMessage('Erreur lors de la vérification de la disponibilité de la page. Veuillez réessayer.');
-      setIsCheckingPage(false);
-    }
-  };
-
-  useEffect(() => {
-    if (isCheckingPage && pageUrl) {
-      const intervalId = setInterval(checkPageAvailability, 10000); // Vérifie toutes les 10 secondes
-      return () => clearInterval(intervalId);
-    }
-  }, [isCheckingPage, pageUrl]);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!isAuthenticated) {
-      setMessage('Veuillez vous connecter pour créer une page.');
-      return;
-    }
-    setLoading(true);
-    setMessage('Votre page est en cours de préparation. Veuillez patienter...');
-
-    const formData = new FormData();
-    formData.append('titre', titre);
-    if (imageDeFond) formData.append('imageDeFond', imageDeFond);
-    if (logo) formData.append('logo', logo);
-    formData.append('userUuid', user.uuid);
-    const userSubscriptionId = userSubscriptions.length > 0 ? userSubscriptions[0].subscriptionId : '';
-    formData.append('subscriptionId', userSubscriptionId);
-
-    try {
-      const response = await fetch('/.netlify/functions/UploadImages', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Erreur lors de l'envoi du formulaire: ${errorText}`);
-      }
-
-      const result = await response.json();
-      console.log('Réponse du serveur:', result);
-      console.log('URL reçue du serveur:', result.pageUrl);
-      setMessage(result.message || 'Formulaire envoyé avec succès.');
-      setPageUrl(result.pageUrl); // Enregistrez l'URL de la page générée
-      setFormSubmitted(true);
-      setIsCheckingPage(true); // Commencer à vérifier la disponibilité de la page
-    } catch (error) {
-      handleError(`Erreur lors de l'envoi du formulaire: ${error.message}`);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (formSubmitted && !pageReady) {
-    return (
-      <div className="text-center p-5">
-        <p>La page est en cours de préparation. Veuillez patienter...</p>
-      </div>
-    );
-  }
-
-  if (pageReady && userPageUrl) {
-    return (
-      <motion.div
-        initial={{ scale: 0.95, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.5 }}
-        className="max-w-lg mx-auto my-12 bg-white p-8 rounded-xl shadow-xl border border-gray-200"
-      >
-        <motion.div
-          className="text-2xl font-bold text-center text-purple-800 mb-4"
-          initial={{ y: -20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.5 }}
-        >
-          Votre page est déjà créée !
-        </motion.div>
-        <motion.div
-          initial={{ y: -20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.2, duration: 0.5 }}
-        >
-          <p className="text-center text-gray-700">Voici le lien vers votre page :</p>
-          <a
-            href={userPageUrl}
-            className="block text-center mt-4 text-purple-600 hover:text-purple-800 text-lg font-semibold"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Accéder à la page
-          </a>
-        </motion.div>
-      </motion.div>
-    );
-  }
+  const {
+    titre,
+    setTitre,
+    setImageDeFond,
+    setLogo,
+    loading,
+    message,
+    handleSubmit,
+    pageReady,
+    userPageUrl,
+  } = useHtml();
 
   return (
     <motion.div
@@ -164,54 +22,69 @@ const PageForm = () => {
       transition={{ duration: 0.5 }}
       className="max-w-lg mx-auto my-12 bg-white p-8 rounded-xl shadow-xl border border-gray-200"
     >
-      {message && <div className="my-3 p-3 text-center text-white bg-purple-600 rounded-md">{message}</div>}
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <h2 className="text-2xl font-bold text-center text-purple-800">Créer votre page</h2>
-        <div className="space-y-2">
-          <label htmlFor="titre" className="block text-lg font-semibold text-gray-700">Nom de la société</label>
-          <input
-            type="text"
-            id="titre"
-            name="titre"
-            value={titre}
-            onChange={(e) => setTitre(e.target.value)}
-            required
-            className="mt-1 block w-full px-4 py-3 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
-            placeholder="Entrez le nom de votre société"
-          />
+      {pageReady && userPageUrl ? (
+        <div>
+          <h2 className="text-3xl font-bold text-center mb-8">Votre page est prête !</h2>
+          <p className="text-center">Voici le lien vers votre nouvelle page :</p>
+          <a
+            href={userPageUrl}
+            className="block text-center mt-4 text-purple-600 hover:text-purple-800"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Accéder à la page
+          </a>
         </div>
-        <div className="space-y-2">
-          <label htmlFor="imageDeFond" className="block text-lg font-semibold text-gray-700">Image de fond (JPG, PNG)</label>
-          <input
-            type="file"
-            id="imageDeFond"
-            name="imageDeFond"
-            accept=".jpg, .jpeg, .png"
-            onChange={(e) => setImageDeFond(e.target.files[0])}
-            className="mt-1 block w-full file:px-4 file:py-2 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
-          />
-        </div>
-        <div className="space-y-2">
-          <label htmlFor="logo" className="block text-lg font-semibold text-gray-700">Logo (JPG, PNG)</label>
-          <input
-            type="file"
-            id="logo"
-            name="logo"
-            accept=".jpg, .jpeg, .png"
-            onChange={(e) => setLogo(e.target.files[0])}
-            className="mt-1 block w-full file:px-4 file:py-2 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
-          />
-        </div>
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          type="submit"
-          className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
-          disabled={loading}
-        >
-          {loading ? 'Envoi en cours...' : 'Créer la page'}
-        </motion.button>
-      </form>
+      ) : (
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {message && <div className="my-3 p-3 text-center text-white bg-purple-600 rounded-md">{message}</div>}
+          <h2 className="text-2xl font-bold text-center text-purple-800">Créer votre page</h2>
+          <div className="space-y-2">
+            <label htmlFor="titre" className="block text-lg font-semibold text-gray-700">Nom de la société</label>
+            <input
+              type="text"
+              id="titre"
+              name="titre"
+              value={titre}
+              onChange={(e) => setTitre(e.target.value)}
+              required
+              className="mt-1 block w-full px-4 py-3 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+              placeholder="Entrez le nom de votre société"
+            />
+          </div>
+          <div className="space-y-2">
+            <label htmlFor="imageDeFond" className="block text-lg font-semibold text-gray-700">Image de fond (JPG, PNG)</label>
+            <input
+              type="file"
+              id="imageDeFond"
+              name="imageDeFond"
+              accept=".jpg, .jpeg, .png"
+              onChange={(e) => setImageDeFond(e.target.files[0])}
+              className="mt-1 block w-full file:px-4 file:py-2 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
+            />
+          </div>
+          <div className="space-y-2">
+            <label htmlFor="logo" className="block text-lg font-semibold text-gray-700">Logo (JPG, PNG)</label>
+            <input
+              type="file"
+              id="logo"
+              name="logo"
+              accept=".jpg, .jpeg, .png"
+              onChange={(e) => setLogo(e.target.files[0])}
+              className="mt-1 block w-full file:px-4 file:py-2 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
+            />
+          </div>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            type="submit"
+            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+            disabled={loading}
+          >
+            {loading ? 'Envoi en cours...' : 'Créer la page'}
+          </motion.button>
+        </form>
+      )}
     </motion.div>
   );
 };
