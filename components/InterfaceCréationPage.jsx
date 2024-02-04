@@ -63,6 +63,7 @@ const PageForm = () => {
       const result = await response.json();
       setMessage(result.message || 'Formulaire envoyé avec succès.');
       setHtmlResponse(result.htmlResponse); // Enregistrez la réponse HTML générée
+      console.log('Réponse du backend:', result);
       setFormSubmitted(true); // Marquez le formulaire comme soumis
       setTitre('');
       setImageDeFond(null);
