@@ -2,6 +2,17 @@ import React, { useState, useContext, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { AuthContext } from '../context/AuthContext';
 
+const containerVariants = {
+  hidden: { opacity: 0, scale: 0.95 },
+  visible: { opacity: 1, scale: 1, transition: { delay: 0.3, duration: 0.5 } },
+  exit: { opacity: 0, scale: 0.95, transition: { duration: 0.5 } },
+};
+
+const iframeVariants = {
+  hidden: { opacity: 0, y: 50 },
+  visible: { opacity: 1, y: 0, transition: { delay: 0.5, duration: 0.5 } },
+};
+
 const PageForm = () => {
   const {
     isAuthenticated,
@@ -64,16 +75,24 @@ const PageForm = () => {
   };
 
   if (formSubmitted && htmlResponse) {
-    // Après la soumission du formulaire, affichez l'`iframe` avec le HTML généré
     return (
-      <div className="max-w-lg mx-auto my-12 p-8">
-        <h2 className="text-2xl font-bold text-center text-purple-800">Votre page est prête !</h2>
-        <iframe
-          className="w-full h-screen border-none" // Tailwind classes pour largeur, hauteur et pas de bordure
+      <motion.div
+        className="max-w-4xl mx-auto my-12 p-8"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        exit="exit"
+      >
+        <h2 className="text-3xl font-bold text-center mb-8" style={{ color: '#6D28D9' }}>Votre page est prête !</h2>
+        <motion.iframe
+          className="w-full h-screen border-none"
           srcDoc={htmlResponse}
           title="Aperçu de la page générée"
+          variants={iframeVariants}
+          initial="hidden"
+          animate="visible"
         />
-      </div>
+      </motion.div>
     );
   }
 
