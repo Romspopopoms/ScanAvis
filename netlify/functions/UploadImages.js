@@ -3,13 +3,15 @@ const { Octokit } = require('@octokit/rest');
 const path = require('path');
 const os = require('os');
 const fs = require('fs');
-const { v4: uuidv4 } = require('uuid'); // Pour générer des ID uniques
-const { conn } = require('../../utils/db'); // Assurez-vous que ce chemin correspond à votre structure de projet
-const { generateHtmlPage } = require('./ReturnHtml'); // Assurez-vous que le chemin est correct
+const { v4: uuidv4 } = require('uuid');
+const { conn } = require('../../utils/db');
+const { generateHtmlPage } = require('./ReturnHtml');
+const { pushHtmlToRepoAndTriggerNetlify } = require('./PushDeployHtml');
 
 const GITHUB_OWNER = 'Romspopopoms';
 const GITHUB_REPO = 'ScanAvis';
 const UPLOAD_PATH = 'uploaded_images';
+const NETLIFY_SITE_URL = 'https://scanavis.netlify.app';
 
 async function getCurrentSha(octokit, filePathInRepo) {
   try {
@@ -76,7 +78,9 @@ exports.handler = async (event) => {
   const busboy = new Busboy({ headers: event.headers });
   const tmpdir = os.tmpdir();
   const fileWrites = [];
-  let userUuid; let subscriptionId; let titrePage; // Définir la variable titrePage ici
+  let userUuid;
+  let subscriptionId;
+  let titrePage; // Définir la variable titrePage ici
 
   busboy.on('field', (fieldname, val) => {
     if (fieldname === 'userUuid') userUuid = val;
@@ -104,7 +108,12 @@ exports.handler = async (event) => {
         const writtenFiles = await Promise.all(fileWrites);
         const pageId = uuidv4();
         const insertPageQuery = 'INSERT INTO UserPages (pageId, titre, user_uuid, subscriptionId) VALUES (?, ?, ?, ?)';
-        await conn.execute(insertPageQuery, [pageId, titrePage, userUuid, subscriptionId]); // Utiliser titrePage ici
+        await conn.execute(insertPageQuery, [
+          pageId,
+          titrePage,
+          userUuid,
+          subscriptionId,
+        ]); // Utiliser titrePage ici
 
         const updatePagePromises = writtenFiles.map(async (file) => {
           const url = await uploadFile(file, octokit);
@@ -121,14 +130,27 @@ exports.handler = async (event) => {
         try {
           const htmlResponse = await generateHtmlPage(pageId);
           console.log('HTML page generated successfully');
+
+          // Définir le chemin où le fichier HTML sera stocké dans le dépôt GitHub
+          const htmlFilePath = `pages/${pageId}.html`;
+          await pushHtmlToRepoAndTriggerNetlify(htmlResponse, htmlFilePath);
+
+          // Construire l'URL complète de la page HTML déployée
+          const deployedHtmlUrl = `${NETLIFY_SITE_URL}/${htmlFilePath}`;
+
           resolve({
             statusCode: 200,
-            headers: { 'Content-Type': 'text/html' },
-            body: htmlResponse, // Renvoyer le HTML généré
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              message: 'Page created and deployment initiated.',
+              pageUrl: deployedHtmlUrl, // Renvoyer l'URL complète de la page déployée
+            }),
           });
         } catch (error) {
-          console.error('Failed to generate HTML page:', error);
-          const rejectionError = new Error(`Failed to generate HTML page: ${error.message}`);
+          console.error('Operation failed:', error);
+          const rejectionError = new Error(
+            `Operation failed: ${error.message}`,
+          );
           rejectionError.statusCode = 500;
           reject(rejectionError);
         }
