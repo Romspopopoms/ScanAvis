@@ -19,6 +19,7 @@ const PageForm = () => {
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [isCheckingPage, setIsCheckingPage] = useState(false);
   const [pageUrl, setPageUrl] = useState('');
+  const [pageReady, setPageReady] = useState(false);
 
   useEffect(() => {
     setMessage('');
@@ -30,12 +31,16 @@ const PageForm = () => {
       const response = await fetch(pageUrl);
       if (response.ok) {
         setIsCheckingPage(false);
+        setPageReady(true);
         setMessage('Votre page est prête !');
       } else {
         console.log('La page n\'est pas encore disponible.');
+        // Après un certain nombre de tentatives, arrêtez de vérifier et montrez un message d'erreur ou un bouton de rechargement.
       }
     } catch (error) {
       console.error('Erreur lors de la vérification de la disponibilité de la page:', error);
+      setMessage('Erreur lors de la vérification de la disponibilité de la page. Veuillez réessayer.');
+      setIsCheckingPage(false);
     }
   };
 
@@ -88,7 +93,7 @@ const PageForm = () => {
     }
   };
 
-  if (isCheckingPage) {
+  if (formSubmitted && !pageReady) {
     return (
       <div className="text-center p-5">
         <p>La page est en cours de préparation. Veuillez patienter...</p>
@@ -96,7 +101,7 @@ const PageForm = () => {
     );
   }
 
-  if (formSubmitted && !isCheckingPage && pageUrl) {
+  if (pageReady) {
     return (
       <motion.div
         className="max-w-4xl mx-auto my-12 p-8"
