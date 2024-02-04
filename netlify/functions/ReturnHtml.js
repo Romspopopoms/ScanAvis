@@ -9,7 +9,7 @@ async function generateHtmlPage(pageId) {
   try {
     // Récupérer les données de la page depuis la base de données en utilisant pageId
     const query = 'SELECT titre, imageDeFondURL, logoURL FROM UserPages WHERE pageId = ? LIMIT 1';
-    const [rows] = await conn.execute(query, [pageId]);
+    const rows = await conn.execute(query, [pageId]);
 
     if (rows.length === 0) {
       throw new Error('Page not found');
