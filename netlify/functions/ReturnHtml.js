@@ -1,3 +1,4 @@
+const prettier = require('prettier'); // Assurez-vous d'installer le package prettier
 const { conn } = require('../../utils/db');
 
 async function generateHtmlPage(pageId) {
@@ -38,7 +39,10 @@ async function generateHtmlPage(pageId) {
       export default Page;
     `;
 
-    return reactContent; // Renvoie uniquement le contenu HTML / JSX généré
+    // Utiliser Prettier pour formater le code généré
+    const formattedReactContent = prettier.format(reactContent, { parser: 'babel' });
+
+    return formattedReactContent; // Renvoie le contenu HTML / JSX formaté
   } catch (error) {
     console.error('Database query failed:', error);
     throw error;
