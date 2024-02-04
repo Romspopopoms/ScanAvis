@@ -5,12 +5,12 @@ const Page = () => (
     className="bg-cover bg-center h-screen"
     style={{
       backgroundImage:
-        'url("https://github.com/Romspopopoms/ScanAvis/blob/main/uploaded_images/get-started.jpg?raw=true")',
+        'url("https://github.com/Romspopopoms/ScanAvis/blob/main/uploaded_images/cover.png?raw=true")',
     }}
   >
     <div className="flex flex-col items-center justify-center h-full">
       <img
-        src="https://github.com/Romspopopoms/ScanAvis/blob/main/uploaded_images/people-02.png?raw=true"
+        src="https://github.com/Romspopopoms/ScanAvis/blob/main/uploaded_images/get-started.jpg?raw=true"
         alt="Logo"
         className="mb-4"
       />
