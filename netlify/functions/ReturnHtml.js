@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const { conn } = require('../../utils/db');
 
-async function generatehtlmPage(pageId) {
+async function generateHtmlPage(pageId) {
   if (!pageId) {
     throw new Error('Page ID is required');
   }
@@ -53,4 +53,4 @@ async function generatehtlmPage(pageId) {
   }
 }
 
-module.exports = { generatehtlmPage };
+module.exports = { generateHtmlPage };
