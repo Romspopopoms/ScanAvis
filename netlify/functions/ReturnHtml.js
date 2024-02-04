@@ -21,22 +21,25 @@ async function generateHtmlPage(pageId) {
       import React from 'react';
       
       const Page = () => (
-        <div className="bg-cover bg-center h-screen" style={{ backgroundImage: 'url("${imageDeFondURL}")' }}>
-          <div className="flex flex-col items-center justify-center h-full">
-            <img src="${logoURL}" alt="Logo" className="mb-4" />
-            <h1 className="text-4xl text-white mb-4">${titre}</h1>
-            <div className="bg-white opacity-75 rounded p-4">
-              <input
-                type="email"
-                placeholder="Entrez votre email"
-                className="appearance-none rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              />
-            </div>
-          </div>
-        </div>
-      );
-      
-      export default Page;
+        <div className="relative bg-cover bg-center h-screen flex items-center justify-center" style={{ backgroundImage: 'url("${imageDeFondURL}")' }}>
+        <div className="flex flex-col items-center">
+            <img src="${logoURL}" alt="Logo" className="mb-8 w-32 h-auto" />
+            <h1 className="text-5xl text-white mb-8">${titre}</h1>
+            <div className="bg-white bg-opacity-50 rounded-lg p-4 shadow-lg mb-8">
+        <input
+          type="email"
+          placeholder="Entrez votre email"
+          className="appearance-none rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+        />
+      </div>
+      <button className="bg-transparent border border-white text-white py-2 px-6 rounded-full hover:bg-white hover:text-black transition-all duration-300 ease-in-out shadow-lg">
+        Envoyer
+      </button>
+    </div>
+  </div>
+);
+
+export default Page;
     `;
 
     // Utiliser Prettier pour formater le code généré
