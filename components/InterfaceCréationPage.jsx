@@ -20,6 +20,33 @@ const PageForm = () => {
   const [isCheckingPage, setIsCheckingPage] = useState(false);
   const [pageUrl, setPageUrl] = useState('');
   const [pageReady, setPageReady] = useState(false);
+  const [userPageUrl, setUserPageUrl] = useState(null); // URL de la page de l'utilisateur, s'il en a une
+
+  useEffect(() => {
+    // Simulez la vérification de l'existence d'une page pour cet utilisateur
+    const checkUserPage = async () => {
+      try {
+        // Ajoutez ici votre logique pour vérifier si l'utilisateur a déjà une page
+        const response = await fetch(`/.netlify/functions/checkPageUrl?userId=${user.uuid}`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.hasPage) {
+            setUserPageUrl(data.pageUrl); // Mettre à jour l'état avec l'URL de la page de l'utilisateur
+            setPageReady(true); // Indiquer que la page est prête
+          }
+        } else {
+          // Gérer les erreurs de réponse ici
+          console.error("Erreur lors de la vérification de la page de l'utilisateur");
+        }
+      } catch (error) {
+        console.error("Erreur lors de la vérification de la page de l'utilisateur", error);
+      }
+    };
+
+    if (user) {
+      checkUserPage();
+    }
+  }, [user]);
 
   useEffect(() => {
     setMessage('');
@@ -101,7 +128,7 @@ const PageForm = () => {
     );
   }
 
-  if (pageReady) {
+  if (pageReady && userPageUrl) {
     return (
       <motion.div
         className="max-w-4xl mx-auto my-12 p-8"
@@ -110,10 +137,10 @@ const PageForm = () => {
         animate="visible"
         exit="exit"
       >
-        <h2 className="text-3xl font-bold text-center mb-8">Votre page est prête !</h2>
-        <p className="text-center">Voici le lien vers votre nouvelle page :</p>
+        <h2 className="text-3xl font-bold text-center mb-8">Votre page est déjà créée !</h2>
+        <p className="text-center">Voici le lien vers votre page :</p>
         <a
-          href={pageUrl}
+          href={userPageUrl}
           className="block text-center mt-4 text-purple-600 hover:text-purple-800"
           target="_blank"
           rel="noopener noreferrer"

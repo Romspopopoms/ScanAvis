@@ -134,14 +134,18 @@ exports.handler = async (event) => {
         // Build the deployed page URL
         const deployedPageUrl = `${NETLIFY_SITE_URL}/generated/${pageSlug}`;
 
-        console.log(`URL générée et envoyée au client: ${deployedPageUrl}`);
+        // Store page URL in the database
+        const updatePageUrlQuery = 'UPDATE UserPages SET pageUrl = ? WHERE pageId = ?';
+        await conn.execute(updatePageUrlQuery, [deployedPageUrl, pageId]);
+
+        console.log(`Page URL stored in database: ${deployedPageUrl}`);
 
         // Resolve the promise with the deployment details
         resolve({
           statusCode: 200,
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            message: 'Page created and deployment initiated.',
+            message: 'Page created, deployment initiated, and URL stored in database.',
             pageUrl: deployedPageUrl,
           }),
         });
