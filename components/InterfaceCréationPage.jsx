@@ -64,17 +64,15 @@ const PageForm = () => {
   };
 
   if (formSubmitted && htmlResponse) {
+    // Après la soumission du formulaire, affichez l'`iframe` avec le HTML généré
     return (
       <div className="max-w-lg mx-auto my-12 p-8">
         <h2 className="text-2xl font-bold text-center text-purple-800">Votre page est prête !</h2>
-        <div className="text-center mt-4">
-          {/* Affichez la réponse HTML directement dans une balise iframe */}
-          <iframe
-            srcDoc={htmlResponse}
-            style={{ width: '100%', height: '500px', border: 'none' }}
-            title="Aperçu de la page générée"
-          />
-        </div>
+        <iframe
+          className="w-full h-screen border-none" // Tailwind classes pour largeur, hauteur et pas de bordure
+          srcDoc={htmlResponse}
+          title="Aperçu de la page générée"
+        />
       </div>
     );
   }
