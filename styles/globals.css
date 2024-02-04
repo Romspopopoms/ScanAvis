@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-.use-global-styles * {
+ * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -10,7 +10,7 @@
   scroll-behavior: smooth;
 }
 
-.use-global-styles .gradient-01 {
+ .gradient-01 {
   background-image: linear-gradient(
     270deg,
     hsl(249, 64%, 58%) 0%,
