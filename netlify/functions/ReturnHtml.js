@@ -21,7 +21,11 @@ async function generateHtmlPage(pageId) {
   import React from 'react';
   
   const Page = () => (
-    <div className="relative bg-cover bg-center h-screen flex items-center justify-center" style={{ backgroundImage: 'url("${imageDeFondURL}")' }}>
+    <div className="relative bg-cover bg-center h-screen flex items-center justify-center" style={{ backgroundImage: 'url("${imageDeFondURL}")' backgroundSize: 'cover',
+    backgroundPosition: 'center center',
+    backgroundRepeat: 'no-repeat',
+    height: '100vh',
+    width: '100vw' }}>
       <div className="flex flex-col items-center">
         <img src="${logoURL}" alt="Logo" className="mb-6 w-20 h-auto" />
         <h1 className="text-4xl text-white mb-4">${titre}</h1>
@@ -41,8 +45,6 @@ async function generateHtmlPage(pageId) {
 
   export default Page;
 `;
-
-    // Utilisez prettier pour formater le contenu ici...
 
     // Utiliser Prettier pour formater le code généré
     const formattedReactContent = prettier.format(reactContent, { parser: 'babel', singleQuote: true, // force l'utilisation de guillemets simples
