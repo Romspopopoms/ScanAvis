@@ -9,6 +9,7 @@ const PageForm = () => {
     setImageDeFond,
     setLogo,
     loading,
+    message,
     pageReady,
     userPageUrl,
     handleSubmit,
@@ -22,16 +23,6 @@ const PageForm = () => {
     }
   };
 
-  // Fonction pour afficher un message d'état approprié
-  const renderStatusMessage = () => {
-    if (loading) {
-      return 'Votre page est en cours de préparation. Veuillez patienter...';
-    } if (pageReady && userPageUrl) {
-      return 'Votre page est prête !';
-    }
-    return ''; // Aucun message par défaut
-  };
-
   return (
     <motion.div
       initial={{ scale: 0.95, opacity: 0 }}
@@ -39,19 +30,13 @@ const PageForm = () => {
       transition={{ duration: 0.5 }}
       className="max-w-lg mx-auto my-12 bg-white p-8 rounded-xl shadow-xl border border-gray-200"
     >
-      {/* Affichage du message d'état du processus */}
-      <div className="my-3 p-3 text-center text-white bg-purple-600 rounded-md">
-        {renderStatusMessage()}
-      </div>
-
-      {/* Affichage conditionnel basé sur l'état de la page */}
       {pageReady && userPageUrl ? (
-        <div className="text-center">
-          <h2 className="text-3xl font-bold mb-8">Votre page est prête !</h2>
-          <p>Voici le lien vers votre nouvelle page :</p>
+        <div>
+          <h2 className="text-3xl font-bold text-center mb-8">Votre page est prête !</h2>
+          <p className="text-center">Voici le lien vers votre nouvelle page :</p>
           <a
             href={userPageUrl}
-            className="block mt-4 text-purple-600 hover:text-purple-800"
+            className="block text-center mt-4 text-purple-600 hover:text-purple-800"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -59,8 +44,8 @@ const PageForm = () => {
           </a>
         </div>
       ) : (
-        // Le formulaire reste visible mais désactivé
         <form onSubmit={handleSubmit} className="space-y-6">
+          {message && <div className="my-3 p-3 text-center text-white bg-purple-600 rounded-md">{message}</div>}
           <h2 className="text-2xl font-bold text-center text-purple-800">Créer votre page</h2>
           <div className="space-y-2">
             <label htmlFor="titre" className="block text-lg font-semibold text-gray-700">Nom de la société</label>
@@ -73,7 +58,6 @@ const PageForm = () => {
               required
               className="mt-1 block w-full px-4 py-3 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
               placeholder="Entrez le nom de votre société"
-              disabled={loading}
             />
           </div>
           <div className="space-y-2">
@@ -85,7 +69,6 @@ const PageForm = () => {
               accept=".jpg, .jpeg, .png"
               onChange={(e) => handleImageChange(e, setImageDeFond)}
               className="mt-1 block w-full file:px-4 file:py-2 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
-              disabled={loading}
             />
           </div>
           <div className="space-y-2">
@@ -97,7 +80,6 @@ const PageForm = () => {
               accept=".jpg, .jpeg, .png"
               onChange={(e) => handleImageChange(e, setLogo)}
               className="mt-1 block w-full file:px-4 file:py-2 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
-              disabled={loading}
             />
           </div>
           <motion.button
@@ -107,7 +89,7 @@ const PageForm = () => {
             className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
             disabled={loading}
           >
-            {loading ? 'Préparation...' : 'Créer la page'}
+            {loading ? 'Envoi en cours...' : 'Créer la page'}
           </motion.button>
         </form>
       )}
