@@ -15,6 +15,14 @@ const PageForm = () => {
     userPageUrl,
   } = useHtml();
 
+  // Gère le changement des champs de fichier pour imageDeFond et logo
+  const handleImageChange = (e, setImage) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImage(file);
+    }
+  };
+
   return (
     <motion.div
       initial={{ scale: 0.95, opacity: 0 }}
@@ -23,6 +31,7 @@ const PageForm = () => {
       className="max-w-lg mx-auto my-12 bg-white p-8 rounded-xl shadow-xl border border-gray-200"
     >
       {pageReady && userPageUrl ? (
+        // Affiche le lien vers la page si elle est prête
         <div>
           <h2 className="text-3xl font-bold text-center mb-8">Votre page est prête !</h2>
           <p className="text-center">Voici le lien vers votre nouvelle page :</p>
@@ -36,6 +45,7 @@ const PageForm = () => {
           </a>
         </div>
       ) : (
+        // Affiche le formulaire pour créer une page
         <form onSubmit={handleSubmit} className="space-y-6">
           {message && <div className="my-3 p-3 text-center text-white bg-purple-600 rounded-md">{message}</div>}
           <h2 className="text-2xl font-bold text-center text-purple-800">Créer votre page</h2>
@@ -59,7 +69,7 @@ const PageForm = () => {
               id="imageDeFond"
               name="imageDeFond"
               accept=".jpg, .jpeg, .png"
-              onChange={(e) => setImageDeFond(e.target.files[0])}
+              onChange={(e) => handleImageChange(e, setImageDeFond)}
               className="mt-1 block w-full file:px-4 file:py-2 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
             />
           </div>
@@ -70,7 +80,7 @@ const PageForm = () => {
               id="logo"
               name="logo"
               accept=".jpg, .jpeg, .png"
-              onChange={(e) => setLogo(e.target.files[0])}
+              onChange={(e) => handleImageChange(e, setLogo)}
               className="mt-1 block w-full file:px-4 file:py-2 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
             />
           </div>

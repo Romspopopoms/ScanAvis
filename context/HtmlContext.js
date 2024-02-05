@@ -19,53 +19,46 @@ export const HtmlProvider = ({ children }) => {
   const [pageReady, setPageReady] = useState(false);
   const [userPageUrl, setUserPageUrl] = useState(null);
 
+  // Vérification initiale de la page de l'utilisateur
   useEffect(() => {
     const checkUserPage = async () => {
+      if (!user) return;
       try {
         const response = await fetch(`/.netlify/functions/checkPageUrl?userId=${user.uuid}`);
-        if (response.ok) {
-          const data = await response.json();
-          if (data.hasPage) {
-            setUserPageUrl(data.pageUrl);
-            setPageReady(true);
-          }
-        } else {
-          console.error("Erreur lors de la vérification de la page de l'utilisateur");
+        const data = await response.json();
+        if (response.ok && data.hasPage) {
+          setUserPageUrl(data.pageUrl);
+          setPageReady(true);
         }
       } catch (error) {
         console.error("Erreur lors de la vérification de la page de l'utilisateur", error);
       }
     };
-
-    if (user) {
-      checkUserPage();
-    }
+    checkUserPage();
   }, [user]);
 
-  const checkPageAvailability = async () => {
-    console.log(`Vérification de la disponibilité de la page: ${pageUrl}`);
-    try {
-      const response = await fetch(pageUrl);
-      if (response.ok) {
-        setIsCheckingPage(false);
-        setPageReady(true);
-        setMessage('Votre page est prête !');
-      } else {
-        console.log('La page n\'est pas encore disponible.');
-        // Après un certain nombre de tentatives, arrêtez de vérifier et montrez un message d'erreur ou un bouton de rechargement.
-      }
-    } catch (error) {
-      console.error('Erreur lors de la vérification de la disponibilité de la page:', error);
-      setMessage('Erreur lors de la vérification de la disponibilité de la page. Veuillez réessayer.');
-      setIsCheckingPage(false);
-    }
-  };
-
+  // Vérification périodique de la disponibilité de la page
   useEffect(() => {
+    let intervalId;
     if (isCheckingPage && pageUrl) {
-      const intervalId = setInterval(checkPageAvailability, 10000); // Vérifie toutes les 10 secondes
-      return () => clearInterval(intervalId);
+      intervalId = setInterval(async () => {
+        try {
+          const response = await fetch(pageUrl);
+          if (response.ok) {
+            setIsCheckingPage(false);
+            setPageReady(true);
+            setMessage('Votre page est prête !');
+          } else {
+            console.log('La page n\'est pas encore disponible.');
+          }
+        } catch (error) {
+          console.error('Erreur lors de la vérification de la disponibilité de la page:', error);
+          setMessage('Erreur lors de la vérification de la disponibilité de la page. Veuillez réessayer.');
+          setIsCheckingPage(false);
+        }
+      }, 10000); // Vérifie toutes les 10 secondes
     }
+    return () => clearInterval(intervalId);
   }, [isCheckingPage, pageUrl]);
 
   const handleSubmit = async (e) => {
@@ -82,7 +75,7 @@ export const HtmlProvider = ({ children }) => {
     if (imageDeFond) formData.append('imageDeFond', imageDeFond);
     if (logo) formData.append('logo', logo);
     formData.append('userUuid', user.uuid);
-    const userSubscriptionId = userSubscriptions.length > 0 ? userSubscriptions[0].subscriptionId : '';
+    const userSubscriptionId = userSubscriptions?.[0]?.subscriptionId || '';
     formData.append('subscriptionId', userSubscriptionId);
 
     try {
@@ -91,20 +84,19 @@ export const HtmlProvider = ({ children }) => {
         body: formData,
       });
 
+      const result = await response.json();
       if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Erreur lors de l'envoi du formulaire: ${errorText}`);
+        throw new Error(result.message || 'Erreur lors de l\'envoi du formulaire.');
       }
 
-      const result = await response.json();
       console.log('Réponse du serveur:', result);
-      console.log('URL reçue du serveur:', result.pageUrl);
       setMessage(result.message || 'Formulaire envoyé avec succès.');
       setPageUrl(result.pageUrl); // Enregistrez l'URL de la page générée
       setFormSubmitted(true);
-      setIsCheckingPage(true); // Commencer à vérifier la disponibilité de la page
+      setIsCheckingPage(true); // Commencer à vérifier la disponibilité de la page immédiatement
     } catch (error) {
-      handleError(`Erreur lors de l'envoi du formulaire: ${error.message}`);
+      handleError(error.toString());
+      setMessage(error.message);
     } finally {
       setLoading(false);
     }
@@ -139,3 +131,5 @@ export const HtmlProvider = ({ children }) => {
 
   return <HtmlContext.Provider value={value}>{children}</HtmlContext.Provider>;
 };
+
+export default HtmlProvider;
