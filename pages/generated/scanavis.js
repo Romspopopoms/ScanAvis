@@ -5,7 +5,7 @@ const Page = () => (
     className="relative bg-cover bg-center h-screen flex items-center justify-center"
     style={{
       backgroundImage:
-        'url("https://github.com/Romspopopoms/ScanAvis/blob/main/uploaded_images/cover.png?raw=true")',
+        'url("https://github.com/Romspopopoms/ScanAvis/blob/main/uploaded_images/get-started.jpg?raw=true")',
       backgroundSize: 'cover',
       backgroundPosition: 'center center',
       backgroundRepeat: 'no-repeat',
@@ -15,11 +15,11 @@ const Page = () => (
   >
     <div className="flex flex-col items-center">
       <img
-        src="https://github.com/Romspopopoms/ScanAvis/blob/main/uploaded_images/people-03.png?raw=true"
+        src="https://github.com/Romspopopoms/ScanAvis/blob/main/uploaded_images/stamp.png?raw=true"
         alt="Logo"
-        className="mb-6 w-20 h-auto"
+        className="mb-6 h-12 w-12"
       />
-      <h1 className="text-4xl text-white mb-4">Scan'Avis</h1>
+      <h1 className="text-4xl text-white mb-4">ScanAvis</h1>
       <div className="bg-white bg-opacity-75 rounded-lg p-4 shadow-lg mb-6">
         <input
           type="email"
