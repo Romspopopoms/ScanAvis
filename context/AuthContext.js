@@ -224,6 +224,7 @@ export const AuthProvider = ({ children }) => {
       errorMessage,
       handleError,
       setSubscriptionsUpdate,
+      subscriptionsUpdate,
     }}
     >
       {children}

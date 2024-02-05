@@ -13,6 +13,7 @@ const PageForm = () => {
     handleSubmit,
     pageReady,
     userPageUrl,
+    updateTrigger,
   } = useHtml();
 
   // Gère le changement des champs de fichier pour imageDeFond et logo
@@ -23,6 +24,12 @@ const PageForm = () => {
     }
   };
 
+  React.useEffect(() => {
+    // Cette fonction sera exécutée chaque fois que la valeur de pageUpdateTrigger change
+    // Vous n'avez pas besoin d'ajouter de logique ici si le seul objectif est de forcer un re-rendu
+    // Mais vous pouvez ajouter des logiques supplémentaires si nécessaire, par exemple, vérifier si la page est prête
+  }, [updateTrigger]);
+
   return (
     <motion.div
       initial={{ scale: 0.95, opacity: 0 }}
@@ -31,7 +38,6 @@ const PageForm = () => {
       className="max-w-lg mx-auto my-12 bg-white p-8 rounded-xl shadow-xl border border-gray-200"
     >
       {pageReady && userPageUrl ? (
-        // Affiche le lien vers la page si elle est prête
         <div>
           <h2 className="text-3xl font-bold text-center mb-8">Votre page est prête !</h2>
           <p className="text-center">Voici le lien vers votre nouvelle page :</p>
@@ -45,7 +51,6 @@ const PageForm = () => {
           </a>
         </div>
       ) : (
-        // Affiche le formulaire pour créer une page
         <form onSubmit={handleSubmit} className="space-y-6">
           {message && <div className="my-3 p-3 text-center text-white bg-purple-600 rounded-md">{message}</div>}
           <h2 className="text-2xl font-bold text-center text-purple-800">Créer votre page</h2>
