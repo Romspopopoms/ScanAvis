@@ -1,24 +1,15 @@
 import React from 'react';
-import { useRouter } from 'next/router'; // Importer useRouter pour la navigation programmatique
 import Link from 'next/link';
 import { usePayment } from '../context/PaymentContext';
 import Spinner from '../components/Spinner';
 
 const PaymentStatusPage = () => {
   const { paymentStatus, paymentMessage, paymentDetails } = usePayment();
-  const router = useRouter(); // Utiliser useRouter pour la navigation
 
   // Affichez les logs pour le débogage
   console.log('Payment Status:', paymentStatus);
   console.log('Payment Message:', paymentMessage);
   console.log('Payment Details in PaymentStatusPage:', paymentDetails);
-
-  const handleProfileRedirect = () => {
-    // Rafraîchir les données de l'abonnement avant la redirection
-    // Ceci est un exemple, ajustez la logique selon vos besoins réels
-    window.location.reload(); // Rafraîchir la page pour s'assurer que les données sont à jour
-    router.push('/mon-profil'); // Rediriger vers la page de profil après le rafraîchissement
-  };
 
   if (!paymentStatus || paymentStatus === 'loading') {
     return <Spinner />;
@@ -54,9 +45,9 @@ const PaymentStatusPage = () => {
                 >
                   Retour à l'accueil
                 </Link>
-                <button type="button" onClick={handleProfileRedirect} className="bg-purple-500 text-white px-6 py-2 rounded hover:bg-purple-600 transition duration-200">
+                <Link href="/mon-profil" className="bg-purple-500 text-white px-6 py-2 rounded hover:bg-purple-600 transition duration-200">
                   Mon Profil
-                </button>
+                </Link>
               </div>
             </div>
           </div>
