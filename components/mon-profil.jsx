@@ -25,7 +25,7 @@ const MonProfil = () => {
 
   return (
     <motion.div
-      className=" flex flex-col items-center justify-center "
+      className="flex flex-col items-center justify-center"
       variants={containerVariants}
       initial="hidden"
       animate="visible"
@@ -45,12 +45,12 @@ const MonProfil = () => {
         </div>
       </motion.div>
 
-      {userSubscriptions.length > 0 && (
-        <motion.div
-          className="w-full max-w-4xl bg-white shadow-xl rounded-lg p-6 mx-4"
-          variants={containerVariants}
-        >
-          <h2 className="text-2xl font-bold text-center text-purple-800 mb-6">Abonnements</h2>
+      <motion.div
+        className="w-full max-w-4xl bg-white shadow-xl rounded-lg p-6 mx-4"
+        variants={containerVariants}
+      >
+        <h2 className="text-2xl font-bold text-center text-purple-800 mb-6">Abonnements</h2>
+        {userSubscriptions.length > 0 ? (
           <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0 md:space-x-4">
             {userSubscriptions.map((subscription, index) => (
               <div key={index} className="flex-1 bg-purple-100 shadow-md rounded-lg p-4">
@@ -84,8 +84,12 @@ const MonProfil = () => {
               </div>
             ))}
           </div>
-        </motion.div>
-      )}
+        ) : (
+          <div className="text-center">
+            <p className="text-lg">Vous n'avez actuellement aucun abonnement actif.</p>
+          </div>
+        )}
+      </motion.div>
     </motion.div>
   );
 };
