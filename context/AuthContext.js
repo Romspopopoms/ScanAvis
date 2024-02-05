@@ -9,21 +9,12 @@ export const AuthProvider = ({ children }) => {
   const [userSubscriptions, setUserSubscriptions] = useState([]);
   const [errorMessage, setErrorMessage] = useState('');
 
-  useEffect(() => {
-    // Tentez de restaurer l'état d'authentification lors du montage du composant
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      const userData = JSON.parse(storedUser);
-      setUser(userData);
-      setIsAuthenticated(true);
-    }
-  }, []);
-
   const clearError = () => setErrorMessage('');
   const handleError = (message) => setErrorMessage(message);
 
   const logout = () => {
     localStorage.removeItem('user');
+    localStorage.removeItem('authToken');
     setIsAuthenticated(false);
     setUser(null);
     setUserSubscriptions([]);
@@ -45,6 +36,16 @@ export const AuthProvider = ({ children }) => {
       handleError(`Erreur lors de la récupération des abonnements: ${error.message}`);
     }
   };
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      const userData = JSON.parse(storedUser);
+      setUser(userData);
+      setIsAuthenticated(true);
+      fetchUserSubscriptions(userData.uuid);
+    }
+  }, []);
 
   const handleResubscribe = async (subscriptionId) => {
     try {
