@@ -1,15 +1,24 @@
 import React from 'react';
+import { useRouter } from 'next/router'; // Importer useRouter pour la navigation programmatique
 import Link from 'next/link';
 import { usePayment } from '../context/PaymentContext';
 import Spinner from '../components/Spinner';
 
 const PaymentStatusPage = () => {
   const { paymentStatus, paymentMessage, paymentDetails } = usePayment();
+  const router = useRouter(); // Utiliser useRouter pour la navigation
 
   // Affichez les logs pour le débogage
   console.log('Payment Status:', paymentStatus);
   console.log('Payment Message:', paymentMessage);
   console.log('Payment Details in PaymentStatusPage:', paymentDetails);
+
+  const handleProfileRedirect = () => {
+    // Rafraîchir les données de l'abonnement avant la redirection
+    // Ceci est un exemple, ajustez la logique selon vos besoins réels
+    window.location.reload(); // Rafraîchir la page pour s'assurer que les données sont à jour
+    router.push('/mon-profil'); // Rediriger vers la page de profil après le rafraîchissement
+  };
 
   if (!paymentStatus || paymentStatus === 'loading') {
     return <Spinner />;
@@ -22,8 +31,9 @@ const PaymentStatusPage = () => {
           <div className="text-center">
             <h2 className="text-xl font-bold text-red-600 mb-4">Oups !</h2>
             <p className="mb-4">Erreur : {paymentMessage}</p>
-            <Link href="/paiement" passHref>
-              className="inline-block bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition duration-200"{'>'}
+            <Link href="/paiement" passHref
+              className="inline-block bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition duration-200"
+            >
               Réessayer le paiement
             </Link>
           </div>
@@ -38,12 +48,16 @@ const PaymentStatusPage = () => {
             </div>
             <div>
               <h2 className="text-xl font-bold text-white mb-4">Retrouvez vos informations dans votre page profil !</h2>
-              <Link href="/" passHref
-                className="inline-block bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600 transition duration-200 mt-4"
-              >
-                Retour à l'accueil
-
-              </Link>
+              <div className="inline-block">
+                <Link href="/" passHref
+                  className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600 transition duration-200 mr-4"
+                >
+                  Retour à l'accueil
+                </Link>
+                <button type="button" onClick={handleProfileRedirect} className="bg-purple-500 text-white px-6 py-2 rounded hover:bg-purple-600 transition duration-200">
+                  Mon Profil
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -55,7 +69,6 @@ const PaymentStatusPage = () => {
               className="inline-block bg-gray-500 text-white px-6 py-2 rounded hover:bg-gray-600 transition duration-200"
             >
               Retour à l'accueil
-
             </Link>
           </div>
         )}
