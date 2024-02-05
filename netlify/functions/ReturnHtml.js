@@ -33,7 +33,7 @@ async function generateHtmlPage(pageId) {
       }}
     >
       <div className="flex flex-col items-center">
-        <img src="${logoURL}" alt="Logo" className="mb-6 w-20 h-auto" />
+        <img src="${logoURL}" alt="Logo" className="mb-6 h-12 w-12" />
         <h1 className="text-4xl text-white mb-4">${titre}</h1>
         <div className="bg-white bg-opacity-75 rounded-lg p-4 shadow-lg mb-6">
           <input

@@ -73,7 +73,7 @@ export const HtmlProvider = ({ children }) => {
       return;
     }
     setLoading(true);
-    setMessage('Votre page est en cours de préparation. Veuillez patienter...');
+    setMessage('Votre page est en cours de préparation. Veuillez patienter. Cela peut prendre quelques minutes.');
 
     const formData = new FormData();
     formData.append('titre', titre);

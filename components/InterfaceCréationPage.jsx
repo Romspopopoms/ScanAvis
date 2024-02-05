@@ -9,7 +9,6 @@ const PageForm = () => {
     setImageDeFond,
     setLogo,
     loading,
-    message,
     pageReady,
     userPageUrl,
     handleSubmit,
@@ -34,9 +33,7 @@ const PageForm = () => {
       transition={{ duration: 0.5 }}
       className="max-w-lg mx-auto my-12 bg-white p-8 rounded-xl shadow-xl border border-gray-200"
     >
-      {/* Affichage du message */}
-      {message && <div className="my-3 p-3 text-center text-white bg-purple-600 rounded-md">{message}</div>}
-
+      {/* Affichage conditionnel basé sur l'état de la page */}
       {pageReady && userPageUrl ? (
         <div>
           <h2 className="text-3xl font-bold text-center mb-8">Votre page est prête !</h2>
@@ -51,6 +48,7 @@ const PageForm = () => {
           </a>
         </div>
       ) : (
+        // Le formulaire reste visible mais désactivé
         <form onSubmit={handleSubmit} className="space-y-6">
           <h2 className="text-2xl font-bold text-center text-purple-800">Créer votre page</h2>
           <div className="space-y-2">
@@ -98,9 +96,15 @@ const PageForm = () => {
             className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
             disabled={isFormDisabled}
           >
-            Créer la page
+            {loading ? 'Préparation...' : 'Créer la page'}
           </motion.button>
         </form>
+      )}
+      {/* Afficher un message d'état du processus */}
+      {loading && !pageReady && (
+        <div className="text-center mt-4">
+          <p className="text-lg">La première partie de la page a été créée, veuillez patienter quelques instants...</p>
+        </div>
       )}
     </motion.div>
   );
