@@ -58,6 +58,7 @@ const PageForm = () => {
               required
               className="mt-1 block w-full px-4 py-3 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
               placeholder="Entrez le nom de votre société"
+              disabled={loading}
             />
           </div>
           <div className="space-y-2">
@@ -69,6 +70,7 @@ const PageForm = () => {
               accept=".jpg, .jpeg, .png"
               onChange={(e) => handleImageChange(e, setImageDeFond)}
               className="mt-1 block w-full file:px-4 file:py-2 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
+              disabled={loading}
             />
           </div>
           <div className="space-y-2">
@@ -80,6 +82,7 @@ const PageForm = () => {
               accept=".jpg, .jpeg, .png"
               onChange={(e) => handleImageChange(e, setLogo)}
               className="mt-1 block w-full file:px-4 file:py-2 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
+              disabled={loading}
             />
           </div>
           <motion.button
@@ -89,7 +92,7 @@ const PageForm = () => {
             className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
             disabled={loading}
           >
-            {loading ? 'Envoi en cours...' : 'Créer la page'}
+            {loading ? 'La première partie de la page a été créée, veuillez patienter quelques instants...' : 'Créer la page'}
           </motion.button>
         </form>
       )}
