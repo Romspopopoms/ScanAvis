@@ -27,10 +27,17 @@ export const AuthProvider = ({ children }) => {
         headers: { 'Content-Type': 'application/json' },
       });
 
-      if (!response.ok) throw new Error(`Erreur HTTP ! Statut : ${response.status}`);
-
-      const data = await response.json();
-      setUserSubscriptions(data.subscriptions || []);
+      if (!response.ok) {
+        if (response.status === 404) {
+          setUserSubscriptions([]);
+        } else {
+          // Gérer les autres erreurs HTTP
+          throw new Error(`Erreur HTTP ! Statut : ${response.status}`);
+        }
+      } else {
+        const data = await response.json();
+        setUserSubscriptions(data.subscriptions || []);
+      }
     } catch (error) {
       console.error('Erreur lors de la récupération des abonnements utilisateur:', error);
       handleError(`Erreur lors de la récupération des abonnements: ${error.message}`);
