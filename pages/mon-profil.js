@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import MonProfil from '../components/mon-profil';
-import PageForm from '../components/InterfaceCréationPage'; // Assurez-vous d'importer correctement votre composant de création de page
+import PageForm from '../components/InterfaceCréationPage';
+import { AuthContext } from '../context/AuthContext'; // Assurez-vous que le chemin est correct
+
 import { useNavbarHeight } from '../context/NavbarContext';
 
 const menuItems = [
@@ -18,8 +20,15 @@ const variants = {
 const MonProfilPage = () => {
   const [activeSection, setActiveSection] = useState('profil');
   const { navbarHeight } = useNavbarHeight(); // Utilisez le hook pour obtenir la hauteur de la navbar
+  const { fetchUserSubscriptions, user } = useContext(AuthContext);
 
   const adjustedPaddingTop = navbarHeight > 64 ? `${navbarHeight - 30}px` : '44px'; // Calculez le padding top ajusté
+
+  useEffect(() => {
+    if (user && user.uuid) {
+      fetchUserSubscriptions(user.uuid);
+    }
+  }, [user]);
 
   const renderSection = (key) => {
     switch (key) {
