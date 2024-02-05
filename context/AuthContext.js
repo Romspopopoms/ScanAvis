@@ -9,11 +9,21 @@ export const AuthProvider = ({ children }) => {
   const [userSubscriptions, setUserSubscriptions] = useState([]);
   const [errorMessage, setErrorMessage] = useState('');
 
+  useEffect(() => {
+    // Tentez de restaurer l'état d'authentification lors du montage du composant
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      const userData = JSON.parse(storedUser);
+      setUser(userData);
+      setIsAuthenticated(true);
+    }
+  }, []);
+
   const clearError = () => setErrorMessage('');
   const handleError = (message) => setErrorMessage(message);
 
   const logout = () => {
-    localStorage.removeItem('authToken');
+    localStorage.removeItem('user');
     setIsAuthenticated(false);
     setUser(null);
     setUserSubscriptions([]);
@@ -115,16 +125,17 @@ export const AuthProvider = ({ children }) => {
     clearError();
     try {
       const data = await response.json();
-      if (response.ok) {
-        setIsAuthenticated(true);
-        setUser({
+      if (response.ok && data.user) {
+        const userData = { // Définir userData à partir de data.user
           uuid: data.user.uuid,
           email: data.user.email,
           name: data.user.name,
           access_token: data.user.access_token,
-        });
-        localStorage.setItem('authToken', data.user.access_token);
-        fetchUserSubscriptions(data.user.uuid);
+        };
+        localStorage.setItem('user', JSON.stringify(userData)); // Sauvegarder dans le localStorage
+        setUser(userData); // Mettre à jour l'état de l'utilisateur
+        setIsAuthenticated(true); // Mettre à jour l'état d'authentification
+        fetchUserSubscriptions(data.user.uuid); // Charger les abonnements de l'utilisateur
       } else {
         handleError(data.error || 'Erreur lors du traitement de la réponse.');
       }
