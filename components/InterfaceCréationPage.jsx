@@ -1,6 +1,5 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { useRouter } from 'next/router'; // Importez useRouter si vous utilisez Next.js
 import { useHtml } from '../context/HtmlContext'; // Assurez-vous que le chemin est correct
 
 const PageForm = () => {
@@ -11,12 +10,10 @@ const PageForm = () => {
     setLogo,
     loading,
     message,
-    handleSubmit,
     pageReady,
     userPageUrl,
+    handleSubmit,
   } = useHtml();
-
-  const router = useRouter(); // Utilisez useRouter pour la navigation
 
   // Gère le changement des champs de fichier pour imageDeFond et logo
   const handleImageChange = (e, setImage) => {
@@ -25,13 +22,6 @@ const PageForm = () => {
       setImage(file);
     }
   };
-
-  React.useEffect(() => {
-    if (pageReady && userPageUrl) {
-      // Utiliser router pour forcer le rechargement de la page actuelle, ce qui peut aider à s'assurer que toutes les données sont à jour
-      router.reload(window.location.pathname);
-    }
-  }, [pageReady, userPageUrl, router]);
 
   return (
     <motion.div

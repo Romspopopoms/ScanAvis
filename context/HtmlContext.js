@@ -17,25 +17,22 @@ export const HtmlProvider = ({ children }) => {
   const [isCheckingPage, setIsCheckingPage] = useState(false);
   const [pageUrl, setPageUrl] = useState('');
   const [pageReady, setPageReady] = useState(false);
-  const [userPageUrl, setUserPageUrl] = useState(null);
-  const [updateTrigger, setUpdateTrigger] = useState(0); // Ajout d'un compteur pour forcer le re-rendu
+  const [userPageUrl, setUserPageUrl] = useState('');
 
-  const triggerRerender = () => {
-    // Incrémenter le compteur pour forcer le re-rendu
-    setUpdateTrigger(updateTrigger + 1);
-  };
-
-  // Vérification initiale de la page de l'utilisateur
+  // Effectuer une vérification initiale pour la page de l'utilisateur
   useEffect(() => {
     const checkUserPage = async () => {
       if (!user) return;
       try {
         const response = await fetch(`/.netlify/functions/checkPageUrl?userId=${user.uuid}`);
-        const data = await response.json();
-        if (response.ok && data.hasPage) {
-          setUserPageUrl(data.pageUrl);
-          setPageReady(true);
-          triggerRerender(); // Forcer le re-rendu après la mise à jour
+        if (response.ok) {
+          const data = await response.json();
+          if (data.hasPage) {
+            setUserPageUrl(data.pageUrl);
+            setPageReady(true);
+          }
+        } else {
+          console.error("Erreur lors de la vérification de la page de l'utilisateur");
         }
       } catch (error) {
         console.error("Erreur lors de la vérification de la page de l'utilisateur", error);
@@ -44,7 +41,7 @@ export const HtmlProvider = ({ children }) => {
     checkUserPage();
   }, [user]);
 
-  // Vérification périodique de la disponibilité de la page
+  // Effectuer une vérification périodique de la disponibilité de la page
   useEffect(() => {
     let intervalId;
     if (isCheckingPage && pageUrl) {
@@ -55,7 +52,7 @@ export const HtmlProvider = ({ children }) => {
             setIsCheckingPage(false);
             setPageReady(true);
             setMessage('Votre page est prête !');
-            triggerRerender(); // Forcer le re-rendu après la mise à jour
+            setUserPageUrl(pageUrl); // Mettre à jour l'URL de la page de l'utilisateur
           } else {
             console.log('La page n\'est pas encore disponible.');
           }
@@ -64,7 +61,7 @@ export const HtmlProvider = ({ children }) => {
           setMessage('Erreur lors de la vérification de la disponibilité de la page. Veuillez réessayer.');
           setIsCheckingPage(false);
         }
-      }, 10000); // Vérifie toutes les 10 secondes
+      }, 10000); // Vérifier toutes les 10 secondes
     }
     return () => clearInterval(intervalId);
   }, [isCheckingPage, pageUrl]);
@@ -92,19 +89,18 @@ export const HtmlProvider = ({ children }) => {
         body: formData,
       });
 
-      const result = await response.json();
       if (!response.ok) {
-        throw new Error(result.message || 'Erreur lors de l\'envoi du formulaire.');
+        const errorText = await response.text();
+        throw new Error(`Erreur lors de l'envoi du formulaire: ${errorText}`);
       }
 
-      console.log('Réponse du serveur:', result);
+      const result = await response.json();
       setMessage(result.message || 'Formulaire envoyé avec succès.');
       setPageUrl(result.pageUrl); // Enregistrez l'URL de la page générée
       setFormSubmitted(true);
-      setIsCheckingPage(true); // Commencer à vérifier la disponibilité de la page immédiatement
+      setIsCheckingPage(true); // Commencer à vérifier la disponibilité de la page
     } catch (error) {
-      handleError(error.toString());
-      setMessage(error.message);
+      handleError(`Erreur lors de l'envoi du formulaire: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -135,7 +131,6 @@ export const HtmlProvider = ({ children }) => {
     isAuthenticated,
     handleSubmit,
     user,
-    updateTrigger, // Exposer le compteur pour les mises à jour
   };
 
   return <HtmlContext.Provider value={value}>{children}</HtmlContext.Provider>;
