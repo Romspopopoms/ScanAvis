@@ -4,8 +4,7 @@ const Page = () => (
   <div
     className="relative bg-cover bg-center h-screen flex items-center justify-center"
     style={{
-      backgroundImage:
-        'url("https://github.com/Romspopopoms/ScanAvis/blob/main/uploaded_images/planet-05.png?raw=true")',
+      backgroundImage: 'url("null")',
       backgroundSize: 'cover',
       backgroundPosition: 'center center',
       backgroundRepeat: 'no-repeat',
@@ -14,11 +13,7 @@ const Page = () => (
     }}
   >
     <div className="flex flex-col items-center">
-      <img
-        src="https://github.com/Romspopopoms/ScanAvis/blob/main/uploaded_images/people-01.png?raw=true"
-        alt="Logo"
-        className="mb-6 w-20 h-auto"
-      />
+      <img src="null" alt="Logo" className="mb-6 h-12 w-12" />
       <h1 className="text-4xl text-white mb-4">Mariav</h1>
       <div className="bg-white bg-opacity-75 rounded-lg p-4 shadow-lg mb-6">
         <input
