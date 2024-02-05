@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useRouter } from 'next/router'; // Importez useRouter si vous utilisez Next.js
 import { useHtml } from '../context/HtmlContext'; // Assurez-vous que le chemin est correct
 
 const PageForm = () => {
@@ -13,8 +14,9 @@ const PageForm = () => {
     handleSubmit,
     pageReady,
     userPageUrl,
-    updateTrigger,
   } = useHtml();
+
+  const router = useRouter(); // Utilisez useRouter pour la navigation
 
   // Gère le changement des champs de fichier pour imageDeFond et logo
   const handleImageChange = (e, setImage) => {
@@ -25,10 +27,11 @@ const PageForm = () => {
   };
 
   React.useEffect(() => {
-    // Cette fonction sera exécutée chaque fois que la valeur de pageUpdateTrigger change
-    // Vous n'avez pas besoin d'ajouter de logique ici si le seul objectif est de forcer un re-rendu
-    // Mais vous pouvez ajouter des logiques supplémentaires si nécessaire, par exemple, vérifier si la page est prête
-  }, [updateTrigger]);
+    if (pageReady && userPageUrl) {
+      // Utiliser router pour forcer le rechargement de la page actuelle, ce qui peut aider à s'assurer que toutes les données sont à jour
+      router.reload(window.location.pathname);
+    }
+  }, [pageReady, userPageUrl, router]);
 
   return (
     <motion.div

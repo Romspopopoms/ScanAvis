@@ -29,7 +29,6 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-intersection-observer": "^9.5.3",
-    "react-router-dom": "^6.21.3",
     "react-use-shoppingcart": "^0.1.5",
     "simple-git": "^3.22.0",
     "slugify": "^1.6.6",
