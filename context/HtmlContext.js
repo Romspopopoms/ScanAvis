@@ -18,6 +18,12 @@ export const HtmlProvider = ({ children }) => {
   const [pageUrl, setPageUrl] = useState('');
   const [pageReady, setPageReady] = useState(false);
   const [userPageUrl, setUserPageUrl] = useState(null);
+  const [updateTrigger, setUpdateTrigger] = useState(0); // Ajout d'un compteur pour forcer le re-rendu
+
+  const triggerRerender = () => {
+    // Incrémenter le compteur pour forcer le re-rendu
+    setUpdateTrigger(updateTrigger + 1);
+  };
 
   // Vérification initiale de la page de l'utilisateur
   useEffect(() => {
@@ -29,6 +35,7 @@ export const HtmlProvider = ({ children }) => {
         if (response.ok && data.hasPage) {
           setUserPageUrl(data.pageUrl);
           setPageReady(true);
+          triggerRerender(); // Forcer le re-rendu après la mise à jour
         }
       } catch (error) {
         console.error("Erreur lors de la vérification de la page de l'utilisateur", error);
@@ -48,6 +55,7 @@ export const HtmlProvider = ({ children }) => {
             setIsCheckingPage(false);
             setPageReady(true);
             setMessage('Votre page est prête !');
+            triggerRerender(); // Forcer le re-rendu après la mise à jour
           } else {
             console.log('La page n\'est pas encore disponible.');
           }
@@ -127,6 +135,7 @@ export const HtmlProvider = ({ children }) => {
     isAuthenticated,
     handleSubmit,
     user,
+    updateTrigger, // Exposer le compteur pour les mises à jour
   };
 
   return <HtmlContext.Provider value={value}>{children}</HtmlContext.Provider>;

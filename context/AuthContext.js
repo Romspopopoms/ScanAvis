@@ -7,6 +7,7 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
   const [userSubscriptions, setUserSubscriptions] = useState([]);
+  const [subscriptionsUpdate, setSubscriptionsUpdate] = useState(0);
   const [errorMessage, setErrorMessage] = useState('');
 
   const clearError = () => setErrorMessage('');
@@ -20,6 +21,11 @@ export const AuthProvider = ({ children }) => {
     setUserSubscriptions([]);
   };
 
+  const triggerRerender = () => {
+    // Mettre à jour le compteur pour forcer le re-rendu
+    setSubscriptionsUpdate(subscriptionsUpdate + 1);
+  };
+
   const fetchUserSubscriptions = async (uuid) => {
     try {
       const response = await fetch(`/.netlify/functions/getUserSubscriptions?userUuid=${uuid}`, {
@@ -31,7 +37,6 @@ export const AuthProvider = ({ children }) => {
         if (response.status === 404) {
           setUserSubscriptions([]);
         } else {
-          // Gérer les autres erreurs HTTP
           throw new Error(`Erreur HTTP ! Statut : ${response.status}`);
         }
       } else {
@@ -41,6 +46,8 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error('Erreur lors de la récupération des abonnements utilisateur:', error);
       handleError(`Erreur lors de la récupération des abonnements: ${error.message}`);
+    } finally {
+      triggerRerender(); // Forcer le re-rendu après chaque fetch, réussi ou non
     }
   };
 
@@ -216,6 +223,7 @@ export const AuthProvider = ({ children }) => {
       refreshAccessToken,
       errorMessage,
       handleError,
+      setSubscriptionsUpdate,
     }}
     >
       {children}

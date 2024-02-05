@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { AuthContext } from '../context/AuthContext';
 
@@ -9,7 +9,11 @@ const MonProfil = () => {
     handleResubscribe,
     handleCancelSubscription,
     errorMessage,
+    subscriptionsUpdate,
   } = useContext(AuthContext);
+
+  useEffect(() => {
+  }, [subscriptionsUpdate]);
 
   const formatAmount = (amount) => new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(amount);
 
