@@ -45,7 +45,7 @@ const PaymentStatusPage = () => {
                 >
                   Retour à l'accueil
                 </Link>
-                <Link href="/mon-profil" className="bg-purple-500 text-white px-6 py-2 rounded hover:bg-purple-600 transition duration-200">
+                <Link href="/mon-profil" className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600 transition duration-200 ml-4">
                   Mon Profil
                 </Link>
               </div>
