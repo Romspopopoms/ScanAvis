@@ -12,7 +12,6 @@ const PageForm = () => {
     pageReady,
     userPageUrl,
     handleSubmit,
-    formSubmitted, // Assurez-vous que cette variable est définie et mise à jour dans le contexte HtmlContext
   } = useHtml();
 
   // Gère le changement des champs de fichier pour imageDeFond et logo
@@ -23,8 +22,15 @@ const PageForm = () => {
     }
   };
 
-  // Bloquer l'interaction avec le formulaire une fois soumis, en attente de la mise à jour de l'état
-  const isFormDisabled = loading || formSubmitted || pageReady;
+  // Fonction pour afficher un message d'état approprié
+  const renderStatusMessage = () => {
+    if (loading) {
+      return 'Votre page est en cours de préparation. Veuillez patienter...';
+    } if (pageReady && userPageUrl) {
+      return 'Votre page est prête !';
+    }
+    return ''; // Aucun message par défaut
+  };
 
   return (
     <motion.div
@@ -33,14 +39,19 @@ const PageForm = () => {
       transition={{ duration: 0.5 }}
       className="max-w-lg mx-auto my-12 bg-white p-8 rounded-xl shadow-xl border border-gray-200"
     >
+      {/* Affichage du message d'état du processus */}
+      <div className="my-3 p-3 text-center text-white bg-purple-600 rounded-md">
+        {renderStatusMessage()}
+      </div>
+
       {/* Affichage conditionnel basé sur l'état de la page */}
       {pageReady && userPageUrl ? (
-        <div>
-          <h2 className="text-3xl font-bold text-center mb-8">Votre page est prête !</h2>
-          <p className="text-center">Voici le lien vers votre nouvelle page :</p>
+        <div className="text-center">
+          <h2 className="text-3xl font-bold mb-8">Votre page est prête !</h2>
+          <p>Voici le lien vers votre nouvelle page :</p>
           <a
             href={userPageUrl}
-            className="block text-center mt-4 text-purple-600 hover:text-purple-800"
+            className="block mt-4 text-purple-600 hover:text-purple-800"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -62,7 +73,7 @@ const PageForm = () => {
               required
               className="mt-1 block w-full px-4 py-3 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
               placeholder="Entrez le nom de votre société"
-              disabled={isFormDisabled}
+              disabled={loading}
             />
           </div>
           <div className="space-y-2">
@@ -74,7 +85,7 @@ const PageForm = () => {
               accept=".jpg, .jpeg, .png"
               onChange={(e) => handleImageChange(e, setImageDeFond)}
               className="mt-1 block w-full file:px-4 file:py-2 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
-              disabled={isFormDisabled}
+              disabled={loading}
             />
           </div>
           <div className="space-y-2">
@@ -86,7 +97,7 @@ const PageForm = () => {
               accept=".jpg, .jpeg, .png"
               onChange={(e) => handleImageChange(e, setLogo)}
               className="mt-1 block w-full file:px-4 file:py-2 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
-              disabled={isFormDisabled}
+              disabled={loading}
             />
           </div>
           <motion.button
@@ -94,17 +105,11 @@ const PageForm = () => {
             whileTap={{ scale: 0.95 }}
             type="submit"
             className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
-            disabled={isFormDisabled}
+            disabled={loading}
           >
             {loading ? 'Préparation...' : 'Créer la page'}
           </motion.button>
         </form>
-      )}
-      {/* Afficher un message d'état du processus */}
-      {loading && !pageReady && (
-        <div className="text-center mt-4">
-          <p className="text-lg">La première partie de la page a été créée, veuillez patienter quelques instants...</p>
-        </div>
       )}
     </motion.div>
   );
