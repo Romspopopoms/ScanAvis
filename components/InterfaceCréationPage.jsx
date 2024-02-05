@@ -13,7 +13,7 @@ const PageForm = () => {
     pageReady,
     userPageUrl,
     handleSubmit,
-    formSubmitted,
+    formSubmitted, // Assurez-vous que cette variable est définie et mise à jour dans le contexte HtmlContext
   } = useHtml();
 
   // Gère le changement des champs de fichier pour imageDeFond et logo
@@ -25,7 +25,7 @@ const PageForm = () => {
   };
 
   // Bloquer l'interaction avec le formulaire une fois soumis, en attente de la mise à jour de l'état
-  const isFormDisabled = loading || formSubmitted;
+  const isFormDisabled = loading || formSubmitted || pageReady;
 
   return (
     <motion.div
@@ -34,6 +34,9 @@ const PageForm = () => {
       transition={{ duration: 0.5 }}
       className="max-w-lg mx-auto my-12 bg-white p-8 rounded-xl shadow-xl border border-gray-200"
     >
+      {/* Affichage du message */}
+      {message && <div className="my-3 p-3 text-center text-white bg-purple-600 rounded-md">{message}</div>}
+
       {pageReady && userPageUrl ? (
         <div>
           <h2 className="text-3xl font-bold text-center mb-8">Votre page est prête !</h2>
@@ -49,7 +52,6 @@ const PageForm = () => {
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-6">
-          {message && <div className="my-3 p-3 text-center text-white bg-purple-600 rounded-md">{message}</div>}
           <h2 className="text-2xl font-bold text-center text-purple-800">Créer votre page</h2>
           <div className="space-y-2">
             <label htmlFor="titre" className="block text-lg font-semibold text-gray-700">Nom de la société</label>
@@ -96,7 +98,7 @@ const PageForm = () => {
             className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
             disabled={isFormDisabled}
           >
-            {loading ? 'La première partie de la page est en cours de création...' : 'Créer la page'}
+            Créer la page
           </motion.button>
         </form>
       )}
