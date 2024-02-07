@@ -43,7 +43,7 @@ exports.handler = async (event) => {
 
     let userUuid;
 
-    if (userRows.length === 0) {
+    if (userRows && userRows.length === 0) {
       console.log('Aucun utilisateur correspondant trouvé, création d\'un nouveau.');
       userUuid = uuidv4();
       const insertUserSql = 'INSERT INTO users (uuid, email, name, access_token) VALUES (?, ?, ?, ?)';
