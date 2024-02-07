@@ -22,8 +22,14 @@ const MonProfil = () => {
   const [localGoogleBusiness, setLocalGoogleBusiness] = useState('');
 
   useEffect(() => {
-    fetchUserDetails(user?.uuid); // Fetch user details on component mount and when user changes
-  }, [user?.uuid, fetchUserDetails]);
+    const fetchUserDetailsAndUpdateState = async () => {
+      await fetchUserDetails(user?.uuid); // Fetch user details
+      setLocalEntreprise(entreprise); // Update local state after fetching user details
+      setLocalGoogleBusiness(googleBusiness); // Update local state after fetching user details
+    };
+
+    fetchUserDetailsAndUpdateState();
+  }, [user?.uuid, fetchUserDetails, entreprise, googleBusiness]);
 
   useEffect(() => {
     setLocalEntreprise(entreprise); // Update local state when entreprise from context changes
