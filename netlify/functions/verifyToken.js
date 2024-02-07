@@ -58,7 +58,7 @@ exports.handler = async (event) => {
     }
 
     // Mise à jour ou insertion des informations d'entreprise et Google Business
-    const businessQuery = 'INSERT INTO users (user_uuid, entreprise, google_business) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE entreprise = ?, google_business = ?';
+    const businessQuery = 'INSERT INTO users (user_uuid, entreprise, google_business) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE entreprise = VALUES(entreprise), google_business = VALUES(google_business)';
     const businessParams = [userUuid, entreprise, googleBusiness, entreprise, googleBusiness];
     console.log('Exécution de la requête SQL pour insérer ou mettre à jour les informations d\'entreprise et Google Business:', businessQuery, 'avec paramètres:', businessParams);
 
