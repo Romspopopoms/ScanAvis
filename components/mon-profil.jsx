@@ -29,16 +29,14 @@ const MonProfil = () => {
   }, [entreprise, googleBusiness]);
 
   const handleSubmit = async () => {
+    // Mise à jour des détails de l'utilisateur dans le contexte
     await updateUserDetails(localEntreprise, localGoogleBusiness);
-    setIsEditing(false); // Désactivez le mode d'édition après une mise à jour réussie
+    setIsEditing(false); // Sortir du mode d'édition
   };
 
-  // Si nécessaire, vous pouvez également réagir au changement de l'utilisateur ici
   useEffect(() => {
-    if (user?.uuid) {
-      fetchUserDetails(user.uuid);
-    }
-  }, [user?.uuid, fetchUserDetails]);
+    fetchUserDetails(user?.uuid);
+  }, [user?.uuid]);
 
   return (
     <motion.div className="flex flex-col items-center justify-center min-h-screen">
