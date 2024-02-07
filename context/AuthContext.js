@@ -73,6 +73,8 @@ export const AuthProvider = ({ children }) => {
 
   const updateUserDetails = async (newEntreprise, newGoogleBusiness) => {
     if (!user || !user.uuid) {
+      setEntreprise(newEntreprise);
+      setGoogleBusiness(newGoogleBusiness);
       console.error('Aucun utilisateur connecté pour mettre à jour les détails.');
       setErrorMessage('Vous devez être connecté pour mettre à jour les informations.');
       return;
@@ -106,8 +108,10 @@ export const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    // Initialisation et récupération des détails de l'utilisateur ici...
-  }, []);
+    if (user?.uuid) {
+      fetchUserDetails(user.uuid);
+    }
+  }, [user?.uuid, fetchUserDetails]);
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
