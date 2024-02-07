@@ -18,28 +18,27 @@ const MonProfil = () => {
   const formatAmount = (amount) => new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(amount);
 
   const [isEditing, setIsEditing] = useState(false);
-  const [localEntreprise, setLocalEntreprise] = useState('');
-  const [localGoogleBusiness, setLocalGoogleBusiness] = useState('');
+  // Utilisez des états locaux pour les champs éditables
+  const [localEntreprise, setLocalEntreprise] = useState(entreprise);
+  const [localGoogleBusiness, setLocalGoogleBusiness] = useState(googleBusiness);
 
+  // Écoutez les changements de entreprise et googleBusiness dans le contexte
   useEffect(() => {
-    const fetchUserDetailsAndUpdateState = async () => {
-      await fetchUserDetails(user?.uuid); // Fetch user details
-      setLocalEntreprise(entreprise); // Update local state after fetching user details
-      setLocalGoogleBusiness(googleBusiness); // Update local state after fetching user details
-    };
-
-    fetchUserDetailsAndUpdateState();
-  }, [user?.uuid, fetchUserDetails, entreprise, googleBusiness]);
-
-  useEffect(() => {
-    setLocalEntreprise(entreprise); // Update local state when entreprise from context changes
-    setLocalGoogleBusiness(googleBusiness); // Update local state when googleBusiness from context changes
+    setLocalEntreprise(entreprise);
+    setLocalGoogleBusiness(googleBusiness);
   }, [entreprise, googleBusiness]);
 
   const handleSubmit = async () => {
     await updateUserDetails(localEntreprise, localGoogleBusiness);
-    setIsEditing(false); // Disable editing mode after successful update
+    setIsEditing(false); // Désactivez le mode d'édition après une mise à jour réussie
   };
+
+  // Si nécessaire, vous pouvez également réagir au changement de l'utilisateur ici
+  useEffect(() => {
+    if (user?.uuid) {
+      fetchUserDetails(user.uuid);
+    }
+  }, [user?.uuid, fetchUserDetails]);
 
   return (
     <motion.div className="flex flex-col items-center justify-center min-h-screen">
