@@ -31,10 +31,6 @@ const MonProfil = () => {
     // Ajouter ici la logique pour mettre à jour les informations dans la base de données
   };
 
-  if (!user) {
-    return <div>Chargement...</div>;
-  }
-
   return (
     <motion.div
       className="flex flex-col items-center justify-center min-h-screen"
@@ -48,9 +44,28 @@ const MonProfil = () => {
         variants={containerVariants}
       >
         <h1 className="text-3xl font-bold text-center text-purple-800 mb-8">Mon Profil</h1>
-        <div className="mb-6">
-          <p className="text-lg"><span className="font-semibold">Nom :</span> {user.name}</p>
-          <p className="text-lg"><span className="font-semibold">Email :</span> {user.email}</p>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div>
+            <label htmlFor="name" className="block text-lg font-semibold">Nom:</label>
+            <input
+              id="name"
+              type="text"
+              value={user.name}
+              className="mt-1 p-2 w-full border rounded"
+              readOnly // Assurez-vous que l'input est en lecture seule si l'utilisateur ne peut pas modifier son nom ici
+            />
+          </div>
+          <div>
+            <label htmlFor="email" className="block text-lg font-semibold">Email:</label>
+            <input
+              id="email"
+              type="email"
+              value={user.email}
+              className="mt-1 p-2 w-full border rounded"
+              readOnly // Assurez-vous que l'input est en lecture seule si l'utilisateur ne peut pas modifier son email ici
+            />
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
