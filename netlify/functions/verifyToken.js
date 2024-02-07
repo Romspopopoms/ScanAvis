@@ -1,9 +1,9 @@
 const { OAuth2Client } = require('google-auth-library');
 const { v4: uuidv4 } = require('uuid');
-const { conn } = require('../../utils/db'); // Assurez-vous que ce chemin est correct et que `conn` est bien configuré
+const { conn } = require('../../utils/db'); // Assurez-vous que ce chemin est correct
 
 exports.handler = async (event) => {
-  console.log('Début de la fonction verifyToken.');
+  console.log('Début de la fonction.');
 
   try {
     // Vérification de la méthode HTTP
@@ -13,8 +13,8 @@ exports.handler = async (event) => {
     }
 
     // Parsing du corps de la requête
-    const { idToken, userData, accessToken } = JSON.parse(event.body);
-    console.log('idToken:', idToken, 'userData:', userData, 'accessToken:', accessToken);
+    const { idToken, userData, accessToken, entreprise, googleBusiness } = JSON.parse(event.body);
+    console.log('idToken:', idToken, 'userData:', userData, 'accessToken:', accessToken, 'entreprise:', entreprise, 'googleBusiness:', googleBusiness);
 
     if (!idToken && (!userData || !accessToken)) {
       console.error('Données nécessaires non fournies dans le corps de la requête.');
@@ -34,29 +34,40 @@ exports.handler = async (event) => {
       payload = { ...userData, access_token: accessToken };
     }
 
-    // Logique de gestion des utilisateurs (extraction, insertion, mise à jour)
     const { email } = payload;
-    const sqlQuery = 'SELECT uuid FROM users WHERE email = ?';
-    console.log('Exécution de la requête SQL pour rechercher l\'utilisateur:', sqlQuery, 'avec email:', email);
+    const userQuery = 'SELECT uuid FROM users WHERE email = ?';
+    console.log('Exécution de la requête SQL pour rechercher l\'utilisateur:', userQuery, 'avec email:', email);
 
-    const result = await conn.execute(sqlQuery, [email]);
-    const { rows } = result;
-    console.log('Résultat de la requête SQL:', rows);
+    const userResult = await conn.execute(userQuery, [email]);
+    const userRows = userResult[0];
+    console.log('Résultat de la requête SQL:', userRows);
 
-    if (rows.length === 0) {
+    let userUuid;
+
+    if (userRows.length === 0) {
       console.log('Aucun utilisateur correspondant trouvé, création d\'un nouveau.');
-      const newUuid = uuidv4();
-      const insertSql = 'INSERT INTO users (uuid, email, name, access_token) VALUES (?, ?, ?, ?)';
-      const insertParams = [newUuid, email, payload.name, accessToken];
-      console.log('Exécution de la requête SQL pour insérer un nouvel utilisateur:', insertSql, 'avec paramètres:', insertParams);
+      userUuid = uuidv4();
+      const insertUserSql = 'INSERT INTO users (uuid, email, name, access_token) VALUES (?, ?, ?, ?)';
+      const userParams = [userUuid, email, payload.name, accessToken];
+      console.log('Exécution de la requête SQL pour insérer un nouvel utilisateur:', insertUserSql, 'avec paramètres:', userParams);
 
-      await conn.execute(insertSql, insertParams);
-      console.log('Nouvel utilisateur créé avec UUID:', newUuid);
-      payload.uuid = newUuid;
+      await conn.execute(insertUserSql, userParams);
+      console.log('Nouvel utilisateur créé avec UUID:', userUuid);
     } else {
-      console.log('Utilisateur existant trouvé avec UUID:', rows[0].uuid);
-      payload.uuid = rows[0].uuid;
+      userUuid = userRows[0].uuid;
+      console.log('Utilisateur existant trouvé avec UUID:', userUuid);
     }
+
+    // Mise à jour ou insertion des informations d'entreprise et Google Business
+    const businessQuery = 'INSERT INTO users (user_uuid, entreprise, google_business) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE entreprise = ?, google_business = ?';
+    const businessParams = [userUuid, entreprise, googleBusiness, entreprise, googleBusiness];
+    console.log('Exécution de la requête SQL pour insérer ou mettre à jour les informations d\'entreprise et Google Business:', businessQuery, 'avec paramètres:', businessParams);
+
+    await conn.execute(businessQuery, businessParams);
+    console.log('Informations d\'entreprise et Google Business mises à jour pour l\'utilisateur UUID:', userUuid);
+
+    payload.entreprise = entreprise;
+    payload.googleBusiness = googleBusiness;
 
     console.log('Préparation de la réponse avec les données de l\'utilisateur:', payload);
     return {
@@ -64,7 +75,7 @@ exports.handler = async (event) => {
       body: JSON.stringify({ user: payload }),
     };
   } catch (error) {
-    console.error('Erreur lors de la fonction verifyToken:', error);
+    console.error('Erreur lors de l\'exécution de la fonction:', error);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: 'Internal Server Error', details: error.message }),

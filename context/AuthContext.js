@@ -9,6 +9,8 @@ export const AuthProvider = ({ children }) => {
   const [userSubscriptions, setUserSubscriptions] = useState([]);
   const [subscriptionsUpdate, setSubscriptionsUpdate] = useState(0);
   const [errorMessage, setErrorMessage] = useState('');
+  const [entreprise, setEntreprise] = useState('');
+  const [googleBusiness, setGoogleBusiness] = useState('');
 
   const clearError = () => setErrorMessage('');
   const handleError = (message) => setErrorMessage(message);
@@ -51,6 +53,62 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const fetchUserDetails = async (uuid) => {
+    try {
+      const response = await fetch(`/.netlify/functions/getUserDetails?userUuid=${uuid}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      if (!response.ok) throw new Error(`Erreur HTTP ! Statut : ${response.status}`);
+
+      const data = await response.json();
+      setEntreprise(data.entreprise);
+      setGoogleBusiness(data.googleBusiness);
+    } catch (error) {
+      console.error('Erreur lors de la récupération des détails de lutilisateur:', error);
+      handleError(`Erreur lors de la récupération des détails: ${error.message}`);
+    }
+  };
+
+  const updateUserDetails = async (newEntreprise, newGoogleBusiness) => {
+    if (!user || !user.uuid) {
+      console.error('Aucun utilisateur connecté pour mettre à jour les détails.');
+      setErrorMessage('Vous devez être connecté pour mettre à jour les informations.');
+      return;
+    }
+
+    try {
+      const response = await fetch('/.netlify/functions/updateUserDetails', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userUuid: user.uuid,
+          entreprise: newEntreprise, // Utilisez les nouveaux noms de paramètres pour éviter les conflits
+          googleBusiness: newGoogleBusiness,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erreur HTTP! statut: ${response.status}`);
+      }
+
+      // Mettez à jour les informations de l'utilisateur dans le contexte
+      setEntreprise(newEntreprise);
+      setGoogleBusiness(newGoogleBusiness);
+      console.log('Informations de l\'utilisateur mises à jour avec succès.');
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour des détails de l\'utilisateur:', error);
+      setErrorMessage(`Erreur lors de la mise à jour: ${error.message}`);
+    }
+  };
+
+  useEffect(() => {
+    // Initialisation et récupération des détails de l'utilisateur ici...
+  }, []);
+
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
@@ -58,6 +116,7 @@ export const AuthProvider = ({ children }) => {
       setUser(userData);
       setIsAuthenticated(true);
       fetchUserSubscriptions(userData.uuid);
+      fetchUserDetails(userData.uuid);
     }
   }, []);
 
@@ -226,6 +285,12 @@ export const AuthProvider = ({ children }) => {
       setSubscriptionsUpdate,
       subscriptionsUpdate,
       fetchUserSubscriptions,
+      entreprise,
+      setEntreprise,
+      googleBusiness,
+      setGoogleBusiness,
+      fetchUserDetails,
+      updateUserDetails,
     }}
     >
       {children}

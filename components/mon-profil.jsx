@@ -10,14 +10,15 @@ const MonProfil = () => {
     handleCancelSubscription,
     errorMessage,
     subscriptionsUpdate,
+    entreprise,
+    setEntreprise,
+    setGoogleBusiness,
+    googleBusiness,
+    fetchUserDetails, // Supposons que cette fonction récupère les détails actuels de l'utilisateur
+    updateUserDetails,
   } = useContext(AuthContext);
 
-  const [entreprise, setEntreprise] = useState('');
-  const [googleBusiness, setGoogleBusiness] = useState('');
-
   useEffect(() => {}, [subscriptionsUpdate]);
-
-  const formatAmount = (amount) => new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(amount);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -25,81 +26,65 @@ const MonProfil = () => {
     exit: { opacity: 0, transition: { duration: 0.5 } },
   };
 
-  const handleSubmit = () => {
-    console.log("Mise à jour de l'entreprise :", entreprise);
-    console.log('Mise à jour du Google Business :', googleBusiness);
-    // Ajouter ici la logique pour mettre à jour les informations dans la base de données
+  const [isEditing, setIsEditing] = useState(false);
+
+  const formatAmount = (amount) => new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(amount);
+
+  const handleSubmit = async () => {
+    await updateUserDetails(user.uuid, entreprise, googleBusiness); // Met à jour les détails dans la base de données
+    setIsEditing(false); // Désactive le mode d'édition après la mise à jour
+    fetchUserDetails(user.uuid); // Rafraîchit les informations de l'utilisateur après la mise à jour
   };
 
   return (
-    <motion.div
-      className="flex flex-col items-center justify-center min-h-screen"
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-      exit="exit"
-    >
-      <motion.div
-        className="w-full max-w-4xl bg-white shadow-xl rounded-lg p-6 mb-6"
-        variants={containerVariants}
-      >
+    <motion.div className="flex flex-col items-center justify-center min-h-screen">
+      <motion.div className="w-full max-w-4xl bg-white shadow-xl rounded-lg p-6 mb-6">
         <h1 className="text-3xl font-bold text-center text-purple-800 mb-8">Mon Profil</h1>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          <div>
-            <label htmlFor="name" className="block text-lg font-semibold">Nom:</label>
+        {/* Affichage conditionnel basé sur isEditing */}
+        {isEditing ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <input
-              id="name"
-              type="text"
-              value={user.name}
-              className="mt-1 p-2 w-full border rounded"
-              readOnly // Assurez-vous que l'input est en lecture seule si l'utilisateur ne peut pas modifier son nom ici
-            />
-          </div>
-          <div>
-            <label htmlFor="email" className="block text-lg font-semibold">Email:</label>
-            <input
-              id="email"
-              type="email"
-              value={user.email}
-              className="mt-1 p-2 w-full border rounded"
-              readOnly // Assurez-vous que l'input est en lecture seule si l'utilisateur ne peut pas modifier son email ici
-            />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label htmlFor="entreprise" className="block text-lg font-semibold">Mon Entreprise:</label>
-            <input
-              id="entreprise"
               type="text"
               value={entreprise}
               onChange={(e) => setEntreprise(e.target.value)}
               className="mt-1 p-2 w-full border rounded"
             />
-          </div>
-          <div>
-            <label htmlFor="googleBusiness" className="block text-lg font-semibold">Mon Google Business:</label>
             <input
-              id="googleBusiness"
               type="text"
               value={googleBusiness}
               onChange={(e) => setGoogleBusiness(e.target.value)}
               className="mt-1 p-2 w-full border rounded"
             />
-            <p className="mt-2 text-purple-800 hover:text-purple-600 cursor-pointer">Cliquez ici pour savoir quoi rentrer</p>
           </div>
-        </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <p><strong>Entreprise:</strong> {entreprise}</p>
+            <p><strong>Google Business:</strong> {googleBusiness}</p>
+          </div>
+        )}
 
-        <div className="text-center mt-6">
-          <button type="button"
-            onClick={handleSubmit}
-            className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded"
-          >
-            Valider les Modifications
-          </button>
-        </div>
+        {isEditing && (
+          <div className="text-center mt-6">
+            <button type="button"
+              onClick={handleSubmit}
+              className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded"
+            >
+              Enregistrer les modifications
+            </button>
+          </div>
+        )}
+
+        {!isEditing && (
+          <div className="text-center mt-6">
+            <button type="button"
+              onClick={() => setIsEditing(true)}
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            >
+              Modifier
+            </button>
+          </div>
+        )}
 
         {errorMessage && <p className="text-red-600 text-center mt-4">{errorMessage}</p>}
       </motion.div>
