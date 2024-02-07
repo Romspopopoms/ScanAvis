@@ -24,7 +24,7 @@ exports.handler = async (event) => {
 
   try {
     const query = 'SELECT entreprise, google_business FROM users WHERE uuid = ?';
-    const [rows] = await conn.execute(query, [userUuid]);
+    const rows = await conn.execute(query, [userUuid]);
     console.log('Result from conn.execute:', rows);
 
     if (!rows || rows.length === 0) {
