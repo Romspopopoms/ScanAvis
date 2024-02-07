@@ -13,9 +13,9 @@ exports.handler = async (event) => {
     }
 
     // Parsing du corps de la requête
-    const { idToken, userData, accessToken, entreprise, googleBusiness } = JSON.parse(event.body);
+    const { idToken, userData, accessToken } = JSON.parse(event.body);
 
-    if (!idToken && (!userData || !accessToken || !entreprise || !googleBusiness)) {
+    if (!idToken && (!userData || !accessToken)) {
       console.error('Données nécessaires non fournies dans le corps de la requête.');
       return { statusCode: 400, body: JSON.stringify({ error: 'Missing required data in request body' }) };
     }
@@ -56,6 +56,16 @@ exports.handler = async (event) => {
       userUuid = userRows[0].uuid;
       console.log('Utilisateur existant trouvé avec UUID:', userUuid);
     }
+
+    // Récupération des valeurs d'entreprise et de Google Business depuis la base de données
+    const entrepriseQuery = 'SELECT entreprise FROM entreprise WHERE user_uuid = ?';
+    const googleBusinessQuery = 'SELECT google_business FROM google_business WHERE user_uuid = ?';
+
+    const entrepriseResult = await conn.execute(entrepriseQuery, [userUuid]);
+    const googleBusinessResult = await conn.execute(googleBusinessQuery, [userUuid]);
+
+    const entreprise = entrepriseResult.length > 0 ? entrepriseResult[0].entreprise : null;
+    const googleBusiness = googleBusinessResult.length > 0 ? googleBusinessResult[0].google_business : null;
 
     // Mise à jour ou insertion des informations d'entreprise et Google Business
     const businessQuery = 'INSERT INTO users (user_uuid, entreprise, google_business) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE entreprise = VALUES(entreprise), google_business = VALUES(google_business)';
