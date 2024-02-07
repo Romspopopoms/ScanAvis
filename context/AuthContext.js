@@ -54,20 +54,22 @@ export const AuthProvider = ({ children }) => {
   };
 
   const fetchUserDetails = async (uuid) => {
+    console.log(`Récupération des détails pour l'UUID : ${uuid}`);
     try {
       const response = await fetch(`/.netlify/functions/getUserDetails?userUuid=${uuid}`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
       });
-
       if (!response.ok) throw new Error(`Erreur HTTP ! Statut : ${response.status}`);
 
       const data = await response.json();
+      console.log('Détails de l’utilisateur récupérés :', data);
+
       setEntreprise(data.entreprise);
       setGoogleBusiness(data.googleBusiness);
     } catch (error) {
-      console.error('Erreur lors de la récupération des détails de lutilisateur:', error);
-      handleError(`Erreur lors de la récupération des détails: ${error.message}`);
+      console.error('Erreur lors de la récupération des détails de l’utilisateur :', error);
+      handleError(`Erreur lors de la récupération des détails : ${error.message}`);
     }
   };
 
