@@ -24,17 +24,22 @@ const MonProfil = () => {
 
   // Écoutez les changements de entreprise et googleBusiness dans le contexte
   useEffect(() => {
+    console.log('Context entreprise changed:', entreprise);
+    console.log('Context googleBusiness changed:', googleBusiness);
     setLocalEntreprise(entreprise);
     setLocalGoogleBusiness(googleBusiness);
   }, [entreprise, googleBusiness]);
 
   const handleSubmit = async () => {
+    console.log('Submitting:', localEntreprise, localGoogleBusiness);
     // Mise à jour des détails de l'utilisateur dans le contexte
     await updateUserDetails(localEntreprise, localGoogleBusiness);
+    console.log('Updated:', localEntreprise, localGoogleBusiness);
     setIsEditing(false); // Sortir du mode d'édition
   };
 
   useEffect(() => {
+    console.log('Fetching user details for uuid:', user?.uuid);
     fetchUserDetails(user?.uuid);
   }, [user?.uuid]);
 
