@@ -86,7 +86,7 @@ export const AuthProvider = ({ children }) => {
         },
         body: JSON.stringify({
           userUuid: user.uuid,
-          entreprise: newEntreprise, // Utilisez les nouveaux noms de paramètres pour éviter les conflits
+          entreprise: newEntreprise,
           googleBusiness: newGoogleBusiness,
         }),
       });
@@ -95,7 +95,7 @@ export const AuthProvider = ({ children }) => {
         throw new Error(`Erreur HTTP! statut: ${response.status}`);
       }
 
-      // Mettez à jour les informations de l'utilisateur dans le contexte
+      // Mettre à jour les informations de l'utilisateur dans le contexte
       setEntreprise(newEntreprise);
       setGoogleBusiness(newGoogleBusiness);
       console.log('Informations de l\'utilisateur mises à jour avec succès.');
