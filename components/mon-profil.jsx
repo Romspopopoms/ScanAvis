@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { AuthContext } from '../context/AuthContext';
 
@@ -12,6 +12,9 @@ const MonProfil = () => {
     subscriptionsUpdate,
   } = useContext(AuthContext);
 
+  const [entreprise, setEntreprise] = useState('');
+  const [googleBusiness, setGoogleBusiness] = useState('');
+
   useEffect(() => {
   }, [subscriptionsUpdate]);
 
@@ -21,6 +24,12 @@ const MonProfil = () => {
     hidden: { opacity: 0 },
     visible: { opacity: 1, transition: { delay: 0.3, duration: 0.5 } },
     exit: { opacity: 0, transition: { duration: 0.5 } },
+  };
+
+  const handleSubmit = () => {
+    console.log("Mise à jour de l'entreprise :", entreprise);
+    console.log('Mise à jour du Google Business :', googleBusiness);
+    // Ici, ajoutez le code pour insérer/actualiser les valeurs dans votre base de données
   };
 
   if (!user) {
@@ -42,10 +51,35 @@ const MonProfil = () => {
         <h1 className="text-3xl font-bold text-center text-purple-800 mb-8">Mon Profil</h1>
         <div className="flex flex-col md:flex-row md:items-center md:justify-between">
           <div className="mb-4 md:mb-0">
-            <p className="text-lg"><span className="font-semibold">Nom :</span> {user.name}</p>
-            <p className="text-lg"><span className="font-semibold">Email :</span> {user.email}</p>
+            <label htmlFor="entreprise" className="block text-lg font-semibold">Mon Entreprise:</label>
+            <input
+              id="entreprise"
+              type="text"
+              value={entreprise}
+              onChange={(e) => setEntreprise(e.target.value)}
+              className="mt-1 p-2 w-full border rounded"
+            />
+          </div>
+          <div className="md:ml-4">
+            <label htmlFor="googleBusiness" className="block text-lg font-semibold">Mon Google Business:</label>
+            <input
+              id="googleBusiness"
+              type="text"
+              value={googleBusiness}
+              onChange={(e) => setGoogleBusiness(e.target.value)}
+              className="mt-1 p-2 w-full border rounded"
+            />
+            <p className="mt-2 text-purple-800 hover:text-purple-600 cursor-pointer">Cliquez ici pour savoir quoi rentrer</p>
           </div>
           {errorMessage && <p className="text-red-600">{errorMessage}</p>}
+        </div>
+        <div className="mt-4 text-center">
+          <button type="button"
+            onClick={handleSubmit}
+            className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Valider les Modifications
+          </button>
         </div>
       </motion.div>
 
