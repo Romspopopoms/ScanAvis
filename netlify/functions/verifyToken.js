@@ -14,11 +14,10 @@ exports.handler = async (event) => {
 
     // Parsing du corps de la requête
     const { idToken, userData, accessToken, entreprise, googleBusiness } = JSON.parse(event.body);
-    console.log('idToken:', idToken, 'userData:', userData, 'accessToken:', accessToken, 'entreprise:', entreprise, 'googleBusiness:', googleBusiness);
 
-    if (!idToken && (!userData || !accessToken)) {
+    if (!idToken && (!userData || !accessToken || !entreprise || !googleBusiness)) {
       console.error('Données nécessaires non fournies dans le corps de la requête.');
-      return { statusCode: 400, body: JSON.stringify({ error: 'No ID token or user data with access token provided' }) };
+      return { statusCode: 400, body: JSON.stringify({ error: 'Missing required data in request body' }) };
     }
 
     const client = new OAuth2Client(process.env.CLIENT_ID);
