@@ -9,6 +9,8 @@ const MonProfil = () => {
     handleResubscribe,
     handleCancelSubscription,
     errorMessage,
+    entreprise,
+    googleBusiness,
     fetchUserDetails,
     updateUserDetails,
   } = useContext(AuthContext);
@@ -16,8 +18,9 @@ const MonProfil = () => {
   const formatAmount = (amount) => new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(amount);
 
   const [isEditing, setIsEditing] = useState(false);
-  const [localEntreprise, setLocalEntreprise] = useState('');
-  const [localGoogleBusiness, setLocalGoogleBusiness] = useState('');
+  const [localEmail, setLocalEmail] = useState(user?.email || '');
+  const [localEntreprise, setLocalEntreprise] = useState(entreprise || '');
+  const [localGoogleBusiness, setLocalGoogleBusiness] = useState(googleBusiness || '');
 
   useEffect(() => {
     if (user?.uuid) {
@@ -26,13 +29,14 @@ const MonProfil = () => {
   }, [user?.uuid, fetchUserDetails]);
 
   useEffect(() => {
-    setLocalEntreprise(user?.entreprise || '');
-    setLocalGoogleBusiness(user?.googleBusiness || '');
-  }, [user?.entreprise, user?.googleBusiness]);
+    setLocalEmail(user?.email || '');
+    setLocalEntreprise(entreprise || '');
+    setLocalGoogleBusiness(googleBusiness || '');
+  }, [user?.email, entreprise, googleBusiness]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await updateUserDetails(user.uuid, localEntreprise, localGoogleBusiness);
+    await updateUserDetails(localEmail, localEntreprise, localGoogleBusiness);
     setIsEditing(false);
   };
 
@@ -49,6 +53,17 @@ const MonProfil = () => {
         {isEditing ? (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label htmlFor="email" className="block">Email:</label>
+                <input
+                  id="email"
+                  type="email"
+                  value={localEmail}
+                  onChange={(e) => setLocalEmail(e.target.value)}
+                  className="mt-1 p-2 w-full border rounded"
+                  required
+                />
+              </div>
               <div>
                 <label htmlFor="entreprise" className="block">Entreprise:</label>
                 <input
@@ -78,8 +93,8 @@ const MonProfil = () => {
           </form>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <p><strong>Entreprise:</strong> {user?.entreprise || 'Non spécifiée'}</p>
-            <p><strong>Google Business:</strong> {user?.googleBusiness || 'Non spécifié'}</p>
+            <p><strong>Entreprise:</strong> {entreprise || 'Non spécifiée'}</p>
+            <p><strong>Google Business:</strong> {googleBusiness || 'Non spécifié'}</p>
           </div>
         )}
 
