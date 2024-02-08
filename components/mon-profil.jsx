@@ -86,6 +86,11 @@ const MonProfil = () => {
                   onChange={(e) => setLocalGoogleBusiness(e.target.value)}
                   className="mt-1 p-2 w-full border rounded"
                 />
+                <p className="mt-2 text-sm text-blue-500">
+                  <a href="https://support.google.com/business/answer/2911778?hl=fr" target="_blank" rel="noopener noreferrer">
+                    Vous ne savez pas comment le trouver? Cliquez-ici !
+                  </a>
+                </p>
               </div>
             </div>
             <div className="flex justify-end mt-4">
