@@ -45,61 +45,65 @@ const MonProfil = () => {
       <motion.div className="w-full max-w-4xl bg-white shadow-xl rounded-lg p-6 mb-6">
         <h1 className="text-3xl font-bold text-center text-purple-800 mb-8">Mon Profil</h1>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <p><strong>Nom:</strong> {user?.name}</p>
-            <div>
-              {isEditing ? (
-                <>
-                  <label htmlFor="email" className="block">Email:</label>
-                  <input
-                    id="email"
-                    type="email"
-                    value={localEmail}
-                    onChange={(e) => setLocalEmail(e.target.value)}
-                    className="mt-1 p-2 w-full border rounded"
-                    required
-                  />
-                </>
-              ) : (
-                <p><strong>Email:</strong> {user?.email}</p>
-              )}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <p><strong>Nom:</strong> {user?.name}</p>
+        </div>
+
+        {isEditing ? (
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label htmlFor="email" className="block">Email:</label>
+                <input
+                  id="email"
+                  type="email"
+                  value={localEmail}
+                  onChange={(e) => setLocalEmail(e.target.value)}
+                  className="mt-1 p-2 w-full border rounded"
+                  required
+                />
+              </div>
+              <div>
+                <label htmlFor="entreprise" className="block">Entreprise:</label>
+                <input
+                  id="entreprise"
+                  type="text"
+                  value={localEntreprise}
+                  onChange={(e) => setLocalEntreprise(e.target.value)}
+                  className="mt-1 p-2 w-full border rounded"
+                />
+              </div>
+              <div>
+                <label htmlFor="googleBusiness" className="block">Google Business:</label>
+                <input
+                  id="googleBusiness"
+                  type="text"
+                  value={localGoogleBusiness}
+                  onChange={(e) => setLocalGoogleBusiness(e.target.value)}
+                  className="mt-1 p-2 w-full border rounded"
+                />
+              </div>
             </div>
-            <div>
-              <label htmlFor="entreprise" className="block">Entreprise:</label>
-              <input
-                id="entreprise"
-                type="text"
-                value={localEntreprise}
-                onChange={(e) => setLocalEntreprise(e.target.value)}
-                className="mt-1 p-2 w-full border rounded"
-                disabled={!isEditing}
-              />
-            </div>
-            <div>
-              <label htmlFor="googleBusiness" className="block">Google Business:</label>
-              <input
-                id="googleBusiness"
-                type="text"
-                value={localGoogleBusiness}
-                onChange={(e) => setLocalGoogleBusiness(e.target.value)}
-                className="mt-1 p-2 w-full border rounded"
-                disabled={!isEditing}
-              />
-            </div>
-          </div>
-          <div className="text-center mt-6">
-            {isEditing ? (
+            <div className="flex justify-end mt-4">
               <button type="submit" className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded">
                 Enregistrer les modifications
               </button>
-            ) : (
-              <button type="button" onClick={() => setIsEditing(true)} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                Modifier
-              </button>
-            )}
+            </div>
+          </form>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <p><strong>Entreprise:</strong> {entreprise || 'Non spécifiée'}</p>
+            <p><strong>Google Business:</strong> {googleBusiness || 'Non spécifié'}</p>
           </div>
-        </form>
+        )}
+
+        <div className="text-center mt-6">
+          {!isEditing && (
+            <button type="button" onClick={() => setIsEditing(true)} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+              Modifier
+            </button>
+          )}
+        </div>
 
         {errorMessage && <p className="text-red-600 text-center mt-4">{errorMessage}</p>}
       </motion.div>
