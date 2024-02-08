@@ -86,11 +86,6 @@ const MonProfil = () => {
                   onChange={(e) => setLocalGoogleBusiness(e.target.value)}
                   className="mt-1 p-2 w-full border rounded"
                 />
-                <p className="mt-2 text-sm text-blue-500">
-                  <a href="https://support.google.com/business/answer/2911778?hl=fr" target="_blank" rel="noopener noreferrer">
-                    Vous ne savez pas comment le trouver? Cliquez-ici !
-                  </a>
-                </p>
               </div>
             </div>
             <div className="flex justify-end mt-4">
@@ -102,7 +97,17 @@ const MonProfil = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <p><strong>Entreprise:</strong> {entreprise || 'Veuillez remplir ce champs'}</p>
-            <p><strong>Google Business:</strong> {googleBusiness || 'Veuillez remplir ce champs'}</p>
+            <p>
+              <strong>Google Business:</strong> {googleBusiness || 'Veuillez remplir ce champs'}
+              <br />
+              <a href="https://aide.neocamino.com/fr/articles/2613724-comment-trouver-et-partager-mon-adresse-google-my-business-google-maps" target="_blank" rel="noopener noreferrer" className="text-blue-500">
+                Vous avez déjà une fiche Google pour votre établissement? Cliquez-ici pour le guide explicatif.
+              </a>
+              <br />
+              <a href="https://help.wavy.co/hc/fr/articles/360023113332-Comment-puis-je-trouver-ma-page-Google-My-Business-et-savoir-si-il-existe" target="_blank" rel="noopener noreferrer" className="text-blue-500">
+                Vous n'avez pas, ou ne savez pas comment configurer votre fiche Google pour votre établissement? Cliquez ici pour le guide explicatif.
+              </a>
+            </p>
           </div>
         )}
 
@@ -116,6 +121,7 @@ const MonProfil = () => {
 
         {errorMessage && <p className="text-red-600 text-center mt-4">{errorMessage}</p>}
       </motion.div>
+      );
 
       <motion.div className="w-full max-w-4xl bg-white shadow-xl rounded-lg p-6">
         <h2 className="text-2xl font-bold text-center text-purple-800 mb-6">Abonnements</h2>
