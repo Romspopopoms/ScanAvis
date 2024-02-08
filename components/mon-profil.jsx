@@ -9,9 +9,6 @@ const MonProfil = () => {
     handleResubscribe,
     handleCancelSubscription,
     errorMessage,
-    entreprise,
-    googleBusiness,
-    email, // Assurez-vous que le contexte AuthContext fournit l'email actuel de l'utilisateur
     fetchUserDetails,
     updateUserDetails,
   } = useContext(AuthContext);
@@ -19,26 +16,25 @@ const MonProfil = () => {
   const formatAmount = (amount) => new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(amount);
 
   const [isEditing, setIsEditing] = useState(false);
-  const [localEntreprise, setLocalEntreprise] = useState(entreprise);
-  const [localGoogleBusiness, setLocalGoogleBusiness] = useState(googleBusiness);
-  const [localEmail, setLocalEmail] = useState(email); // État local pour l'email
-
-  useEffect(() => {
-    setLocalEntreprise(entreprise);
-    setLocalGoogleBusiness(googleBusiness);
-    setLocalEmail(email); // Mise à jour de l'état local lorsque l'email dans le contexte change
-  }, [entreprise, googleBusiness, email]); // Ajouter email ici
-
-  const handleSubmit = async () => {
-    await updateUserDetails(localEmail, localEntreprise, localGoogleBusiness);
-    setIsEditing(false);
-  };
+  const [localEntreprise, setLocalEntreprise] = useState('');
+  const [localGoogleBusiness, setLocalGoogleBusiness] = useState('');
 
   useEffect(() => {
     if (user?.uuid) {
       fetchUserDetails(user.uuid);
     }
-  }, [user?.uuid]);
+  }, [user?.uuid, fetchUserDetails]);
+
+  useEffect(() => {
+    setLocalEntreprise(user?.entreprise || '');
+    setLocalGoogleBusiness(user?.googleBusiness || '');
+  }, [user?.entreprise, user?.googleBusiness]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    await updateUserDetails(user.uuid, localEntreprise, localGoogleBusiness);
+    setIsEditing(false);
+  };
 
   return (
     <motion.div className="flex flex-col items-center justify-center min-h-screen">
@@ -51,52 +47,44 @@ const MonProfil = () => {
         </div>
 
         {isEditing ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label htmlFor="email" className="block">Email:</label>
-              <input
-                id="email"
-                type="email"
-                value={localEmail}
-                onChange={(e) => setLocalEmail(e.target.value)}
-                className="mt-1 p-2 w-full border rounded"
-              />
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label htmlFor="entreprise" className="block">Entreprise:</label>
+                <input
+                  id="entreprise"
+                  type="text"
+                  value={localEntreprise}
+                  onChange={(e) => setLocalEntreprise(e.target.value)}
+                  className="mt-1 p-2 w-full border rounded"
+                />
+              </div>
+              <div>
+                <label htmlFor="googleBusiness" className="block">Google Business:</label>
+                <input
+                  id="googleBusiness"
+                  type="text"
+                  value={localGoogleBusiness}
+                  onChange={(e) => setLocalGoogleBusiness(e.target.value)}
+                  className="mt-1 p-2 w-full border rounded"
+                />
+              </div>
             </div>
-            <div>
-              <label htmlFor="entreprise" className="block">Entreprise:</label>
-              <input
-                id="entreprise"
-                type="text"
-                value={localEntreprise}
-                onChange={(e) => setLocalEntreprise(e.target.value)}
-                className="mt-1 p-2 w-full border rounded"
-              />
+            <div className="flex justify-end mt-4">
+              <button type="submit" className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded">
+                Enregistrer les modifications
+              </button>
             </div>
-            <div>
-              <label htmlFor="googleBusiness" className="block">Google Business:</label>
-              <input
-                id="googleBusiness"
-                type="text"
-                value={localGoogleBusiness}
-                onChange={(e) => setLocalGoogleBusiness(e.target.value)}
-                className="mt-1 p-2 w-full border rounded"
-              />
-            </div>
-          </div>
+          </form>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <p><strong>Email:</strong> {email}</p>
-            <p><strong>Entreprise:</strong> {entreprise}</p>
-            <p><strong>Google Business:</strong> {googleBusiness}</p>
+            <p><strong>Entreprise:</strong> {user?.entreprise || 'Non spécifiée'}</p>
+            <p><strong>Google Business:</strong> {user?.googleBusiness || 'Non spécifié'}</p>
           </div>
         )}
 
         <div className="text-center mt-6">
-          {isEditing ? (
-            <button type="button" onClick={handleSubmit} className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded">
-              Enregistrer les modifications
-            </button>
-          ) : (
+          {!isEditing && (
             <button type="button" onClick={() => setIsEditing(true)} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
               Modifier
             </button>
