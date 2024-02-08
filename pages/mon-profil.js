@@ -2,15 +2,15 @@ import React, { useState, useEffect, useContext } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import MonProfil from '../components/mon-profil';
 import PageForm from '../components/InterfaceCréationPage';
-import { AuthContext } from '../context/AuthContext'; // Assurez-vous que le chemin est correct
+import AbonnementsComponent from '../components/AbonnementsComponent'; // Assurez-vous que le chemin est correct
+import { AuthContext } from '../context/AuthContext';
 
 import { useNavbarHeight } from '../context/NavbarContext';
-import AbonnementsComponent from '../components/AbonnementsComponent';
 
 const menuItems = [
   { name: 'Profil', key: 'profil' },
   { name: 'Création de votre page', key: 'creation' },
-  // Ajoutez d'autres éléments de menu ici
+  { name: 'Abonnements', key: 'abonnement' }, // Nouvel élément de menu ajouté ici
 ];
 
 const variants = {
@@ -29,16 +29,16 @@ const MonProfilPage = () => {
     if (user && user.uuid) {
       fetchUserSubscriptions(user.uuid);
     }
-  }, [user]);
+  }, [user, fetchUserSubscriptions]); // Assurez-vous d'inclure fetchUserSubscriptions dans le tableau de dépendances
 
   const renderSection = (key) => {
     switch (key) {
       case 'profil':
         return <MonProfil />;
-      case 'Abonnement':
-        return <AbonnementsComponent />;
       case 'creation':
-        return <PageForm />; // Intégrez ici votre composant de création de page
+        return <PageForm />;
+      case 'abonnement': // Assurez-vous que la clé correspond à celle définie dans menuItems
+        return <AbonnementsComponent />;
       default:
         return <div>Section non trouvée</div>;
     }
