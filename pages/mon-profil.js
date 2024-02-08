@@ -35,10 +35,11 @@ const MonProfilPage = () => {
     switch (key) {
       case 'profil':
         return <MonProfil />;
-      case 'creation':
-        return <PageForm />;
       case 'abonnement': // Assurez-vous que la clé correspond à celle définie dans menuItems
         return <AbonnementsComponent />;
+      case 'creation':
+        return <PageForm />;
+
       default:
         return <div>Section non trouvée</div>;
     }
