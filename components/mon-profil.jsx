@@ -5,7 +5,6 @@ import { AuthContext } from '../context/AuthContext';
 const MonProfil = () => {
   const {
     user,
-    setUser,
     userSubscriptions,
     handleResubscribe,
     handleCancelSubscription,
@@ -26,20 +25,12 @@ const MonProfil = () => {
     setLocalEmail(user?.email || '');
     setLocalEntreprise(user?.entreprise || '');
     setLocalGoogleBusiness(user?.googleBusiness || '');
-  }, [user]);
+  }, [user?.email, user?.entreprise, user?.googleBusiness]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       await updateUserDetails(user.uuid, localEmail, localEntreprise, localGoogleBusiness);
-
-      setUser((prevUser) => ({
-        ...prevUser,
-        email: localEmail,
-        entreprise: localEntreprise,
-        googleBusiness: localGoogleBusiness,
-      }));
-
       setIsEditing(false);
       setErrorMessage('');
     } catch (error) {
@@ -60,6 +51,7 @@ const MonProfil = () => {
         <h1 className="text-3xl font-bold text-center text-purple-800 mb-8">Mon Profil</h1>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <p><strong>Nom:</strong> {user?.name}</p>
             <div>
               <label htmlFor="email" className="block">Email:</label>
               <input
@@ -95,7 +87,7 @@ const MonProfil = () => {
             </div>
           </div>
 
-          <div className="flex justify-between">
+          <div className="flex justify-end">
             {isEditing ? (
               <button type="submit" className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded">
                 Enregistrer les modifications
