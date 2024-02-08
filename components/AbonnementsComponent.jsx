@@ -13,7 +13,7 @@ const AbonnementsComponent = () => {
   const formatAmount = (amount) => new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(amount);
 
   return (
-    <div className="flex flex-col justify-center min-h-screen">
+    <div className="flex flex-col items-center justify-start min-h-screen pt-20">
       <motion.div className="w-full max-w-4xl bg-white shadow-xl rounded-lg p-6">
         <h2 className="text-3xl font-bold text-center text-purple-800 mb-6">Abonnements</h2>
         {userSubscriptions.length > 0 ? (
