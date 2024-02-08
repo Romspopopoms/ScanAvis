@@ -36,7 +36,7 @@ const MonProfil = () => {
   };
 
   return (
-    <motion.div className="flex flex-col items-center justify-center min-h-screen">
+    <motion.div className="flex flex-col items-center justify-center min-h-screen pt-10">
       <motion.div className="w-full max-w-4xl bg-white shadow-xl rounded-lg p-6 mb-6">
         <h1 className="text-3xl font-bold text-center text-purple-800 mb-8">Mon Profil</h1>
 
