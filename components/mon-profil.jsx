@@ -11,6 +11,7 @@ const MonProfil = () => {
     errorMessage,
     entreprise,
     googleBusiness,
+    email, // Assurez-vous que le contexte AuthContext fournit l'email actuel de l'utilisateur
     fetchUserDetails,
     updateUserDetails,
   } = useContext(AuthContext);
@@ -18,29 +19,25 @@ const MonProfil = () => {
   const formatAmount = (amount) => new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(amount);
 
   const [isEditing, setIsEditing] = useState(false);
-  // Utilisez des états locaux pour les champs éditables
   const [localEntreprise, setLocalEntreprise] = useState(entreprise);
   const [localGoogleBusiness, setLocalGoogleBusiness] = useState(googleBusiness);
+  const [localEmail, setLocalEmail] = useState(email); // État local pour l'email
 
-  // Écoutez les changements de entreprise et googleBusiness dans le contexte
   useEffect(() => {
-    console.log('Context entreprise changed:', entreprise);
-    console.log('Context googleBusiness changed:', googleBusiness);
     setLocalEntreprise(entreprise);
     setLocalGoogleBusiness(googleBusiness);
-  }, [entreprise, googleBusiness]);
+    setLocalEmail(email); // Mise à jour de l'état local lorsque l'email dans le contexte change
+  }, [entreprise, googleBusiness, email]); // Ajouter email ici
 
   const handleSubmit = async () => {
-    console.log('Submitting:', localEntreprise, localGoogleBusiness);
-    // Mise à jour des détails de l'utilisateur dans le contexte
-    await updateUserDetails(localEntreprise, localGoogleBusiness);
-    console.log('Updated:', localEntreprise, localGoogleBusiness);
-    setIsEditing(false); // Sortir du mode d'édition
+    await updateUserDetails(localEmail, localEntreprise, localGoogleBusiness);
+    setIsEditing(false);
   };
 
   useEffect(() => {
-    console.log('Fetching user details for uuid:', user?.uuid);
-    fetchUserDetails(user?.uuid);
+    if (user?.uuid) {
+      fetchUserDetails(user.uuid);
+    }
   }, [user?.uuid]);
 
   return (
@@ -55,6 +52,16 @@ const MonProfil = () => {
 
         {isEditing ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label htmlFor="email" className="block">Email:</label>
+              <input
+                id="email"
+                type="email"
+                value={localEmail}
+                onChange={(e) => setLocalEmail(e.target.value)}
+                className="mt-1 p-2 w-full border rounded"
+              />
+            </div>
             <div>
               <label htmlFor="entreprise" className="block">Entreprise:</label>
               <input
@@ -78,6 +85,7 @@ const MonProfil = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <p><strong>Email:</strong> {email}</p>
             <p><strong>Entreprise:</strong> {entreprise}</p>
             <p><strong>Google Business:</strong> {googleBusiness}</p>
           </div>
@@ -85,17 +93,11 @@ const MonProfil = () => {
 
         <div className="text-center mt-6">
           {isEditing ? (
-            <button type="button"
-              onClick={handleSubmit}
-              className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded"
-            >
+            <button type="button" onClick={handleSubmit} className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded">
               Enregistrer les modifications
             </button>
           ) : (
-            <button type="button"
-              onClick={() => setIsEditing(true)}
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-            >
+            <button type="button" onClick={() => setIsEditing(true)} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
               Modifier
             </button>
           )}

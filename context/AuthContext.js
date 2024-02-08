@@ -77,10 +77,8 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const updateUserDetails = async (newEntreprise, newGoogleBusiness) => {
+  const updateUserDetails = async (newEmail, newEntreprise, newGoogleBusiness) => {
     if (!user || !user.uuid) {
-      setEntreprise(newEntreprise);
-      setGoogleBusiness(newGoogleBusiness);
       console.error('Aucun utilisateur connecté pour mettre à jour les détails.');
       setErrorMessage('Vous devez être connecté pour mettre à jour les informations.');
       return;
@@ -94,6 +92,7 @@ export const AuthProvider = ({ children }) => {
         },
         body: JSON.stringify({
           userUuid: user.uuid,
+          email: newEmail, // Inclure l'email dans le corps de la requête
           entreprise: newEntreprise,
           googleBusiness: newGoogleBusiness,
         }),
@@ -104,6 +103,7 @@ export const AuthProvider = ({ children }) => {
       }
 
       // Mettre à jour les informations de l'utilisateur dans le contexte
+      setUser((prevUser) => ({ ...prevUser, email: newEmail })); // Mise à jour de l'email dans le state user
       setEntreprise(newEntreprise);
       setGoogleBusiness(newGoogleBusiness);
       console.log('Informations de l\'utilisateur mises à jour avec succès.');

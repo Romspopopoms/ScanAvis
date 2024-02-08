@@ -3,7 +3,6 @@ const { conn } = require('../../utils/db'); // Assurez-vous que le chemin d'acc�
 exports.handler = async (event) => {
   console.log('Événement reçu:', JSON.stringify(event));
 
-  // La méthode devrait être POST car nous allons mettre à jour les informations
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
@@ -13,21 +12,21 @@ exports.handler = async (event) => {
   }
 
   // Extraire les données du corps de la requête
-  const { userUuid, entreprise, googleBusiness } = JSON.parse(event.body);
+  const { userUuid, entreprise, googleBusiness, email } = JSON.parse(event.body);
   console.log('Mise à jour des informations pour userUuid:', userUuid);
 
-  if (!userUuid || !entreprise || !googleBusiness) {
+  if (!userUuid || !email || !entreprise || !googleBusiness) {
     return {
       statusCode: 400,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: 'Les champs userUuid, entreprise et googleBusiness sont requis' }),
+      body: JSON.stringify({ message: 'Les champs userUuid, email, entreprise et googleBusiness sont requis' }),
     };
   }
 
   try {
-    // Mettre à jour les informations d'entreprise et Google Business pour l'utilisateur spécifié
-    const query = 'UPDATE users SET entreprise = ?, google_business = ? WHERE uuid = ?';
-    await conn.execute(query, [entreprise, googleBusiness, userUuid]);
+    // Mettre à jour l'email en plus des informations d'entreprise et Google Business pour l'utilisateur spécifié
+    const query = 'UPDATE users SET email = ?, entreprise = ?, google_business = ? WHERE uuid = ?';
+    await conn.execute(query, [email, entreprise, googleBusiness, userUuid]);
     console.log('Informations mises à jour avec succès pour userUuid:', userUuid);
 
     return {
