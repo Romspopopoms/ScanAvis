@@ -60,13 +60,17 @@ export const AuthProvider = ({ children }) => {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
       });
-      if (!response.ok) throw new Error(`Erreur HTTP ! Statut : ${response.status}`);
+      if (!response.ok) {
+        throw new Error(`Erreur HTTP ! Statut : ${response.status}`);
+      }
 
-      const userDetails = await response.json();
-      console.log('Détails de l’utilisateur récupérés :', userDetails);
+      const data = await response.json();
+      // Assurez-vous que la réponse contient bien les champs 'entreprise' et 'googleBusiness'
+      console.log('Détails de l’utilisateur récupérés :', data);
 
-      setEntreprise(userDetails.entreprise);
-      setGoogleBusiness(userDetails.google_business);
+      // Mise à jour du contexte avec les nouvelles informations
+      if (data.entreprise) setEntreprise(data.entreprise);
+      if (data.googleBusiness) setGoogleBusiness(data.googleBusiness);
     } catch (error) {
       console.error('Erreur lors de la récupération des détails de l’utilisateur :', error);
       handleError(`Erreur lors de la récupération des détails : ${error.message}`);
