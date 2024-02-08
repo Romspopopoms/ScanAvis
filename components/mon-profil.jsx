@@ -47,22 +47,26 @@ const MonProfil = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           <p><strong>Nom:</strong> {user?.name}</p>
+          {isEditing ? (
+            <div>
+              <label htmlFor="email" className="block">Email:</label>
+              <input
+                id="email"
+                type="email"
+                value={localEmail}
+                onChange={(e) => setLocalEmail(e.target.value)}
+                className="mt-1 p-2 w-full border rounded"
+                required
+              />
+            </div>
+          ) : (
+            <p><strong>Email:</strong> {user?.email}</p>
+          )}
         </div>
 
         {isEditing ? (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label htmlFor="email" className="block">Email:</label>
-                <input
-                  id="email"
-                  type="email"
-                  value={localEmail}
-                  onChange={(e) => setLocalEmail(e.target.value)}
-                  className="mt-1 p-2 w-full border rounded"
-                  required
-                />
-              </div>
               <div>
                 <label htmlFor="entreprise" className="block">Entreprise:</label>
                 <input
@@ -92,8 +96,8 @@ const MonProfil = () => {
           </form>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <p><strong>Entreprise:</strong> {entreprise || 'Non spécifiée'}</p>
-            <p><strong>Google Business:</strong> {googleBusiness || 'Non spécifié'}</p>
+            <p><strong>Entreprise:</strong> {entreprise || 'Veuillez remplir ce champs'}</p>
+            <p><strong>Google Business:</strong> {googleBusiness || 'Veuillez remplir ce champs'}</p>
           </div>
         )}
 
