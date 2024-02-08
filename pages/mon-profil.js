@@ -5,6 +5,7 @@ import PageForm from '../components/InterfaceCréationPage';
 import { AuthContext } from '../context/AuthContext'; // Assurez-vous que le chemin est correct
 
 import { useNavbarHeight } from '../context/NavbarContext';
+import AbonnementsComponent from '../components/AbonnementsComponent';
 
 const menuItems = [
   { name: 'Profil', key: 'profil' },
@@ -34,9 +35,10 @@ const MonProfilPage = () => {
     switch (key) {
       case 'profil':
         return <MonProfil />;
+      case 'Abonnement':
+        return <AbonnementsComponent />;
       case 'creation':
         return <PageForm />; // Intégrez ici votre composant de création de page
-      // Ajoutez d'autres sections ici si nécessaire
       default:
         return <div>Section non trouvée</div>;
     }
