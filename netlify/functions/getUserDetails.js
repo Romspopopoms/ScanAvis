@@ -23,7 +23,7 @@ exports.handler = async (event) => {
   }
 
   try {
-    const query = 'SELECT entreprise, google_business FROM users WHERE uuid = ?';
+    const query = 'SELECT email, entreprise, google_business FROM users WHERE uuid = ?';
     // Correction: Destructuration correcte du résultat pour obtenir les lignes
     const { rows } = await conn.execute(query, [userUuid]);
     console.log('Result from conn.execute:', rows);
@@ -43,6 +43,7 @@ exports.handler = async (event) => {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
+        email: userDetails.email, // Ajout de l'email à la réponse
         entreprise: userDetails.entreprise,
         googleBusiness: userDetails.google_business,
       }),

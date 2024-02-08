@@ -66,7 +66,6 @@ export const AuthProvider = ({ children }) => {
 
       const data = await response.json();
       // Assurez-vous que la réponse contient bien les champs 'entreprise' et 'googleBusiness'
-      console.log('Détails de l’utilisateur récupérés :', data);
 
       // Mise à jour du contexte avec les nouvelles informations
       if (data.entreprise) setEntreprise(data.entreprise);
