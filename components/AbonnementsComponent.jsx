@@ -13,9 +13,9 @@ const AbonnementsComponent = () => {
   const formatAmount = (amount) => new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(amount);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen">
+    <div className="flex flex-col justify-center min-h-screen">
       <motion.div className="w-full max-w-4xl bg-white shadow-xl rounded-lg p-6">
-        <h2 className="text-2xl font-bold text-center text-purple-800 mb-6">Abonnements</h2>
+        <h2 className="text-3xl font-bold text-center text-purple-800 mb-6">Abonnements</h2>
         {userSubscriptions.length > 0 ? (
           userSubscriptions.map((subscription, index) => (
             <div key={index} className="bg-purple-100 shadow-md rounded-lg p-4 mb-4">

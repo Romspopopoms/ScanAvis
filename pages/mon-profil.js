@@ -9,8 +9,8 @@ import { useNavbarHeight } from '../context/NavbarContext';
 
 const menuItems = [
   { name: 'Profil', key: 'profil' },
-  { name: 'Création de votre page', key: 'creation' },
   { name: 'Abonnements', key: 'abonnement' }, // Nouvel élément de menu ajouté ici
+  { name: 'Création de votre page', key: 'creation' },
 ];
 
 const variants = {
