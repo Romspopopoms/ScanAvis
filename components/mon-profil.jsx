@@ -18,19 +18,21 @@ const MonProfil = () => {
   const formatAmount = (amount) => new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(amount);
 
   const [isEditing, setIsEditing] = useState(false);
-  // Initialisation des états locaux avec les valeurs actuelles de l'utilisateur
   const [localEmail, setLocalEmail] = useState(user?.email || '');
-  const [localEntreprise, setLocalEntreprise] = useState(user?.entreprise || '');
-  const [localGoogleBusiness, setLocalGoogleBusiness] = useState(user?.googleBusiness || '');
+  const [localEntreprise, setLocalEntreprise] = useState('');
+  const [localGoogleBusiness, setLocalGoogleBusiness] = useState('');
 
-  // Fonction pour soumettre les modifications
+  useEffect(() => {
+    setLocalEmail(user?.email || '');
+    setLocalEntreprise(user?.entreprise || '');
+    setLocalGoogleBusiness(user?.googleBusiness || '');
+  }, [user]);
+
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Empêche le rechargement de la page
+    e.preventDefault();
     try {
-      // Appel à updateUserDetails pour mettre à jour les informations de l'utilisateur
       await updateUserDetails(user.uuid, localEmail, localEntreprise, localGoogleBusiness);
 
-      // Mise à jour de l'utilisateur dans le contexte
       setUser((prevUser) => ({
         ...prevUser,
         email: localEmail,
@@ -38,29 +40,27 @@ const MonProfil = () => {
         googleBusiness: localGoogleBusiness,
       }));
 
-      setIsEditing(false); // Sortie du mode édition
-      setErrorMessage(''); // Réinitialisation des messages d'erreur
+      setIsEditing(false);
+      setErrorMessage('');
     } catch (error) {
       console.error('Erreur lors de la mise à jour des détails de l’utilisateur :', error);
       setErrorMessage('Erreur lors de la mise à jour des informations.');
     }
   };
 
-  // Effet pour récupérer les détails de l'utilisateur à l'initialisation
   useEffect(() => {
     if (user?.uuid) {
       fetchUserDetails(user.uuid);
     }
-  }, [user?.uuid, fetchUserDetails]);
+  }, [user?.uuid]);
 
   return (
     <motion.div className="flex flex-col items-center justify-center min-h-screen">
-      {/* Profil utilisateur */}
       <motion.div className="w-full max-w-4xl bg-white shadow-xl rounded-lg p-6 mb-6">
         <h1 className="text-3xl font-bold text-center text-purple-800 mb-8">Mon Profil</h1>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           <p><strong>Nom:</strong> {user?.name}</p>
-          <p><strong>Email:</strong> {user?.email}</p>
+          <p><strong>Email:</strong> {localEmail}</p> {/* Affichage de l'email local pour cohérence avec les champs modifiables */}
         </div>
 
         {isEditing ? (
@@ -76,6 +76,7 @@ const MonProfil = () => {
                 required
               />
             </div>
+            {/* Pas de condition pour entreprise et Google Business, affichés dans tous les cas */}
             <div>
               <label htmlFor="entreprise" className="block text-sm font-medium text-gray-700">Entreprise:</label>
               <input
@@ -106,13 +107,18 @@ const MonProfil = () => {
             </div>
           </form>
         ) : (
-          <div className="text-right">
-            <button type="button"
-              onClick={() => setIsEditing(true)}
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-            >
-              Modifier
-            </button>
+          <div>
+            {/* Affichage des informations même hors mode édition */}
+            <p><strong>Entreprise:</strong> {localEntreprise || 'Non renseigné'}</p>
+            <p><strong>Google Business:</strong> {localGoogleBusiness || 'Non renseigné'}</p>
+            <div className="text-right mt-4">
+              <button type="button"
+                onClick={() => setIsEditing(true)}
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+              >
+                Modifier
+              </button>
+            </div>
           </div>
         )}
 
