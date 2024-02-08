@@ -41,7 +41,8 @@ exports.handler = async (event) => {
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userDetails }),
+      body: JSON.stringify({ entreprise: userDetails.entreprise,
+        googleBusiness: userDetails.google_business }),
     };
   } catch (error) {
     console.error('Erreur de la base de données:', error);

@@ -62,11 +62,11 @@ export const AuthProvider = ({ children }) => {
       });
       if (!response.ok) throw new Error(`Erreur HTTP ! Statut : ${response.status}`);
 
-      const data = await response.json();
-      console.log('Détails de l’utilisateur récupérés :', data);
+      const userDetails = await response.json();
+      console.log('Détails de l’utilisateur récupérés :', userDetails);
 
-      setEntreprise(data.entreprise);
-      setGoogleBusiness(data.googleBusiness);
+      setEntreprise(userDetails.entreprise);
+      setGoogleBusiness(userDetails.google_business);
     } catch (error) {
       console.error('Erreur lors de la récupération des détails de l’utilisateur :', error);
       handleError(`Erreur lors de la récupération des détails : ${error.message}`);
