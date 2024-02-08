@@ -23,13 +23,13 @@ exports.handler = async (event) => {
   }
 
   try {
+    // Définissez la variable query avec votre requête SQL
     const query = 'SELECT entreprise, google_business FROM users WHERE uuid = ?';
-    // Correction ici : Assurez-vous que la réponse est correctement destructurée pour accéder aux lignes
-    const [rows] = await conn.execute(query, [userUuid]);
-    console.log('Result from conn.execute:', rows);
 
-    // Correction ici : Vérification des lignes obtenues
-    if (!rows || rows.length === 0) {
+    const result = await conn.execute(query, [userUuid]);
+    console.log('Result from conn.execute:', result);
+
+    if (!result[0] || result[0].length === 0) {
       console.log(`Aucun détail trouvé pour userUuid: ${userUuid}`);
       return {
         statusCode: 404,
@@ -38,10 +38,10 @@ exports.handler = async (event) => {
       };
     }
 
-    // Accès direct au premier élément du tableau de résultats
+    // Accéder directement aux résultats
+    const { rows } = result;
     const userDetails = rows[0];
 
-    // Correction ici : Structure correcte de la réponse JSON
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
