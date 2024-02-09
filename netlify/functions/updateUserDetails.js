@@ -16,11 +16,9 @@ exports.handler = async (event) => {
     }
 
     console.log(`Updating user information for UUID: ${userUuid}`);
-    // Mise à jour des informations de l'utilisateur
     await conn.execute('UPDATE users SET email = ?, entreprise = ?, google_business = ? WHERE uuid = ?', [email, entreprise, googleBusiness, userUuid]);
 
     console.log(`Fetching updated user information for UUID: ${userUuid}`);
-    // Récupération des informations de l'utilisateur après mise à jour
     const userResult = await conn.execute('SELECT name, google_business FROM users WHERE uuid = ?', [userUuid]);
     console.log('User result:', userResult);
 
@@ -31,41 +29,35 @@ exports.handler = async (event) => {
     const user = userResult.rows[0];
 
     console.log(`Fetching subscription items for UUID: ${userUuid}`);
-    // Récupération des items d'abonnement
     const subscriptionResult = await conn.execute('SELECT items FROM Subscriptions WHERE user_uuid = ?', [userUuid]);
     const subscriptionItems = subscriptionResult.rows.map((sub) => sub.items).join(', ');
 
     console.log('Preparing to send data to webhook');
-    // Envoi des données au webhook
     const webhookUrl = 'https://hook.eu2.make.com/gh2844ojmi6ux31e3pf9vapc92yw17tg';
     const payload = { name: user.name, googleBusiness: user.google_business, subscriptionItems };
-    console.log('Payload for webhook:', payload);
+    console.log('Payload for webhook:', JSON.stringify(payload));
 
-    fetch(webhookUrl, {
+    // Modification here to use await instead of then()
+    console.log('Sending data to webhook');
+    const webhookResponse = await fetch(webhookUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
-    })
-      .then((webhookResponse) => {
-        console.log(`Webhook call response status: ${webhookResponse.status}`);
-        if (!webhookResponse.ok) {
-          return webhookResponse.text().then((text) => Promise.reject(new Error(`Webhook call failed: ${webhookResponse.statusText}, Body: ${text}`)));
-        }
-        return webhookResponse.json(); // Adjust based on expected response type
-      })
-      .then((data) => {
-        console.log('Webhook response data:', data);
-        // Handle successful webhook response here
-      })
-      .catch((error) => {
-        console.error('Webhook call error:', error);
-        // Handle webhook call error here
-      });
+    });
 
-    // Note: This return might execute before the webhook call is completed due to the asynchronous nature of fetch
+    console.log(`Webhook call response status: ${webhookResponse.status}`);
+    if (!webhookResponse.ok) {
+      const responseBody = await webhookResponse.text();
+      console.error(`Webhook call failed with status: ${webhookResponse.status}, response: ${responseBody}`);
+      throw new Error(`Webhook call failed: ${webhookResponse.statusText}`);
+    }
+
+    const responseData = await webhookResponse.json(); // Adjust based on expected response type
+    console.log('Webhook response data:', responseData);
+
     return { statusCode: 200, body: JSON.stringify({ message: 'Data successfully updated and sent to webhook.' }) };
   } catch (error) {
     console.error('Error:', error);
-    return { statusCode: 500, body: JSON.stringify({ message: 'Internal Server Error' }) };
+    return { statusCode: 500, body: JSON.stringify({ message: 'Internal Server Error', error: error.message }) };
   }
 };
