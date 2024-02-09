@@ -1,71 +1,47 @@
-const stripe = require('stripe')('sk_test_51OPtGvDWmnYPaxs1DJZliUMMDttrNP1a4usU0uBgZgjnfe4Ho3WuCzFivSpwXhqL0YgVl9c41lbsuHI1O4nHAUhz00ibE6rzPX');
-const { conn } = require('../../utils/db');
+const fetch = require('node-fetch');
+const { conn } = require('../../utils/db'); // Assurez-vous que ce chemin est correct
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
-    return {
-      statusCode: 405,
-      body: JSON.stringify({ error: 'Méthode non autorisée' }),
-    };
-  }
-
-  const { userUuid } = JSON.parse(event.body);
-  if (!userUuid) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ error: 'Le userUuid est requis' }),
-    };
+    return { statusCode: 405, body: JSON.stringify({ message: 'Method Not Allowed' }) };
   }
 
   try {
-    const lastSubscriptionQuery = 'SELECT * FROM Subscriptions WHERE user_uuid = ? AND status = ? ORDER BY createdAt DESC LIMIT 1';
-    const lastSubscriptionResult = await conn.execute(lastSubscriptionQuery, [userUuid, 'cancelled']);
-    const lastSubscription = lastSubscriptionResult.rows[0];
-
-    if (!lastSubscription) {
-      throw new Error('Aucun abonnement annulé précédent trouvé');
+    const { userUuid, entreprise, googleBusiness, email } = JSON.parse(event.body);
+    if (!userUuid || !email || !entreprise || !googleBusiness) {
+      return { statusCode: 400, body: JSON.stringify({ message: 'Missing fields' }) };
     }
 
-    const updatedCustomer = await stripe.customers.update(
-      lastSubscription.stripe_customer_id,
-      { invoice_settings: { default_payment_method: lastSubscription.paymentMethodId } },
-    );
+    // Mise à jour des informations de l'utilisateur
+    await conn.execute('UPDATE users SET email = ?, entreprise = ?, google_business = ? WHERE uuid = ?', [email, entreprise, googleBusiness, userUuid]);
 
-    const newSubscription = await stripe.subscriptions.create({
-      customer: updatedCustomer.id,
-      items: [{ price: lastSubscription.priceId }],
-      expand: ['latest_invoice.payment_intent'],
+    // Récupération des informations de l'utilisateur après mise à jour
+    const userResult = await conn.execute('SELECT name, google_business FROM users WHERE uuid = ?', [userUuid]);
+    if (userResult.rows.length === 0) {
+      return { statusCode: 404, body: JSON.stringify({ message: 'User not found' }) };
+    }
+    const user = userResult.rows[0];
+
+    // Récupération des items d'abonnement
+    const subscriptionResult = await conn.execute('SELECT items FROM subscriptions WHERE user_uuid = ?', [userUuid]);
+    const subscriptionItems = subscriptionResult.rows.map((sub) => sub.items).join(', ');
+
+    // Envoi des données au webhook
+    const webhookUrl = 'https://hook.eu2.make.com/gh2844ojmi6ux31e3pf9vapc92yw17tg';
+    const payload = { name: user.name, googleBusiness: user.google_business, subscriptionItems };
+    const webhookResponse = await fetch(webhookUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
     });
 
-    const paymentIntent = newSubscription.latest_invoice.payment_intent;
-    if (paymentIntent.status !== 'succeeded') {
-      throw new Error('Le paiement pour le nouvel abonnement a échoué');
+    if (!webhookResponse.ok) {
+      throw new Error(`Webhook call failed: ${webhookResponse.statusText}`);
     }
 
-    const updateQuery = `
-      UPDATE Subscriptions
-      SET subscriptionId = ?, status = 'active', nextPaymentDate = ?, nextPaymentAmount = ?
-      WHERE user_uuid = ? AND status = 'cancelled'
-    `;
-    const nextPaymentDate = new Date(newSubscription.current_period_end * 1000);
-    const amount = newSubscription.items.data[0].price.unit_amount / 100;
-
-    await conn.execute(updateQuery, [
-      newSubscription.id,
-      nextPaymentDate,
-      amount,
-      userUuid,
-    ]);
-
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ message: 'Réabonnement effectué avec succès', subscriptionId: newSubscription.id }),
-    };
+    return { statusCode: 200, body: JSON.stringify({ message: 'Data successfully updated and sent to webhook.' }) };
   } catch (error) {
-    console.error('Erreur lors du réabonnement:', error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: `Erreur serveur: ${error.message}` }),
-    };
+    console.error('Error:', error);
+    return { statusCode: 500, body: JSON.stringify({ message: 'Internal Server Error' }) };
   }
 };
