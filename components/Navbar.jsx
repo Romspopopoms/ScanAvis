@@ -69,7 +69,7 @@ const Navbar = () => {
             <img src="/cart-icon.svg" alt="Panier" className="w-6 h-6" />
           </div>
           <button type="button" onClick={handleToggleMenu} className="ml-4">
-            <img src="/menu-icon.svg" alt="Menu" className="w-6 h-6" />
+            <img src="/menu.svg" alt="Menu" className="w-6 h-6" />
           </button>
         </div>
       </motion.nav>
@@ -78,7 +78,7 @@ const Navbar = () => {
         initial="closed"
         animate={isMenuOpen ? 'open' : 'closed'}
         variants={sidebarVariants}
-        className="fixed right-0 top-0 h-full bg-purple-800 text-white shadow-xl z-40 p-5"
+        className="fixed right-0 top-0 h-full bg-purple-600 text-white shadow-xl z-40 p-5"
         style={{ top: navbarHeight }}
         transition={{ type: 'spring', stiffness: 260, damping: 20 }}
       >
