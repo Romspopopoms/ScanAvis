@@ -11,15 +11,9 @@
 }
 
  .gradient-01 {
-  background-image: linear-gradient(
-    270deg,
-    hsl(249, 64%, 58%) 0%,
-    hsl(289, 52%, 20%) 26%,
-    hsl(269, 52%, 20%) 39%,
-    hsl(230, 52%, 20%) 50%,
-    hsl(314, 52%, 20%) 61%
-
-  );
+  background-image: url('/bg.jpg');
+  background-size: cover;
+  background-position: center;
 }
 
 
