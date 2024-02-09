@@ -41,7 +41,7 @@ const Navbar = () => {
     <>
       <motion.nav
         ref={navbarRef}
-        className="fixed top-0 left-0 w-full flex justify-between items-center px-4 bg-purple-900 text-gray-100 z-50"
+        className="fixed top-0 left-0 w-full flex justify-between items-center px-4 bg-purple-500 text-gray-800 z-50"
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ type: 'spring', stiffness: 260, damping: 20 }}
@@ -51,18 +51,19 @@ const Navbar = () => {
         </h2>
         <div className="flex items-center">
           {isAuthenticated ? (
-            <button type="button"
+            <button
+              type="button"
               onClick={logout}
               className="px-4 py-2 bg-red-600 hover:bg-red-700 transition rounded text-white"
             >
               Déconnexion
             </button>
           ) : (
-            <Link href="/login"
+            <Link
+              href="/login"
               className="px-4 py-2 bg-blue-600 hover:bg-blue-700 transition rounded text-white"
             >
               Se connecter
-
             </Link>
           )}
           <div onClick={toggleCart} className="ml-4 relative cursor-pointer">
@@ -78,24 +79,21 @@ const Navbar = () => {
         initial="closed"
         animate={isMenuOpen ? 'open' : 'closed'}
         variants={sidebarVariants}
-        className="fixed right-0 top-0 h-full bg-purple-600 text-white shadow-xl z-40 p-5"
+        className="fixed right-0 top-0 h-full bg-purple-500 text-gray-800 shadow-xl z-40 p-5"
         style={{ top: navbarHeight }}
         transition={{ type: 'spring', stiffness: 260, damping: 20 }}
       >
         <div className="mt-2">
           {isAuthenticated && (
-            <Link href="/mon-profil"
-              className="block hover:text-gray-300"
-            >Mon Profil
+            <Link href="/mon-profil" className="block hover:text-gray-300">
+              Mon Profil
             </Link>
           )}
-          <Link href="/"
-            className="block hover:text-gray-300"
-          >Accueil
+          <Link href="/" className="block hover:text-gray-300">
+            Accueil
           </Link>
-          <Link href="/tarifs"
-            className="block hover:text-gray-300"
-          >Nos offres
+          <Link href="/tarifs" className="block hover:text-gray-300">
+            Nos offres
           </Link>
           {/* Autres liens du menu */}
         </div>
