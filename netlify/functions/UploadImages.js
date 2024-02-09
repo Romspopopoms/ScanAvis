@@ -121,9 +121,10 @@ exports.handler = async (event) => {
 
         await Promise.all(updatePagePromises);
         console.log('All files uploaded successfully and database updated');
+        console.log(`Generating HTML page with pageId: ${pageId}, userUuid: ${userUuid}`);
 
         // Generate the HTML page content
-        const htmlContent = await generateHtmlPage(pageId);
+        const htmlContent = await generateHtmlPage(pageId, userUuid);
 
         // Generate the slug for the page title
         const pageSlug = slugify(titrePage, { lower: true });
