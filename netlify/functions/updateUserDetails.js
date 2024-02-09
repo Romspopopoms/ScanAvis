@@ -25,7 +25,7 @@ exports.handler = async (event) => {
     const user = userResult.rows[0];
 
     // Récupération des items d'abonnement
-    const subscriptionResult = await conn.execute('SELECT items FROM subscriptions WHERE user_uuid = ?', [userUuid]);
+    const subscriptionResult = await conn.execute('SELECT items FROM Subscriptions WHERE user_uuid = ?', [userUuid]);
     const subscriptionItems = subscriptionResult.rows.map((sub) => sub.items).join(', ');
 
     // Envoi des données au webhook
