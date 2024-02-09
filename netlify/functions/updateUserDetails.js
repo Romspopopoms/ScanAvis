@@ -1,5 +1,5 @@
 const fetch = require('node-fetch');
-const { conn } = require('../../utils/db'); // Assure-toi que ce chemin est correct
+const { conn } = require('../../utils/db'); // Assurez-vous que ce chemin est correct
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
@@ -16,15 +16,17 @@ exports.handler = async (event) => {
     await conn.execute('UPDATE users SET email = ?, entreprise = ?, google_business = ? WHERE uuid = ?', [email, entreprise, googleBusiness, userUuid]);
 
     // Récupération des informations de l'utilisateur après mise à jour
-    const [userRows] = await conn.execute('SELECT name, google_business FROM users WHERE uuid = ?', [userUuid]);
-    if (userRows.length === 0) {
+    const userResult = await conn.execute('SELECT name, google_business FROM users WHERE uuid = ?', [userUuid]);
+    console.log(userResult); // Check the structure here
+
+    if (userResult.rows.length === 0) {
       return { statusCode: 404, body: JSON.stringify({ message: 'User not found' }) };
     }
-    const user = userRows[0];
+    const user = userResult.rows[0];
 
     // Récupération des items d'abonnement
-    const [subscriptionRows] = await conn.execute('SELECT items FROM subscriptions WHERE user_uuid = ?', [userUuid]);
-    const subscriptionItems = subscriptionRows.map((sub) => sub.items).join(', ');
+    const subscriptionResult = await conn.execute('SELECT items FROM subscriptions WHERE user_uuid = ?', [userUuid]);
+    const subscriptionItems = subscriptionResult.rows.map((sub) => sub.items).join(', ');
 
     // Envoi des données au webhook
     const webhookUrl = 'https://hook.eu2.make.com/gh2844ojmi6ux31e3pf9vapc92yw17tg';
