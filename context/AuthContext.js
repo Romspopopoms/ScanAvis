@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useCallback } from 'react';
 import fetch from 'node-fetch';
 
 export const AuthContext = createContext();
@@ -53,7 +53,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const fetchUserDetails = async (uuid) => {
+  const fetchUserDetails = useCallback(async (uuid) => {
     try {
       const response = await fetch(`/.netlify/functions/getUserDetails?userUuid=${uuid}`, {
         method: 'GET',
@@ -64,8 +64,6 @@ export const AuthProvider = ({ children }) => {
       }
 
       const data = await response.json();
-      // Assurez-vous que la réponse contient bien les champs 'entreprise' et 'googleBusiness'
-
       // Mise à jour du contexte avec les nouvelles informations
       if (data.email) setUser((prevUser) => ({ ...prevUser, email: data.email }));
       if (data.entreprise) setEntreprise(data.entreprise);
@@ -74,9 +72,9 @@ export const AuthProvider = ({ children }) => {
       console.error('Erreur lors de la récupération des détails de l’utilisateur :', error);
       handleError(`Erreur lors de la récupération des détails : ${error.message}`);
     }
-  };
+  }, []);
 
-  const updateUserDetails = async (newEmail, newEntreprise, newGoogleBusiness) => {
+  const updateUserDetails = useCallback(async (newEmail, newEntreprise, newGoogleBusiness) => {
     if (!user || !user.uuid) {
       console.error('Aucun utilisateur connecté pour mettre à jour les détails.');
       setErrorMessage('Vous devez être connecté pour mettre à jour les informations.');
@@ -91,7 +89,7 @@ export const AuthProvider = ({ children }) => {
         },
         body: JSON.stringify({
           userUuid: user.uuid,
-          email: newEmail, // Inclure l'email dans le corps de la requête
+          email: newEmail,
           entreprise: newEntreprise,
           googleBusiness: newGoogleBusiness,
         }),
@@ -101,8 +99,7 @@ export const AuthProvider = ({ children }) => {
         throw new Error(`Erreur HTTP! statut: ${response.status}`);
       }
 
-      // Mettre à jour les informations de l'utilisateur dans le contexte
-      setUser((prevUser) => ({ ...prevUser, email: newEmail })); // Mise à jour de l'email dans le state user
+      setUser((prevUser) => ({ ...prevUser, email: newEmail }));
       setEntreprise(newEntreprise);
       setGoogleBusiness(newGoogleBusiness);
       console.log('Informations de l\'utilisateur mises à jour avec succès.');
@@ -110,7 +107,7 @@ export const AuthProvider = ({ children }) => {
       console.error('Erreur lors de la mise à jour des détails de l\'utilisateur:', error);
       setErrorMessage(`Erreur lors de la mise à jour: ${error.message}`);
     }
-  };
+  }, [user, setUser, setEntreprise, setGoogleBusiness]); // Assurez-vous d'inclure toutes les dépendances externes utilisées dans la fonction
 
   useEffect(() => {
     if (user?.uuid) {
