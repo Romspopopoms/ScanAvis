@@ -1,45 +1,41 @@
-const { conn } = require('../../utils/db'); // Assurez-vous que le chemin d'accès est correct
+const fetch = require('node-fetch');
+const { conn } = require('../../utils/db');
 
 exports.handler = async (event) => {
-  console.log('Événement reçu:', JSON.stringify(event));
-
   if (event.httpMethod !== 'POST') {
-    return {
-      statusCode: 405,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: 'Méthode non autorisée' }),
-    };
+    return { statusCode: 405, body: JSON.stringify({ message: 'Méthode non autorisée' }) };
   }
 
-  // Extraire les données du corps de la requête
   const { userUuid, entreprise, googleBusiness, email } = JSON.parse(event.body);
-  console.log('Mise à jour des informations pour userUuid:', userUuid);
-
   if (!userUuid || !email || !entreprise || !googleBusiness) {
-    return {
-      statusCode: 400,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: 'Les champs userUuid, email, entreprise et googleBusiness sont requis' }),
-    };
+    return { statusCode: 400, body: JSON.stringify({ message: 'Informations manquantes' }) };
   }
 
   try {
-    // Mettre à jour l'email en plus des informations d'entreprise et Google Business pour l'utilisateur spécifié
-    const query = 'UPDATE users SET email = ?, entreprise = ?, google_business = ? WHERE uuid = ?';
-    await conn.execute(query, [email, entreprise, googleBusiness, userUuid]);
-    console.log('Informations mises à jour avec succès pour userUuid:', userUuid);
+    await conn.execute('UPDATE users SET email = ?, entreprise = ?, google_business = ? WHERE uuid = ?', [email, entreprise, googleBusiness, userUuid]);
 
-    return {
-      statusCode: 200,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: 'Mise à jour réussie' }),
+    const userResult = await conn.query('SELECT name, google_business FROM users WHERE uuid = ?', [userUuid]);
+    const subscriptionResult = await conn.query('SELECT items FROM subscriptions WHERE user_uuid = ?', [userUuid]);
+
+    const payload = {
+      name: userResult[0].name,
+      googleBusiness: userResult[0].google_business,
+      subscriptionItems: subscriptionResult.map((s) => s.items).join(', '),
     };
+
+    const webhookResponse = await fetch('https://hook.eu2.make.com/m2qm1gp3ev3p2ftcw62cw69p30bfubrm', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+
+    if (!webhookResponse.ok) {
+      throw new Error('Failed to send data to the webhook');
+    }
+
+    return { statusCode: 200, body: JSON.stringify({ message: 'Update and webhook notification succeeded' }) };
   } catch (error) {
-    console.error('Erreur de la base de données:', error);
-    return {
-      statusCode: 500,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ error: `Une erreur est survenue lors de la mise à jour: ${error.message}` }),
-    };
+    console.error('Update or webhook error:', error);
+    return { statusCode: 500, body: JSON.stringify({ message: 'Internal server error' }) };
   }
 };
