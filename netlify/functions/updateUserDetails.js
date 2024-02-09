@@ -37,7 +37,6 @@ exports.handler = async (event) => {
     const payload = { name: user.name, googleBusiness: user.google_business, subscriptionItems };
     console.log('Payload for webhook:', JSON.stringify(payload));
 
-    // Modification here to use await instead of then()
     console.log('Sending data to webhook');
     const webhookResponse = await fetch(webhookUrl, {
       method: 'POST',
@@ -46,14 +45,18 @@ exports.handler = async (event) => {
     });
 
     console.log(`Webhook call response status: ${webhookResponse.status}`);
-    if (!webhookResponse.ok) {
-      const responseBody = await webhookResponse.text();
-      console.error(`Webhook call failed with status: ${webhookResponse.status}, response: ${responseBody}`);
-      throw new Error(`Webhook call failed: ${webhookResponse.statusText}`);
+    const contentType = webhookResponse.headers.get('Content-Type');
+    if (contentType && contentType.includes('application/json')) {
+      const responseData = await webhookResponse.json();
+      console.log('Webhook response data:', responseData);
+    } else {
+      const responseText = await webhookResponse.text();
+      console.log('Webhook response text:', responseText);
     }
 
-    const responseData = await webhookResponse.json(); // Adjust based on expected response type
-    console.log('Webhook response data:', responseData);
+    if (!webhookResponse.ok) {
+      throw new Error(`Webhook call failed: ${webhookResponse.statusText}`);
+    }
 
     return { statusCode: 200, body: JSON.stringify({ message: 'Data successfully updated and sent to webhook.' }) };
   } catch (error) {
