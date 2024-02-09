@@ -17,6 +17,8 @@ exports.handler = async (event) => {
 
     // Récupération des informations de l'utilisateur après mise à jour
     const userResult = await conn.execute('SELECT name, google_business FROM users WHERE uuid = ?', [userUuid]);
+    console.log(userResult); // Check the structure here
+
     if (userResult.rows.length === 0) {
       return { statusCode: 404, body: JSON.stringify({ message: 'User not found' }) };
     }
