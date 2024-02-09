@@ -54,7 +54,6 @@ export const AuthProvider = ({ children }) => {
   };
 
   const fetchUserDetails = async (uuid) => {
-    console.log(`Récupération des détails pour l'UUID : ${uuid}`);
     try {
       const response = await fetch(`/.netlify/functions/getUserDetails?userUuid=${uuid}`, {
         method: 'GET',
