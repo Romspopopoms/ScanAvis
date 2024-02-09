@@ -4,7 +4,8 @@ const Page = () => (
   <div
     className="relative bg-cover bg-center h-screen flex items-center justify-center"
     style={{
-      backgroundImage: 'url("null")',
+      backgroundImage:
+        'url("https://github.com/Romspopopoms/ScanAvis/blob/main/uploaded_images/cover.png?raw=true")',
       backgroundSize: 'cover',
       backgroundPosition: 'center center',
       backgroundRepeat: 'no-repeat',
@@ -13,8 +14,12 @@ const Page = () => (
     }}
   >
     <div className="flex flex-col items-center">
-      <img src="null" alt="Logo" className="mb-6 h-12 w-12" />
-      <h1 className="text-4xl text-white mb-4">Mariav</h1>
+      <img
+        src="https://github.com/Romspopopoms/ScanAvis/blob/main/uploaded_images/web.png?raw=true"
+        alt="Logo"
+        className="mb-6 h-12 w-12"
+      />
+      <h1 className="text-4xl text-white mb-4">MARIAV</h1>
       <div className="bg-white bg-opacity-75 rounded-lg p-4 shadow-lg mb-6">
         <input
           type="email"
