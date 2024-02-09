@@ -41,7 +41,7 @@ const Navbar = () => {
     <>
       <motion.nav
         ref={navbarRef}
-        className="fixed top-0 left-0 w-full flex justify-between items-center px-4 bg-purple-500 text-gray-800 z-50"
+        className="fixed top-0 left-0 w-full flex justify-between items-center px-4 bg-white text-gray-800 z-50 shadow-md"
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ type: 'spring', stiffness: 260, damping: 20 }}
@@ -79,7 +79,7 @@ const Navbar = () => {
         initial="closed"
         animate={isMenuOpen ? 'open' : 'closed'}
         variants={sidebarVariants}
-        className="fixed right-0 top-0 h-full bg-purple-500 text-gray-800 shadow-xl z-40 p-5"
+        className="fixed right-0 top-0 h-full bg-white text-gray-800 shadow-xl z-40 p-5"
         style={{ top: navbarHeight }}
         transition={{ type: 'spring', stiffness: 260, damping: 20 }}
       >
