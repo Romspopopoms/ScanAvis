@@ -38,6 +38,9 @@ exports.handler = async (event) => {
     });
 
     if (!webhookResponse.ok) {
+      console.log(`Webhook call failed with status: ${webhookResponse.status}`);
+      const responseBody = await webhookResponse.text(); // Ou .json() si vous attendez du JSON
+      console.log(`Response body: ${responseBody}`);
       throw new Error(`Webhook call failed: ${webhookResponse.statusText}`);
     }
 
