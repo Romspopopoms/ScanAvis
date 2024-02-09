@@ -17,7 +17,7 @@ async function generateHtmlPage(pageId, userUuid) {
     const { titre, imageDeFondURL, logoURL } = resultPage.rows[0];
 
     // Ajout: Récupérer les informations supplémentaires
-    const queryUser = 'SELECT name, google_business FROM users WHERE uuid = ? LIMIT 1';
+    const queryUser = 'SELECT name, entreprise, FROM users WHERE uuid = ? LIMIT 1';
     const resultUser = await conn.execute(queryUser, [userUuid]);
     const user = resultUser.rows.length > 0 ? resultUser.rows[0] : null;
 
@@ -43,7 +43,7 @@ const Page = () => {
       email,
       pageId: "${pageId}",
       name: "${user.name}",
-      googleBusiness: "${user.google_business}",
+      entreprise: "${user.entreprise}",
       subscriptionItems: "${subscriptionItems}",
     };
 
