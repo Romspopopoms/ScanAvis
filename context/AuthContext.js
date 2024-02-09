@@ -67,6 +67,7 @@ export const AuthProvider = ({ children }) => {
       // Assurez-vous que la réponse contient bien les champs 'entreprise' et 'googleBusiness'
 
       // Mise à jour du contexte avec les nouvelles informations
+      if (data.email) setUser((prevUser) => ({ ...prevUser, email: data.email }));
       if (data.entreprise) setEntreprise(data.entreprise);
       if (data.googleBusiness) setGoogleBusiness(data.googleBusiness);
     } catch (error) {
