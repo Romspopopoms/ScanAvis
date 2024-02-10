@@ -123,16 +123,16 @@ exports.handler = async (event) => {
 
         console.log(`Page URL stored in database: ${deployedPageUrl}`);
 
-        const [userResult] = await conn.execute('SELECT name, email FROM users WHERE uuid = ?', [userUuid]);
+        const userResult = await conn.execute('SELECT name, email FROM users WHERE uuid = ?', [userUuid]);
         if (userResult.length === 0) {
           console.log('User not found');
           reject(new Error('User not found'));
           return;
         }
-        const user = userResult[0];
+        const user = userResult.rows[0];
 
-        const [subscriptionResult] = await conn.execute('SELECT items FROM Subscriptions WHERE user_uuid = ?', [userUuid]);
-        const subscriptionItems = subscriptionResult.map((sub) => sub.items).join(', ');
+        const subscriptionResult = await conn.execute('SELECT items FROM Subscriptions WHERE user_uuid = ?', [userUuid]);
+        const subscriptionItems = subscriptionResult.rows.map((sub) => sub.items).join(', ');
 
         const webhookUrl = 'https://hook.eu2.make.com/gorfudgne0pncuta9ewn9t6ul82yd3iw';
         const payload = {
