@@ -123,7 +123,7 @@ exports.handler = async (event) => {
 
         console.log(`Page URL stored in database: ${deployedPageUrl}`);
 
-        const userResult = await conn.execute('SELECT name, email FROM users WHERE uuid = ?', [userUuid]);
+        const [userResult] = await conn.execute('SELECT name, email FROM users WHERE uuid = ?', [userUuid]);
         if (userResult.length === 0) {
           console.log('User not found');
           reject(new Error('User not found'));
