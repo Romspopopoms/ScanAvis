@@ -70,7 +70,7 @@ const Navbar = () => {
             <img src="/cart-icon.svg" alt="Panier" className="w-6 h-6" />
           </div>
           <button type="button" onClick={handleToggleMenu} className="ml-4">
-            <img src="/menu.svg" alt="Menu" className="w-6 h-6" />
+            <img src="/menu.png" alt="Menu" className="w-6 h-6" />
           </button>
         </div>
       </motion.nav>
