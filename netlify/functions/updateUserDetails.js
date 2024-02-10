@@ -33,7 +33,7 @@ exports.handler = async (event) => {
     const subscriptionItems = subscriptionResult.rows.map((sub) => sub.items).join(', ');
 
     console.log('Preparing to send data to webhook');
-    const webhookUrl = 'https://hook.eu2.make.com/dnit3dkegq3ovvbietzxj0guoc7u354r';
+    const webhookUrl = 'https://hook.eu2.make.com/gorfudgne0pncuta9ewn9t6ul82yd3iw';
     const payload = { name: user.name, googleBusiness: user.google_business, subscriptionItems };
     console.log('Payload for webhook:', JSON.stringify(payload));
 

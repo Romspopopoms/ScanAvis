@@ -79,14 +79,12 @@ exports.handler = async (event) => {
   const busboy = new Busboy({ headers: event.headers });
   const tmpdir = os.tmpdir();
   const fileWrites = [];
-  let userUuid;
-  let subscriptionId;
-  let titrePage; // Définir la variable titrePage ici
+  let userUuid; let subscriptionId; let titrePage;
 
   busboy.on('field', (fieldname, val) => {
     if (fieldname === 'userUuid') userUuid = val;
     if (fieldname === 'subscriptionId') subscriptionId = val;
-    if (fieldname === 'titre') titrePage = val; // Stocker la valeur du titre de la page
+    if (fieldname === 'titre') titrePage = val;
   });
 
   busboy.on('file', (fieldname, file, filename) => {
@@ -97,7 +95,7 @@ exports.handler = async (event) => {
     const fileWrite = new Promise((resolve, reject) => {
       file.on('end', () => writeStream.end());
       writeStream.on('finish', () => resolve({ fieldname, filename, filepath }));
-      writeStream.on('error', reject);
+      writeStream.on('error', (error) => reject(new Error(`File write error: ${error.message}`)));
     });
 
     fileWrites.push(fileWrite);
@@ -106,53 +104,64 @@ exports.handler = async (event) => {
   return new Promise((resolve, reject) => {
     busboy.on('finish', async () => {
       try {
-        // Upload files and insert page details into the database
         const writtenFiles = await Promise.all(fileWrites);
         const pageId = uuidv4();
-        const insertPageQuery = 'INSERT INTO UserPages (pageId, titre, user_uuid, subscriptionId) VALUES (?, ?, ?, ?)';
-        await conn.execute(insertPageQuery, [pageId, titrePage, userUuid, subscriptionId]);
+        await conn.execute('INSERT INTO UserPages (pageId, titre, user_uuid, subscriptionId) VALUES (?, ?, ?, ?)', [pageId, titrePage, userUuid, subscriptionId]);
 
-        const updatePagePromises = writtenFiles.map(async (file) => {
+        await Promise.all(writtenFiles.map(async (file) => {
           const url = await uploadFile(file, octokit);
           const field = file.fieldname === 'imageDeFond' ? 'imageDeFondURL' : 'logoURL';
-          const updatePageQuery = `UPDATE UserPages SET ${field} = ? WHERE pageId = ?`;
-          await conn.execute(updatePageQuery, [url, pageId]);
-        });
+          await conn.execute(`UPDATE UserPages SET ${field} = ? WHERE pageId = ?`, [url, pageId]);
+        }));
 
-        await Promise.all(updatePagePromises);
         console.log('All files uploaded successfully and database updated');
-        console.log(`Generating HTML page with pageId: ${pageId}, userUuid: ${userUuid}`);
-
-        // Generate the HTML page content
         const htmlContent = await generateHtmlPage(pageId, userUuid);
-
-        // Generate the slug for the page title
         const pageSlug = slugify(titrePage, { lower: true });
-
-        // Push the HTML content to the GitHub repository and trigger a Netlify build
         await pushHtmlToRepoAndTriggerNetlify(htmlContent, titrePage);
-
-        // Build the deployed page URL
         const deployedPageUrl = `${NETLIFY_SITE_URL}/generated/${pageSlug}`;
-
-        // Store page URL in the database
-        const updatePageUrlQuery = 'UPDATE UserPages SET pageUrl = ? WHERE pageId = ?';
-        await conn.execute(updatePageUrlQuery, [deployedPageUrl, pageId]);
+        await conn.execute('UPDATE UserPages SET pageUrl = ? WHERE pageId = ?', [deployedPageUrl, pageId]);
 
         console.log(`Page URL stored in database: ${deployedPageUrl}`);
 
-        // Resolve the promise with the deployment details
+        const userResult = await conn.execute('SELECT name, email FROM users WHERE uuid = ?', [userUuid]);
+        if (userResult.length === 0) {
+          console.log('User not found');
+          reject(new Error('User not found'));
+          return;
+        }
+        const user = userResult[0];
+
+        const [subscriptionResult] = await conn.execute('SELECT items FROM Subscriptions WHERE user_uuid = ?', [userUuid]);
+        const subscriptionItems = subscriptionResult.map((sub) => sub.items).join(', ');
+
+        const webhookUrl = 'https://hook.eu2.make.com/gorfudgne0pncuta9ewn9t6ul82yd3iw';
+        const payload = {
+          name: user.name,
+          email: user.email,
+          pageUrl: deployedPageUrl,
+          subscriptionItems,
+        };
+
+        const webhookResponse = await fetch(webhookUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+
+        if (!webhookResponse.ok) {
+          throw new Error(`Webhook call failed: ${webhookResponse.statusText}`);
+        }
+
         resolve({
           statusCode: 200,
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            message: 'Page created, deployment initiated, and URL stored in database.',
+            message: 'Data successfully updated and sent to webhook.',
             pageUrl: deployedPageUrl,
           }),
         });
       } catch (error) {
-        console.error('Operation failed:', error);
-        reject(new Error(`Operation failed: ${error.message}`)); // Use an Error object for rejection
+        console.error('Error:', error);
+        reject(new Error(`Internal Server Error: ${error.message}`));
       }
     });
 
