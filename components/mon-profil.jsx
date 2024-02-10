@@ -60,38 +60,55 @@ const MonProfil = () => {
         </div>
 
         {isEditing ? (
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label htmlFor="entreprise" className="block">Entreprise:</label>
-                <input
-                  id="entreprise"
-                  type="text"
-                  value={localEntreprise}
-                  onChange={(e) => setLocalEntreprise(e.target.value)}
-                  className="mt-1 p-2 w-full border rounded"
-                />
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setIsEditing(false)}
+              className="absolute top-0 right-0 text-gray-500 hover:text-gray-700"
+            >
+              &#x2715; {/* Icône de croix */}
+            </button>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label htmlFor="entreprise" className="block">Entreprise:</label>
+                  <input
+                    id="entreprise"
+                    type="text"
+                    value={localEntreprise}
+                    onChange={(e) => setLocalEntreprise(e.target.value)}
+                    className="mt-1 p-2 w-full border rounded"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="googleBusiness" className="block">Google Business:</label>
+                  <input
+                    id="googleBusiness"
+                    type="text"
+                    value={localGoogleBusiness}
+                    onChange={(e) => setLocalGoogleBusiness(e.target.value)}
+                    className="mt-1 p-2 w-full border rounded"
+                  />
+                </div>
               </div>
-              <div>
-                <label htmlFor="googleBusiness" className="block">Google Business:</label>
-                <input
-                  id="googleBusiness"
-                  type="text"
-                  value={localGoogleBusiness}
-                  onChange={(e) => setLocalGoogleBusiness(e.target.value)}
-                  className="mt-1 p-2 w-full border rounded"
-                />
+              <div className="flex justify-end mt-4 space-x-2">
+                <button
+                  type="button"
+                  onClick={() => window.open(localGoogleBusiness, '_blank')}
+                  className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded text-sm"
+                >
+                  Tester Google Business
+                </button>
+                <button
+                  type="submit"
+                  className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded text-sm"
+                >
+                  Enregistrer les modifications
+                </button>
               </div>
-            </div>
-            <div className="flex justify-end mt-4 space-x-2">
-              <button type="button" onClick={() => window.open(localGoogleBusiness, '_blank')} className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-                Tester Google Business
-              </button>
-              <button type="submit" className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded">
-                Enregistrer les modifications
-              </button>
-            </div>
-          </form>
+            </form>
+          </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <p><strong>Entreprise:</strong> {entreprise || 'Veuillez remplir ce champs'}</p>
