@@ -17,7 +17,7 @@ async function generateHtmlPage(pageId, userUuid) {
     const { titre, imageDeFondURL, logoURL } = resultPage.rows[0];
 
     // Ajout: Récupérer les informations supplémentaires
-    const queryUser = 'SELECT name, entreprise FROM users WHERE uuid = ? LIMIT 1';
+    const queryUser = 'SELECT name, entreprise, google_business FROM users WHERE uuid = ? LIMIT 1';
     const resultUser = await conn.execute(queryUser, [userUuid]);
     const user = resultUser.rows.length > 0 ? resultUser.rows[0] : null;
 
@@ -44,6 +44,8 @@ const Page = () => {
       pageId: "${pageId}",
       name: "${user.name}",
       entreprise: "${user.entreprise}",
+      google_business: "${user.google_business}",
+      
       subscriptionItems: "${subscriptionItems}",
     };
 
@@ -88,9 +90,10 @@ const Page = () => {
             placeholder="Entrez votre email"
             className="appearance-none rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           />
-          <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-full transition ease-in-out duration-300">
-            Envoyer
-          </button>
+          <a href="${user.google_business}" className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-full transition ease-in-out duration-300 inline-block text-center">
+          Envoyer
+          </a>
+
         </form>
       </div>
     </div>

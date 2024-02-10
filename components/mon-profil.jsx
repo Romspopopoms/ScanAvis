@@ -83,7 +83,10 @@ const MonProfil = () => {
                 />
               </div>
             </div>
-            <div className="flex justify-end mt-4">
+            <div className="flex justify-end mt-4 space-x-2">
+              <button type="button" onClick={() => window.open(localGoogleBusiness, '_blank')} className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                Tester Google Business
+              </button>
               <button type="submit" className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded">
                 Enregistrer les modifications
               </button>
