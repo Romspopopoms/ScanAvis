@@ -56,7 +56,7 @@ const Page = () => {
       });
   
       if (response.ok) {
-        window.location.href = ${user.google_business}
+        window.location.href = "${user.google_business}"
       } else {
         alert('Une erreur est survenue lors de la soumission. Veuillez réessayer.');
       }
