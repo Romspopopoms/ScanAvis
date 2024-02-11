@@ -68,7 +68,11 @@ const Navbar = () => {
           <div onClick={toggleCart} className="ml-4 relative cursor-pointer">
             <img src="/cart-icon.svg" alt="Panier" className="w-6 h-6" />
           </div>
-          <button type="button" onClick={handleToggleMenu} className="ml-4 md:hidden">
+          <button
+            type="button"
+            onClick={handleToggleMenu}
+            className="ml-4 md:hidden"
+          >
             <img src="/menu.png" alt="Menu" className="w-6 h-6" />
           </button>
         </div>
@@ -83,16 +87,36 @@ const Navbar = () => {
         transition={{ type: 'spring', stiffness: 260, damping: 20 }}
       >
         <div className="mt-2">
-          {isAuthenticated && (
-            <Link href="/mon-profil">
-              <span className="block hover:text-gray-300 cursor-pointer">Mon Profil</span>
+          {isAuthenticated ? (
+            <>
+              <Link href="/mon-profil">
+                <span className="block hover:text-gray-300 cursor-pointer">
+                  Mon Profil
+                </span>
+              </Link>
+              <button type="button"
+                onClick={logout}
+                className="block mt-4 text-red-600 hover:text-red-700 cursor-pointer"
+              >
+                Déconnexion
+              </button>
+            </>
+          ) : (
+            <Link href="/login">
+              <span className="block mt-4 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded cursor-pointer">
+                Se connecter
+              </span>
             </Link>
           )}
           <Link href="/">
-            <span className="block hover:text-gray-300 cursor-pointer">Accueil</span>
+            <span className="block hover:text-gray-300 cursor-pointer">
+              Accueil
+            </span>
           </Link>
           <Link href="/tarifs">
-            <span className="block hover:text-gray-300 cursor-pointer">Nos offres</span>
+            <span className="block hover:text-gray-300 cursor-pointer">
+              Nos offres
+            </span>
           </Link>
           {/* Autres liens du menu */}
         </div>
