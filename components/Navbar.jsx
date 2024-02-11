@@ -34,43 +34,27 @@ const Navbar = () => {
 
   const sidebarVariants = {
     open: { x: 0, opacity: 1 },
-    closed: { x: '100%', opacity: 0 },
+    closed: { x: '-100%', opacity: 0 },
   };
 
   return (
     <>
       <motion.nav
         ref={navbarRef}
-        className="fixed top-0 left-0 w-full flex justify-between items-center px-4 bg-white text-gray-800 z-50 shadow-md"
+        className="fixed top-0 left-0 w-full flex justify-between items-center px-4 py-2 bg-white text-gray-800 z-50 shadow-md"
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ type: 'spring', stiffness: 260, damping: 20 }}
       >
-        <h2 className="font-extrabold text-2xl">
+        <h2 className="text-xl font-bold">
           <Link href="/">SCAN'AVIS</Link>
         </h2>
         <div className="flex items-center">
-          {isAuthenticated ? (
-            <button
-              type="button"
-              onClick={logout}
-              className="px-4 py-2 bg-red-600 hover:bg-red-700 transition rounded text-white"
-            >
-              Déconnexion
-            </button>
-          ) : (
-            <Link
-              href="/login"
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 transition rounded text-white"
-            >
-              Se connecter
-            </Link>
-          )}
-          <div onClick={toggleCart} className="ml-4 relative cursor-pointer">
+          <div onClick={toggleCart} className="ml-4 cursor-pointer">
             <img src="/cart-icon.svg" alt="Panier" className="w-6 h-6" />
           </div>
           <button type="button" onClick={handleToggleMenu} className="ml-4">
-            <img src="/menu.png" alt="Menu" className="w-6 h-6" />
+            <img src="/menu-icon.svg" alt="Menu" className="w-6 h-6" />
           </button>
         </div>
       </motion.nav>
@@ -79,29 +63,39 @@ const Navbar = () => {
         initial="closed"
         animate={isMenuOpen ? 'open' : 'closed'}
         variants={sidebarVariants}
-        className="fixed right-0 top-0 h-full bg-white text-gray-800 shadow-xl z-40 p-5"
-        style={{ top: navbarHeight }}
+        className="fixed top-0 left-0 h-full z-40 w-3/4 bg-white shadow-xl p-5"
+        style={{ top: `${navbarHeight}px` }}
         transition={{ type: 'spring', stiffness: 260, damping: 20 }}
       >
-        <div className="mt-2">
-          {isAuthenticated && (
-            <Link href="/mon-profil" className="block hover:text-gray-300">
-              Mon Profil
+        <div className="flex flex-col space-y-4">
+          {isAuthenticated ? (
+            <>
+              <Link href="/mon-profil" className="text-gray-800 hover:text-gray-600">
+                Mon Profil
+              </Link>
+              <button type="button"
+                onClick={logout}
+                className="text-gray-800 hover:text-gray-600"
+              >
+                Déconnexion
+              </button>
+            </>
+          ) : (
+            <Link href="/login" className="text-gray-800 hover:text-gray-600">
+              Se connecter
             </Link>
           )}
-          <Link href="/" className="block hover:text-gray-300">
+          <Link href="/" className="text-gray-800 hover:text-gray-600">
             Accueil
           </Link>
-          <Link href="/tarifs" className="block hover:text-gray-300">
+          <Link href="/tarifs" className="text-gray-800 hover:text-gray-600">
             Nos offres
           </Link>
-          {/* Autres liens du menu */}
+          {/* Ajoute d'autres liens ici au besoin */}
         </div>
       </motion.div>
 
-      {isCartOpen && (
-        <CartSummary isCartOpen={isCartOpen} toggleCart={toggleCart} />
-      )}
+      {isCartOpen && <CartSummary isCartOpen={isCartOpen} toggleCart={toggleCart} />}
     </>
   );
 };
