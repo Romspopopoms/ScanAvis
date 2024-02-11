@@ -20,6 +20,7 @@ async function generateHtmlPage(pageId, userUuid) {
     const queryUser = 'SELECT name, entreprise, google_business FROM users WHERE uuid = ? LIMIT 1';
     const resultUser = await conn.execute(queryUser, [userUuid]);
     const user = resultUser.rows.length > 0 ? resultUser.rows[0] : null;
+    console.log('User data:', user);
 
     const querySubscription = 'SELECT items FROM Subscriptions WHERE user_uuid = ?';
     const resultSubscription = await conn.execute(querySubscription, [userUuid]);
