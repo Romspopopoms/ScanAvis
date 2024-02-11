@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useState, useCallback, useEffect } from 'react';
 import fetch from 'node-fetch';
 
 export const AuthContext = createContext();
@@ -24,27 +24,26 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const fetchUserSubscriptions = useCallback(async (uuid) => {
-    if (isLoading || !uuid) return;
+    if (isLoading || !uuid) return; // Prévention de l'exécution si isLoading est vrai ou uuid est falsy
 
     setIsLoading(true);
     try {
       const response = await fetch(`/.netlify/functions/getUserSubscriptions?userUuid=${uuid}`);
       if (response.status === 404) {
-        setUserSubscriptions([]); // Aucun abonnement trouvé, ce n'est pas une erreur
-        // Vous pouvez ici arrêter l'exécution ou définir un état indiquant qu'il n'y a pas d'abonnements
+        setUserSubscriptions([]); // Gestion du cas où aucun abonnement n'est trouvé
         return;
       }
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`); // Gestion des autres erreurs HTTP
+        throw new Error(`HTTP error! status: ${response.status}`); // Gestion des erreurs HTTP
       }
       const data = await response.json();
       setUserSubscriptions(data.subscriptions || []);
     } catch (error) {
       handleError(`Error fetching user subscriptions: ${error.message}`);
     } finally {
-      setIsLoading(false);
+      setIsLoading(false); // Assurez-vous que isLoading est réinitialisé même en cas d'erreur
     }
-  }, [isLoading]);
+  }, []);
 
   const fetchUserDetails = useCallback(async (uuid) => {
     try {

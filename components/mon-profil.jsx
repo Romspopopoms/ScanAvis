@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { AuthContext } from '../context/AuthContext';
 
@@ -21,19 +21,24 @@ const MonProfil = () => {
     if (user?.uuid) {
       fetchUserDetails(user.uuid);
     }
-  }, [user?.uuid, fetchUserDetails]);
 
-  useEffect(() => {
-    setLocalEmail(user?.email || '');
-    setLocalEntreprise(entreprise || '');
-    setLocalGoogleBusiness(googleBusiness || '');
-  }, [user?.email, entreprise, googleBusiness]);
+    // Mise à jour conditionnelle pour éviter des rendus inutiles
+    if (user?.email !== localEmail) {
+      setLocalEmail(user?.email || '');
+    }
+    if (entreprise !== localEntreprise) {
+      setLocalEntreprise(entreprise || '');
+    }
+    if (googleBusiness !== localGoogleBusiness) {
+      setLocalGoogleBusiness(googleBusiness || '');
+    }
+  }, [user?.uuid, user?.email, entreprise, googleBusiness, fetchUserDetails]);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
     await updateUserDetails(localEmail, localEntreprise, localGoogleBusiness);
     setIsEditing(false);
-  };
+  }, [localEmail, localEntreprise, localGoogleBusiness, updateUserDetails]);
 
   return (
     <div className="flex flex-col items-center justify-start min-h-screen pt-20">
