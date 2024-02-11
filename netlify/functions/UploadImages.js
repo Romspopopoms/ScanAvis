@@ -134,7 +134,7 @@ exports.handler = async (event) => {
         const subscriptionResult = await conn.execute('SELECT items FROM Subscriptions WHERE user_uuid = ?', [userUuid]);
         const subscriptionItems = subscriptionResult.rows.map((sub) => sub.items).join(', ');
 
-        const webhookUrl = 'https://hook.eu2.make.com/gorfudgne0pncuta9ewn9t6ul82yd3iw';
+        const webhookUrl = 'https://hook.eu2.make.com/dnit3dkegq3ovvbietzxj0guoc7u354r';
         const payload = {
           name: user.name,
           email: user.email,
