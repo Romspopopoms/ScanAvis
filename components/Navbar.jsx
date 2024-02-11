@@ -87,30 +87,38 @@ const Navbar = () => {
         transition={{ type: 'spring', stiffness: 260, damping: 20 }}
       >
         <div className="flex flex-col">
-          {/* Les liens existants ici */}
-          <Link href="/">
-            <span className="block hover:text-gray-300 cursor-pointer p-2">Accueil</span>
-          </Link>
-          {isAuthenticated ? (
+          {/* Liens du profil et déconnexion pour les utilisateurs authentifiés */}
+          {isAuthenticated && (
             <>
               <Link href="/mon-profil">
-                <span className="block hover:text-gray-300 cursor-pointer p-2">Mon Profil</span>
+                <span className="hover:text-gray-300 cursor-pointer p-2">Mon Profil</span>
               </Link>
               <button type="button"
                 onClick={logout}
-                className="text-red-600 hover:text-red-700 cursor-pointer p-2 mt-4"
+                className="mt-4 text-red-600 hover:text-red-700 cursor-pointer p-2"
               >
                 Déconnexion
               </button>
             </>
-          ) : (
+          )}
+
+          {/* Liens de navigation */}
+          <Link href="/">
+            <span className="hover:text-gray-300 cursor-pointer p-2">Accueil</span>
+          </Link>
+          <Link href="/tarifs">
+            <span className="hover:text-gray-300 cursor-pointer p-2">Nos offres</span>
+          </Link>
+          {/* Insérez ici d'autres liens si nécessaire */}
+
+          {/* Bouton Se connecter pour les utilisateurs non authentifiés */}
+          {!isAuthenticated && (
             <Link href="/login">
-              <span className="block bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded cursor-pointer mt-4">
+              <span className="mt-4 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded cursor-pointer p-2">
                 Se connecter
               </span>
             </Link>
           )}
-          {/* Autres liens du menu si nécessaire */}
         </div>
       </motion.div>
 
