@@ -7,7 +7,7 @@ const Page = () => {
     e.preventDefault();
     const payload = {
       email,
-      pageId: 'f08fc82e-bb5a-43b1-bc57-6c4c14c811ed',
+      pageId: '4bf2fc20-c9b7-4af9-aa54-52c118ccf28a',
       name: 'Geoffrey LAURENT',
       entreprise: 'Moi',
       google_business: 'Httpbbjebebjd',
