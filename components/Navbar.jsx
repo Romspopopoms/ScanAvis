@@ -23,10 +23,7 @@ const Navbar = () => {
     };
 
     window.addEventListener('resize', handleResize);
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   const handleToggleMenu = () => setIsMenuOpen(!isMenuOpen);
@@ -34,7 +31,7 @@ const Navbar = () => {
 
   const sidebarVariants = {
     open: { x: 0, opacity: 1 },
-    closed: { x: '-100%', opacity: 0 }, // Slide from the left for mobile
+    closed: { x: '-100%', opacity: 0 },
   };
 
   return (
@@ -50,17 +47,10 @@ const Navbar = () => {
           <h2 className="font-extrabold text-2xl cursor-pointer">SCAN'AVIS</h2>
         </Link>
         <div className="flex items-center">
-          {isAuthenticated ? (
-            <button
-              type="button"
-              onClick={logout}
-              className="hidden md:inline-flex px-4 py-2 bg-red-600 hover:bg-red-700 transition rounded text-white"
-            >
-              Déconnexion
-            </button>
-          ) : (
+          {/* Bouton visible uniquement sur les écrans md et plus */}
+          {!isAuthenticated && (
             <Link href="/login">
-              <span className="hidden md:inline-flex px-4 py-2 bg-blue-600 hover:bg-blue-700 transition rounded text-white cursor-pointer">
+              <span className="hidden md:block px-4 py-2 bg-blue-600 hover:bg-blue-700 transition rounded text-white cursor-pointer">
                 Se connecter
               </span>
             </Link>
@@ -68,11 +58,7 @@ const Navbar = () => {
           <div onClick={toggleCart} className="ml-4 relative cursor-pointer">
             <img src="/cart-icon.svg" alt="Panier" className="w-6 h-6" />
           </div>
-          <button
-            type="button"
-            onClick={handleToggleMenu}
-            className="ml-4 md:hidden"
-          >
+          <button type="button" onClick={handleToggleMenu} className="ml-4 md:hidden">
             <img src="/menu.png" alt="Menu" className="w-6 h-6" />
           </button>
         </div>
@@ -86,45 +72,49 @@ const Navbar = () => {
         style={{ top: navbarHeight }}
         transition={{ type: 'spring', stiffness: 260, damping: 20 }}
       >
-        <div className="flex flex-col">
-          {/* Liens du profil et déconnexion pour les utilisateurs authentifiés */}
-          {isAuthenticated && (
+        <div className="flex flex-col mt-2">
+          {/* Menu pour les utilisateurs authentifiés */}
+          {isAuthenticated ? (
             <>
               <Link href="/mon-profil">
-                <span className="hover:text-gray-300 cursor-pointer p-2">Mon Profil</span>
+                <span className="block hover:text-gray-300 cursor-pointer">
+                  Mon Profil
+                </span>
               </Link>
               <button type="button"
                 onClick={logout}
-                className="mt-4 text-red-600 hover:text-red-700 cursor-pointer p-2"
+                className="text-red-600 hover:text-red-700 cursor-pointer mt-4"
               >
                 Déconnexion
               </button>
             </>
+          ) : (
+            <>
+              {/* Bouton Se connecter pour les petits écrans */}
+              <Link href="/login">
+                <span className="block bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded cursor-pointer mt-4">
+                  Se connecter
+                </span>
+              </Link>
+            </>
           )}
-
-          {/* Liens de navigation */}
+          {/* Liens du menu */}
           <Link href="/">
-            <span className="hover:text-gray-300 cursor-pointer p-2">Accueil</span>
+            <span className="block hover:text-gray-300 cursor-pointer mt-4">
+              Accueil
+            </span>
           </Link>
           <Link href="/tarifs">
-            <span className="hover:text-gray-300 cursor-pointer p-2">Nos offres</span>
+            <span className="block hover:text-gray-300 cursor-pointer mt-4">
+              Nos offres
+            </span>
           </Link>
-          {/* Insérez ici d'autres liens si nécessaire */}
-
-          {/* Bouton Se connecter pour les utilisateurs non authentifiés */}
-          {!isAuthenticated && (
-            <Link href="/login">
-              <span className="mt-4 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded cursor-pointer p-2">
-                Se connecter
-              </span>
-            </Link>
-          )}
+          {/* Vous pouvez ajouter d'autres liens ici si nécessaire */}
         </div>
       </motion.div>
 
-      {isCartOpen && (
-        <CartSummary isCartOpen={isCartOpen} toggleCart={toggleCart} />
-      )}
+      {/* Composant CartSummary pour le panier, si nécessaire */}
+      {isCartOpen && <CartSummary isCartOpen={isCartOpen} toggleCart={toggleCart} />}
     </>
   );
 };
