@@ -36,9 +36,14 @@ const MonProfil = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-start min-h-screen pt-20">
-      <motion.div className="w-full max-w-4xl bg-white shadow-xl rounded-lg p-6 mb-6">
-        <h1 className="text-3xl font-bold text-center text-purple-800 mb-8">Mon Profil</h1>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 pt-4 px-2">
+      <motion.div
+        className="w-full max-w-md bg-white shadow-xl rounded-lg p-4 mb-6"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <h1 className="text-xl sm:text-2xl font-bold text-center text-purple-800 mb-6">Mon Profil</h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           <p><strong>Nom:</strong> {user?.name}</p>
