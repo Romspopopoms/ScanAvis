@@ -24,21 +24,21 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const fetchUserSubscriptions = useCallback(async (uuid) => {
-    if (isLoading) return;
+    if (isLoading || !uuid) return;
 
     setIsLoading(true);
     try {
       const response = await fetch(`/.netlify/functions/getUserSubscriptions?userUuid=${uuid}`);
-
-      // Traiter spécifiquement le cas d'une réponse 404
       if (response.status === 404) {
-        setUserSubscriptions([]); // Aucun abonnement n'existe
-      } else if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`); // Autres erreurs HTTP
-      } else {
-        const data = await response.json();
-        setUserSubscriptions(data.subscriptions || []); // Mise à jour des abonnements
+        setUserSubscriptions([]); // Aucun abonnement trouvé, ce n'est pas une erreur
+        // Vous pouvez ici arrêter l'exécution ou définir un état indiquant qu'il n'y a pas d'abonnements
+        return;
       }
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`); // Gestion des autres erreurs HTTP
+      }
+      const data = await response.json();
+      setUserSubscriptions(data.subscriptions || []);
     } catch (error) {
       handleError(`Error fetching user subscriptions: ${error.message}`);
     } finally {
