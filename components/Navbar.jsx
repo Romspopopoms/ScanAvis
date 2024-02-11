@@ -24,8 +24,14 @@ const Navbar = () => {
     };
   }, []);
 
-  const handleToggleMenu = () => setIsMenuOpen(!isMenuOpen);
-  const toggleCart = () => setIsCartOpen(!isCartOpen);
+  const handleToggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+    if (isCartOpen) setIsCartOpen(false);
+  };
+  const toggleCart = () => {
+    setIsCartOpen(!isCartOpen);
+    if (isMenuOpen) setIsMenuOpen(false);
+  };
 
   const sidebarVariants = {
     open: { x: 0 },
@@ -45,20 +51,7 @@ const Navbar = () => {
           className="text-xl md:text-2xl font-bold tracking-tighter"
         >SCAN'AVIS
         </Link>
-        <div className="flex items-center">
-          {isAuthenticated ? (
-            <button type="button"
-              onClick={logout}
-              className="px-4 py-2 mr-4 bg-red-600 hover:bg-red-700 text-white transition-colors duration-300 rounded-lg"
-            >
-              Déconnexion
-            </button>
-          ) : (
-            <Link href="/login"
-              className="px-4 py-2 mr-4 bg-blue-600 hover:bg-blue-700 text-white transition-colors duration-300 rounded-lg"
-            >Connexion
-            </Link>
-          )}
+        <div>
           <button type="button" onClick={handleToggleMenu} className="text-gray-800 outline-none">
             <img src="/menu.png" alt="Menu" className="w-8 h-8" />
           </button>
@@ -76,7 +69,7 @@ const Navbar = () => {
         <button type="button" onClick={handleToggleMenu} className="self-end">
           <img src="/icon-close.png" alt="Fermer" className="w-8 h-8" />
         </button>
-        <nav className="mt-8 flex-grow">
+        <nav className="flex-grow">
           <Link href="/"
             className="block py-2 text-gray-800 hover:text-gray-600 transition duration-150"
           >Accueil
@@ -91,6 +84,21 @@ const Navbar = () => {
           </Link>
           {/* Autres liens */}
         </nav>
+        <div className="pt-6">
+          {isAuthenticated ? (
+            <button type="button"
+              onClick={logout}
+              className="w-full py-3 bg-red-600 hover:bg-red-700 text-white transition-colors duration-300 rounded-lg"
+            >
+              Déconnexion
+            </button>
+          ) : (
+            <Link href="/login"
+              className="w-full block text-center py-3 bg-blue-600 hover:bg-blue-700 text-white transition-colors duration-300 rounded-lg"
+            >Connexion
+            </Link>
+          )}
+        </div>
       </motion.div>
 
       {isCartOpen && <CartSummary isCartOpen={isCartOpen} toggleCart={toggleCart} />}
