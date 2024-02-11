@@ -18,7 +18,7 @@ const MyApp = ({ Component, pageProps }) => {
   const showGlobalComponents = !router.pathname.startsWith('/generated/') ? 'no-global-styles' : '';
 
   return (
-    <div className="max-w-screen-lg mx-auto">
+    <div className="w-full overflow-hidden max-w-screen-lg mx-auto">
       <AuthProvider>
         <CartProvider>
           <PaymentProvider>
