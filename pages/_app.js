@@ -18,34 +18,36 @@ const MyApp = ({ Component, pageProps }) => {
   const showGlobalComponents = !router.pathname.startsWith('/generated/') ? 'no-global-styles' : '';
 
   return (
-    <AuthProvider>
-      <CartProvider>
-        <PaymentProvider>
-          <NavbarHeightProvider> {/* Enveloppez votre application dans NavbarHeightProvider */}
-            <HtmlProvider> {/* Enveloppez votre application dans HtmlProvider */}
-              <div className={`flex flex-col min-h-screen gradient-01 ${showGlobalComponents}`}>
-                <Head>
-                  <title>Scan'Avis</title>
-                  <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-                  <link rel="icon" href="/favicon.ico" />
-                  <link rel="preconnect" href="https://stijndv.com" />
-                  <link rel="stylesheet" href="https://stijndv.com/fonts/Eudoxus-Sans.css" />
-                </Head>
+    <div className="max-w-screen-lg mx-auto">
+      <AuthProvider>
+        <CartProvider>
+          <PaymentProvider>
+            <NavbarHeightProvider> {/* Enveloppez votre application dans NavbarHeightProvider */}
+              <HtmlProvider> {/* Enveloppez votre application dans HtmlProvider */}
+                <div className={`flex flex-col min-h-screen gradient-01 ${showGlobalComponents}`}>
+                  <Head>
+                    <title>Scan'Avis</title>
+                    <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+                    <link rel="icon" href="/favicon.ico" />
+                    <link rel="preconnect" href="https://stijndv.com" />
+                    <link rel="stylesheet" href="https://stijndv.com/fonts/Eudoxus-Sans.css" />
+                  </Head>
 
-                {showGlobalComponents && <Navbar />}
+                  {showGlobalComponents && <Navbar />}
 
-                <main className="flex-grow">
-                  {shouldDisplayCartSummary && <CartSummary />}
-                  <Component {...pageProps} />
-                </main>
+                  <main className="flex-grow">
+                    {shouldDisplayCartSummary && <CartSummary />}
+                    <Component {...pageProps} />
+                  </main>
 
-                {showGlobalComponents && <Footer />}
-              </div>
-            </HtmlProvider>
-          </NavbarHeightProvider>
-        </PaymentProvider>
-      </CartProvider>
-    </AuthProvider>
+                  {showGlobalComponents && <Footer />}
+                </div>
+              </HtmlProvider>
+            </NavbarHeightProvider>
+          </PaymentProvider>
+        </CartProvider>
+      </AuthProvider>
+    </div>
   );
 };
 
