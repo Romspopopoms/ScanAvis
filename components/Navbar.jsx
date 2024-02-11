@@ -49,13 +49,13 @@ const Navbar = () => {
           {isAuthenticated ? (
             <button type="button"
               onClick={logout}
-              className="hidden sm:block px-4 py-2 mr-4 bg-red-600 hover:bg-red-700 text-white transition-colors duration-300 rounded-lg"
+              className="px-4 py-2 mr-4 bg-red-600 hover:bg-red-700 text-white transition-colors duration-300 rounded-lg"
             >
               Déconnexion
             </button>
           ) : (
             <Link href="/login"
-              className="hidden sm:block px-4 py-2 mr-4 bg-blue-600 hover:bg-blue-700 text-white transition-colors duration-300 rounded-lg"
+              className="px-4 py-2 mr-4 bg-blue-600 hover:bg-blue-700 text-white transition-colors duration-300 rounded-lg"
             >Connexion
             </Link>
           )}
@@ -74,37 +74,23 @@ const Navbar = () => {
         transition={{ type: 'tween' }}
       >
         <button type="button" onClick={handleToggleMenu} className="self-end">
-          <img src="/iconarrow.png" alt="Fermer" className="w-8 h-8" />
+          <img src="/icon-close.png" alt="Fermer" className="w-8 h-8" />
         </button>
         <nav className="mt-8 flex-grow">
           <Link href="/"
             className="block py-2 text-gray-800 hover:text-gray-600 transition duration-150"
-          >
-            Accueil
+          >Accueil
           </Link>
           <Link href="/mon-profil"
             className="block py-2 text-gray-800 hover:text-gray-600 transition duration-150"
-          >
-            Mon Profil
+          >Mon Profil
           </Link>
           <Link href="/tarifs"
             className="block py-2 text-gray-800 hover:text-gray-600 transition duration-150"
-          >
-            Nos offres
+          >Nos offres
           </Link>
           {/* Autres liens */}
         </nav>
-        {isAuthenticated && (
-          <button type="button"
-            onClick={() => {
-              logout();
-              handleToggleMenu();
-            }}
-            className="w-full py-3 mt-4 bg-red-600 hover:bg-red-700 text-white transition-colors duration-300 rounded-lg"
-          >
-            Déconnexion
-          </button>
-        )}
       </motion.div>
 
       {isCartOpen && <CartSummary isCartOpen={isCartOpen} toggleCart={toggleCart} />}
