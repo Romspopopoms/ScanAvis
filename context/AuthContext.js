@@ -268,7 +268,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const envoyerMessage = async (titre, message) => {
-    const webhookUrl = 'VOTRE_WEBHOOK_URL'; // Remplacez par votre URL de webhook réelle
+    const webhookUrl = 'https://hook.eu2.make.com/ifknchx9h9banxrnyau6ahqpgz099rp1'; // Remplacez par votre URL de webhook réelle
     try {
       const response = await fetch(webhookUrl, {
         method: 'POST',
