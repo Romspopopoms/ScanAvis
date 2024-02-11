@@ -1,17 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { motion } from 'framer-motion';
+import { AuthContext } from '../context/AuthContext';
 
 const EnvoyezVosMessages = () => {
   const [titreMessage, setTitreMessage] = useState('');
   const [corpsMessage, setCorpsMessage] = useState('');
+  const [feedback, setFeedback] = useState(''); // Ajout d'un état pour stocker le feedback
+  const { envoyerMessage } = useContext(AuthContext); // Accès à la fonction envoyerMessage du contexte
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Logique d'envoi du message ici
-    console.log('Titre:', titreMessage, 'Message:', corpsMessage);
-    // Réinitialiser le formulaire après l'envoi
-    setTitreMessage('');
-    setCorpsMessage('');
+
+    try {
+      await envoyerMessage(titreMessage, corpsMessage);
+      setFeedback('Message envoyé avec succès !'); // Mise à jour du feedback en cas de succès
+      setTitreMessage(''); // Réinitialisation du titre du message
+      setCorpsMessage(''); // Réinitialisation du corps du message
+    } catch (error) {
+      setFeedback('Erreur lors de l\'envoi du message. Veuillez réessayer.'); // Mise à jour du feedback en cas d'erreur
+    }
   };
 
   return (
@@ -23,6 +30,7 @@ const EnvoyezVosMessages = () => {
     >
       <form onSubmit={handleSubmit} className="space-y-6">
         <h2 className="text-2xl font-bold text-center text-purple-800">Envoyez vos messages</h2>
+        {feedback && <div className="text-center my-2 p-3 bg-purple-100 text-purple-800 rounded-lg">{feedback}</div>}
         <div className="space-y-2">
           <label htmlFor="titreMessage" className="block text-lg font-semibold text-gray-700">Titre</label>
           <input

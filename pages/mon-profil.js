@@ -25,7 +25,7 @@ const MonProfilPage = () => {
   const { navbarHeight } = useNavbarHeight();
   const { fetchUserSubscriptions, user } = useContext(AuthContext);
 
-  const adjustedPaddingTop = navbarHeight > 64 ? `${navbarHeight - 30}px` : '44px';
+  const adjustedPaddingTop = navbarHeight > 64 ? `${navbarHeight - 30}px` : '60px';
 
   useEffect(() => {
     if (user && user.uuid) {

@@ -181,6 +181,27 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const envoyerMessage = async (titre, message) => {
+    const webhookUrl = 'VOTRE_WEBHOOK_URL'; // Remplacez par votre URL de webhook réelle
+    try {
+      const response = await fetch(webhookUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ titre, message }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Erreur lors de l\'envoi du message au webhook');
+      }
+
+      // Traitez ici la réponse du webhook si nécessaire
+      console.log('Message envoyé avec succès au webhook');
+    } catch (error) {
+      console.error('Erreur lors de l\'envoi du message:', error);
+      // Gérez l'erreur ici, par exemple, en mettant à jour un état d'erreur dans votre contexte
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -200,6 +221,7 @@ export const AuthProvider = ({ children }) => {
         clearError,
         fetchUserSubscriptions,
         fetchUserDetails,
+        envoyerMessage,
       }}
     >
       {children}
