@@ -19,7 +19,7 @@ exports.handler = async (event) => {
     await conn.execute('UPDATE users SET email = ?, entreprise = ?, google_business = ? WHERE uuid = ?', [email, entreprise, googleBusiness, userUuid]);
 
     console.log(`Fetching updated user information for UUID: ${userUuid}`);
-    const userResult = await conn.execute('SELECT name, google_business FROM users WHERE uuid = ?', [userUuid]);
+    const userResult = await conn.execute('SELECT name, google_business, entreprise FROM users WHERE uuid = ?', [userUuid]);
     console.log('User result:', userResult);
 
     if (userResult.rows.length === 0) {
