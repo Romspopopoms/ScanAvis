@@ -36,14 +36,9 @@ const MonProfil = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 pt-4 px-2">
-      <motion.div
-        className="w-full max-w-md bg-white shadow-xl rounded-lg p-4 mb-6"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <h1 className="text-xl sm:text-2xl font-bold text-center text-purple-800 mb-6">Mon Profil</h1>
+    <div className="flex flex-col items-center justify-start min-h-screen pt-20">
+      <motion.div className="w-full max-w-4xl bg-white shadow-xl rounded-lg p-6 mb-6">
+        <h1 className="text-3xl font-bold text-center text-purple-800 mb-8">Mon Profil</h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           <p><strong>Nom:</strong> {user?.name}</p>
@@ -65,55 +60,35 @@ const MonProfil = () => {
         </div>
 
         {isEditing ? (
-          <div className="relative">
-            <button
-              type="button"
-              onClick={() => setIsEditing(false)}
-              className="absolute top-0 right-0 text-gray-500 hover:text-gray-700"
-            >
-              &#x2715; {/* Icône de croix */}
-            </button>
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label htmlFor="entreprise" className="block">Entreprise:</label>
-                  <input
-                    id="entreprise"
-                    type="text"
-                    value={localEntreprise}
-                    onChange={(e) => setLocalEntreprise(e.target.value)}
-                    className="mt-1 p-2 w-full border rounded"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="googleBusiness" className="block">Google Business:</label>
-                  <input
-                    id="googleBusiness"
-                    type="text"
-                    value={localGoogleBusiness}
-                    onChange={(e) => setLocalGoogleBusiness(e.target.value)}
-                    className="mt-1 p-2 w-full border rounded"
-                  />
-                </div>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label htmlFor="entreprise" className="block">Entreprise:</label>
+                <input
+                  id="entreprise"
+                  type="text"
+                  value={localEntreprise}
+                  onChange={(e) => setLocalEntreprise(e.target.value)}
+                  className="mt-1 p-2 w-full border rounded"
+                />
               </div>
-              <div className="flex justify-end mt-4 space-x-2">
-                <button
-                  type="button"
-                  onClick={() => window.open(localGoogleBusiness, '_blank')}
-                  className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded text-sm"
-                >
-                  Tester Google Business
-                </button>
-                <button
-                  type="submit"
-                  className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded text-sm"
-                >
-                  Enregistrer les modifications
-                </button>
+              <div>
+                <label htmlFor="googleBusiness" className="block">Google Business:</label>
+                <input
+                  id="googleBusiness"
+                  type="text"
+                  value={localGoogleBusiness}
+                  onChange={(e) => setLocalGoogleBusiness(e.target.value)}
+                  className="mt-1 p-2 w-full border rounded"
+                />
               </div>
-            </form>
-          </div>
+            </div>
+            <div className="flex justify-end mt-4">
+              <button type="submit" className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded">
+                Enregistrer les modifications
+              </button>
+            </div>
+          </form>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <p><strong>Entreprise:</strong> {entreprise || 'Veuillez remplir ce champs'}</p>
