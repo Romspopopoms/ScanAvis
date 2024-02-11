@@ -13,16 +13,18 @@ const MonProfil = () => {
   } = useContext(AuthContext);
 
   const [isEditing, setIsEditing] = useState(false);
-  const [localEmail, setLocalEmail] = useState(user?.email || '');
-  const [localEntreprise, setLocalEntreprise] = useState(entreprise || '');
-  const [localGoogleBusiness, setLocalGoogleBusiness] = useState(googleBusiness || '');
+  const [localEmail, setLocalEmail] = useState('');
+  const [localEntreprise, setLocalEntreprise] = useState('');
+  const [localGoogleBusiness, setLocalGoogleBusiness] = useState('');
 
+  // Effet pour charger les détails de l'utilisateur
   useEffect(() => {
     if (user?.uuid) {
       fetchUserDetails(user.uuid);
     }
   }, [user?.uuid, fetchUserDetails]);
 
+  // Effet pour synchroniser les états locaux avec les valeurs du contexte
   useEffect(() => {
     setLocalEmail(user?.email || '');
     setLocalEntreprise(entreprise || '');
@@ -31,7 +33,11 @@ const MonProfil = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await updateUserDetails(localEmail, localEntreprise, localGoogleBusiness);
+    await updateUserDetails({
+      email: localEmail,
+      entreprise: localEntreprise,
+      googleBusiness: localGoogleBusiness,
+    });
     setIsEditing(false);
   };
 
