@@ -12,20 +12,29 @@ const Navbar = () => {
   const [navbarHeight, setNavbarHeight] = useState(0);
 
   useEffect(() => {
+    if (navbarRef.current) {
+      setNavbarHeight(navbarRef.current.offsetHeight);
+    }
+
     const handleResize = () => {
-      setNavbarHeight(navbarRef.current?.offsetHeight ?? 0);
+      if (navbarRef.current) {
+        setNavbarHeight(navbarRef.current.offsetHeight);
+      }
     };
-    handleResize(); // Set initial navbar height
+
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
   }, []);
 
   const handleToggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const toggleCart = () => setIsCartOpen(!isCartOpen);
 
   const sidebarVariants = {
-    open: { x: 0 },
-    closed: { x: '-100%' },
+    open: { x: 0, opacity: 1 },
+    closed: { x: '100%', opacity: 0 },
   };
 
   return (
@@ -37,19 +46,32 @@ const Navbar = () => {
         animate={{ y: 0 }}
         transition={{ type: 'spring', stiffness: 260, damping: 20 }}
       >
-        {/* ... other navbar content ... */}
+        <h2 className="font-extrabold text-2xl">
+          <Link href="/">SCAN'AVIS</Link>
+        </h2>
         <div className="flex items-center">
-          <div onClick={toggleCart} className="ml-4 relative cursor-pointer">
-            {/* Cart icon */}
-          </div>
-          <button type="button" onClick={handleToggleMenu} className="md:hidden ml-4">
-            {/* Menu icon */}
-          </button>
-          {isAuthenticated && (
-            <button type="button" onClick={logout} className="px-4 py-2 bg-red-600 hover:bg-red-700 transition rounded text-white hidden md:block">
+          {isAuthenticated ? (
+            <button
+              type="button"
+              onClick={logout}
+              className="px-4 py-2 bg-red-600 hover:bg-red-700 transition rounded text-white"
+            >
               Déconnexion
             </button>
+          ) : (
+            <Link
+              href="/login"
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 transition rounded text-white"
+            >
+              Se connecter
+            </Link>
           )}
+          <div onClick={toggleCart} className="ml-4 relative cursor-pointer">
+            <img src="/cart-icon.svg" alt="Panier" className="w-6 h-6" />
+          </div>
+          <button type="button" onClick={handleToggleMenu} className="ml-4">
+            <img src="/menu.png" alt="Menu" className="w-6 h-6" />
+          </button>
         </div>
       </motion.nav>
 
@@ -57,52 +79,29 @@ const Navbar = () => {
         initial="closed"
         animate={isMenuOpen ? 'open' : 'closed'}
         variants={sidebarVariants}
-        className="fixed md:hidden right-0 top-0 h-full bg-white text-gray-800 shadow-xl z-40 p-5"
+        className="fixed right-0 top-0 h-full bg-white text-gray-800 shadow-xl z-40 p-5"
         style={{ top: navbarHeight }}
         transition={{ type: 'spring', stiffness: 260, damping: 20 }}
       >
-        <div className="flex flex-col mt-2">
-          {/* Menu items here */}
-          {isAuthenticated ? (
-            <>
-              {/* User profile link */}
-              <Link href="/mon-profil">
-                <span className="block hover:text-gray-300 cursor-pointer">
-                  Mon Profil
-                </span>
-              </Link>
-              {/* Logout button */}
-              <button type="button" onClick={logout} className="text-red-600 hover:text-red-700 cursor-pointer mt-4">
-                Déconnexion
-              </button>
-            </>
-          ) : (
-            <>
-              {/* Login link for mobile */}
-              <Link href="/login">
-                <span className="block bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded cursor-pointer mt-4">
-                  Se connecter
-                </span>
-              </Link>
-            </>
+        <div className="mt-2">
+          {isAuthenticated && (
+            <Link href="/mon-profil" className="block hover:text-gray-300">
+              Mon Profil
+            </Link>
           )}
-          {/* Additional menu items */}
-          <Link href="/">
-            <span className="block hover:text-gray-300 cursor-pointer mt-4">
-              Accueil
-            </span>
+          <Link href="/" className="block hover:text-gray-300">
+            Accueil
           </Link>
-          <Link href="/tarifs">
-            <span className="block hover:text-gray-300 cursor-pointer mt-4">
-              Nos offres
-            </span>
+          <Link href="/tarifs" className="block hover:text-gray-300">
+            Nos offres
           </Link>
-          {/* ... other links ... */}
+          {/* Autres liens du menu */}
         </div>
       </motion.div>
 
-      {/* Cart summary */}
-      {isCartOpen && <CartSummary isCartOpen={isCartOpen} toggleCart={toggleCart} />}
+      {isCartOpen && (
+        <CartSummary isCartOpen={isCartOpen} toggleCart={toggleCart} />
+      )}
     </>
   );
 };
