@@ -45,22 +45,20 @@ const Page = () => {
       name: "${user.name}",
       entreprise: "${user.entreprise}",
       google_business: "${user.google_business}",
-      
       subscriptionItems: "${subscriptionItems}",
     };
-
+  
     try {
       const response = await fetch('https://hook.eu2.make.com/y4k7i4onsckj63x4c7j1l51dqus6yu3q?', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
-
+  
       if (response.ok) {
-        // Gérer le succès, par exemple afficher un message de succès
+        window.location.href = ${user.google_business}
       } else {
-        // Gérer l'erreur, par exemple afficher un message d'erreur
-        alert('Une erreur est survenue lors de la soumission.');
+        alert('Une erreur est survenue lors de la soumission. Veuillez réessayer.');
       }
     } catch (error) {
       console.error('Erreur lors de la soumission:', error);
@@ -89,9 +87,9 @@ const Page = () => {
             placeholder="Entrez votre email"
             className="appearance-none rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           />
-          <a href="${user.google_business}" className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-full transition ease-in-out duration-300 inline-block text-center">
-          Envoyer
-          </a>
+          <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-full transition ease-in-out duration-300">
+            Envoyer
+          </button>
         </form>
       </div>
     </div>
