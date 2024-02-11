@@ -2,15 +2,17 @@ import React, { useState, useEffect, useContext } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import MonProfil from '../components/mon-profil';
 import PageForm from '../components/InterfaceCréationPage';
-import AbonnementsComponent from '../components/AbonnementsComponent'; // Assurez-vous que le chemin est correct
+import AbonnementsComponent from '../components/AbonnementsComponent';
+import EnvoyezVosMessages from '../components/EnvoyezVosMessages'; // Assurez-vous d'importer le nouveau composant
 import { AuthContext } from '../context/AuthContext';
 
 import { useNavbarHeight } from '../context/NavbarContext';
 
 const menuItems = [
   { name: 'Profil', key: 'profil' },
-  { name: 'Abonnements', key: 'abonnement' }, // Nouvel élément de menu ajouté ici
+  { name: 'Abonnements', key: 'abonnement' },
   { name: 'Création de votre page', key: 'creation' },
+  { name: 'Envoyez vos messages', key: 'messages' }, // Ajout de la nouvelle section ici
 ];
 
 const variants = {
@@ -20,26 +22,27 @@ const variants = {
 
 const MonProfilPage = () => {
   const [activeSection, setActiveSection] = useState('profil');
-  const { navbarHeight } = useNavbarHeight(); // Utilisez le hook pour obtenir la hauteur de la navbar
+  const { navbarHeight } = useNavbarHeight();
   const { fetchUserSubscriptions, user } = useContext(AuthContext);
 
-  const adjustedPaddingTop = navbarHeight > 64 ? `${navbarHeight - 30}px` : '44px'; // Calculez le padding top ajusté
+  const adjustedPaddingTop = navbarHeight > 64 ? `${navbarHeight - 30}px` : '44px';
 
   useEffect(() => {
     if (user && user.uuid) {
       fetchUserSubscriptions(user.uuid);
     }
-  }, [user, fetchUserSubscriptions]); // Assurez-vous d'inclure fetchUserSubscriptions dans le tableau de dépendances
+  }, [user, fetchUserSubscriptions]);
 
   const renderSection = (key) => {
     switch (key) {
       case 'profil':
         return <MonProfil />;
-      case 'abonnement': // Assurez-vous que la clé correspond à celle définie dans menuItems
+      case 'abonnement':
         return <AbonnementsComponent />;
       case 'creation':
         return <PageForm />;
-
+      case 'messages': // Cas pour la nouvelle section "Envoyez vos messages"
+        return <EnvoyezVosMessages />;
       default:
         return <div>Section non trouvée</div>;
     }
