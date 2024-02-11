@@ -90,10 +90,9 @@ const Page = () => {
             placeholder="Entrez votre email"
             className="appearance-none rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           />
-          <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-full transition ease-in-out duration-300">
-            Envoyer
-          </button>
-
+          <a href="${user.google_business}" className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-full transition ease-in-out duration-300 inline-block text-center">
+          Envoyer
+          </a>
         </form>
       </div>
     </div>
