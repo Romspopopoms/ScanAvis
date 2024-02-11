@@ -34,7 +34,7 @@ exports.handler = async (event) => {
 
     console.log('Preparing to send data to webhook');
     const webhookUrl = 'https://hook.eu2.make.com/gorfudgne0pncuta9ewn9t6ul82yd3iw';
-    const payload = { name: user.name, googleBusiness: user.google_business, subscriptionItems };
+    const payload = { entreprise: user.entreprise, googleBusiness: user.google_business, subscriptionItems };
     console.log('Payload for webhook:', JSON.stringify(payload));
 
     console.log('Sending data to webhook');
