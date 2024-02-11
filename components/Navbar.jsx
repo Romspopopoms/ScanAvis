@@ -43,10 +43,22 @@ const Navbar = () => {
       >
         <Link href="/"
           className="text-xl md:text-2xl font-bold tracking-tighter"
-        >
-          SCAN'AVIS
+        >SCAN'AVIS
         </Link>
-        <div>
+        <div className="flex items-center">
+          {isAuthenticated ? (
+            <button type="button"
+              onClick={logout}
+              className="hidden sm:block px-4 py-2 mr-4 bg-red-600 hover:bg-red-700 text-white transition-colors duration-300 rounded-lg"
+            >
+              Déconnexion
+            </button>
+          ) : (
+            <Link href="/login"
+              className="hidden sm:block px-4 py-2 mr-4 bg-blue-600 hover:bg-blue-700 text-white transition-colors duration-300 rounded-lg"
+            >Connexion
+            </Link>
+          )}
           <button type="button" onClick={handleToggleMenu} className="text-gray-800 outline-none">
             <img src="/menu.png" alt="Menu" className="w-8 h-8" />
           </button>
