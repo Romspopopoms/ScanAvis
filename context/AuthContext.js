@@ -29,10 +29,16 @@ export const AuthProvider = ({ children }) => {
     setIsLoading(true);
     try {
       const response = await fetch(`/.netlify/functions/getUserSubscriptions?userUuid=${uuid}`);
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
-      const data = await response.json();
-      setUserSubscriptions(data.subscriptions || []);
+      // Traiter spécifiquement le cas d'une réponse 404
+      if (response.status === 404) {
+        setUserSubscriptions([]); // Aucun abonnement n'existe
+      } else if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`); // Autres erreurs HTTP
+      } else {
+        const data = await response.json();
+        setUserSubscriptions(data.subscriptions || []); // Mise à jour des abonnements
+      }
     } catch (error) {
       handleError(`Error fetching user subscriptions: ${error.message}`);
     } finally {
