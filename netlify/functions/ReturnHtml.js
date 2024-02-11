@@ -58,7 +58,6 @@ const Page = () => {
 
       if (response.ok) {
         // Gérer le succès, par exemple afficher un message de succès
-        alert('Merci pour votre soumission!');
       } else {
         // Gérer l'erreur, par exemple afficher un message d'erreur
         alert('Une erreur est survenue lors de la soumission.');
