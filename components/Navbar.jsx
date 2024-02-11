@@ -86,39 +86,31 @@ const Navbar = () => {
         style={{ top: navbarHeight }}
         transition={{ type: 'spring', stiffness: 260, damping: 20 }}
       >
-        <div className="mt-2">
+        <div className="flex flex-col">
+          {/* Les liens existants ici */}
+          <Link href="/">
+            <span className="block hover:text-gray-300 cursor-pointer p-2">Accueil</span>
+          </Link>
           {isAuthenticated ? (
             <>
               <Link href="/mon-profil">
-                <span className="block hover:text-gray-300 cursor-pointer">
-                  Mon Profil
-                </span>
+                <span className="block hover:text-gray-300 cursor-pointer p-2">Mon Profil</span>
               </Link>
               <button type="button"
                 onClick={logout}
-                className="block mt-4 text-red-600 hover:text-red-700 cursor-pointer"
+                className="text-red-600 hover:text-red-700 cursor-pointer p-2 mt-4"
               >
                 Déconnexion
               </button>
             </>
           ) : (
             <Link href="/login">
-              <span className="block mt-4 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded cursor-pointer">
+              <span className="block bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded cursor-pointer mt-4">
                 Se connecter
               </span>
             </Link>
           )}
-          <Link href="/">
-            <span className="block hover:text-gray-300 cursor-pointer">
-              Accueil
-            </span>
-          </Link>
-          <Link href="/tarifs">
-            <span className="block hover:text-gray-300 cursor-pointer">
-              Nos offres
-            </span>
-          </Link>
-          {/* Autres liens du menu */}
+          {/* Autres liens du menu si nécessaire */}
         </div>
       </motion.div>
 
