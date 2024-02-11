@@ -28,7 +28,7 @@ const Navbar = () => {
     setIsMenuOpen(!isMenuOpen);
     if (isCartOpen) setIsCartOpen(false);
   };
-  const toggleCart = () => {
+  const handleToggleCart = () => {
     setIsCartOpen(!isCartOpen);
     if (isMenuOpen) setIsMenuOpen(false);
   };
@@ -51,8 +51,11 @@ const Navbar = () => {
           className="text-xl md:text-2xl font-bold tracking-tighter"
         >SCAN'AVIS
         </Link>
-        <div>
-          <button type="button" onClick={handleToggleMenu} className="text-gray-800 outline-none">
+        <div className="flex items-center">
+          <button type="button" onClick={handleToggleCart} className="mr-4">
+            <img src="/cart-icon.svg" alt="Panier" className="w-8 h-8" />
+          </button>
+          <button type="button" onClick={handleToggleMenu} className="text-gray-800">
             <img src="/menu.png" alt="Menu" className="w-8 h-8" />
           </button>
         </div>
@@ -70,19 +73,7 @@ const Navbar = () => {
           <img src="/icon-close.png" alt="Fermer" className="w-8 h-8" />
         </button>
         <nav className="flex-grow">
-          <Link href="/"
-            className="block py-2 text-gray-800 hover:text-gray-600 transition duration-150"
-          >Accueil
-          </Link>
-          <Link href="/mon-profil"
-            className="block py-2 text-gray-800 hover:text-gray-600 transition duration-150"
-          >Mon Profil
-          </Link>
-          <Link href="/tarifs"
-            className="block py-2 text-gray-800 hover:text-gray-600 transition duration-150"
-          >Nos offres
-          </Link>
-          {/* Autres liens */}
+          {/* Nav Links */}
         </nav>
         <div className="pt-6">
           {isAuthenticated ? (
@@ -101,7 +92,7 @@ const Navbar = () => {
         </div>
       </motion.div>
 
-      {isCartOpen && <CartSummary isCartOpen={isCartOpen} toggleCart={toggleCart} />}
+      {isCartOpen && <CartSummary isCartOpen={isCartOpen} toggleCart={handleToggleCart} />}
     </>
   );
 };
