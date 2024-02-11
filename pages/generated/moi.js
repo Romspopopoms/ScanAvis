@@ -7,11 +7,11 @@ const Page = () => {
     e.preventDefault();
     const payload = {
       email,
-      pageId: 'b49b5c1c-000e-4915-b241-e28031051949',
+      pageId: 'f08fc82e-bb5a-43b1-bc57-6c4c14c811ed',
       name: 'Geoffrey LAURENT',
       entreprise: 'Moi',
       google_business: 'Httpbbjebebjd',
-      subscriptionItems: 'Base',
+      subscriptionItems: 'Bronze',
     };
 
     try {
