@@ -11,6 +11,7 @@ export const AuthProvider = ({ children }) => {
   const [errorMessage, setErrorMessage] = useState('');
   const [entreprise, setEntreprise] = useState('');
   const [googleBusiness, setGoogleBusiness] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const clearError = () => setErrorMessage('');
   const handleError = (message) => setErrorMessage(message);
@@ -29,6 +30,10 @@ export const AuthProvider = ({ children }) => {
   };
 
   const fetchUserSubscriptions = async (uuid) => {
+    if (isLoading) return; // Pour éviter les appels en boucle
+
+    setIsLoading(true); // Commencer le chargement
+
     try {
       const response = await fetch(`/.netlify/functions/getUserSubscriptions?userUuid=${uuid}`, {
         method: 'GET',
@@ -49,6 +54,7 @@ export const AuthProvider = ({ children }) => {
       console.error('Erreur lors de la récupération des abonnements utilisateur:', error);
       handleError(`Erreur lors de la récupération des abonnements: ${error.message}`);
     } finally {
+      setIsLoading(false); // Terminer le chargement
       triggerRerender(); // Forcer le re-rendu après chaque fetch, réussi ou non
     }
   };
