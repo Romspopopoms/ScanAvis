@@ -65,15 +65,15 @@ const Navbar = () => {
           <img src="/iconarrow.png" alt="Fermer" className="w-8 h-8" />
         </button>
         <nav className="mt-8 flex-grow">
-          <Link href="/mon-profil"
-            className="block py-2 text-gray-800 hover:text-gray-600 transition duration-150"
-          >
-            Mon Profil
-          </Link>
           <Link href="/"
             className="block py-2 text-gray-800 hover:text-gray-600 transition duration-150"
           >
             Accueil
+          </Link>
+          <Link href="/mon-profil"
+            className="block py-2 text-gray-800 hover:text-gray-600 transition duration-150"
+          >
+            Mon Profil
           </Link>
           <Link href="/tarifs"
             className="block py-2 text-gray-800 hover:text-gray-600 transition duration-150"

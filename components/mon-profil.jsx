@@ -3,14 +3,7 @@ import { motion } from 'framer-motion';
 import { AuthContext } from '../context/AuthContext';
 
 const MonProfil = () => {
-  const {
-    user,
-    errorMessage,
-    entreprise,
-    googleBusiness,
-    fetchUserDetails,
-    updateUserDetails,
-  } = useContext(AuthContext);
+  const { user, errorMessage, entreprise, googleBusiness, fetchUserDetails, updateUserDetails } = useContext(AuthContext);
 
   const [isEditing, setIsEditing] = useState(false);
   const [localEmail, setLocalEmail] = useState(user?.email || '');
@@ -27,7 +20,7 @@ const MonProfil = () => {
     setLocalEmail(user?.email || '');
     setLocalEntreprise(entreprise || '');
     setLocalGoogleBusiness(googleBusiness || '');
-  }, [user?.email, entreprise, googleBusiness]);
+  }, [user, entreprise, googleBusiness]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -35,116 +28,111 @@ const MonProfil = () => {
     setIsEditing(false);
   };
 
+  const profileCardVariants = {
+    hidden: { opacity: 0, y: 50 },
+    visible: { opacity: 1, y: 0 },
+  };
+
   return (
-    <div className="flex flex-col items-center justify-start min-h-screen pt-20">
-      <motion.div className="w-full max-w-4xl bg-white shadow-xl rounded-lg p-6 mb-6">
-        <h1 className="text-3xl font-bold text-center text-purple-800 mb-8">Mon Profil</h1>
+    <motion.div
+      className="flex flex-col items-center justify-center min-h-screen pt-16 bg-gray-50"
+      initial="hidden"
+      animate="visible"
+      transition={{ duration: 0.5 }}
+    >
+      <motion.section
+        className="w-full max-w-2xl px-6 py-4 mx-auto bg-white rounded-md shadow-lg"
+        variants={profileCardVariants}
+        initial="hidden"
+        animate="visible"
+        transition={{ delay: 0.2, duration: 0.5 }}
+      >
+        <h1 className="text-2xl md:text-3xl font-bold text-center text-gray-800 mb-8">
+          Mon Profil
+        </h1>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          <p><strong>Nom:</strong> {user?.name}</p>
-          {isEditing ? (
-            <div>
-              <label htmlFor="email" className="block">Email:</label>
-              <input
-                id="email"
-                type="email"
-                value={localEmail}
-                onChange={(e) => setLocalEmail(e.target.value)}
-                className="mt-1 p-2 w-full border rounded"
-                required
-              />
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-1">
+            <label htmlFor="email" className="text-sm font-medium text-gray-700 block">
+              Email:
+            </label>
+            <input
+              id="email"
+              type="email"
+              value={localEmail}
+              onChange={(e) => setLocalEmail(e.target.value)}
+              className="w-full px-4 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500"
+              required
+              disabled={!isEditing}
+            />
+          </div>
+
+          <div className="space-y-1">
+            <label htmlFor="entreprise" className="text-sm font-medium text-gray-700 block">
+              Entreprise:
+            </label>
+            <input
+              id="entreprise"
+              type="text"
+              value={localEntreprise}
+              onChange={(e) => setLocalEntreprise(e.target.value)}
+              className="w-full px-4 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500"
+              disabled={!isEditing}
+            />
+          </div>
+
+          <div className="space-y-1">
+            <label htmlFor="googleBusiness" className="text-sm font-medium text-gray-700 block">
+              Google Business:
+            </label>
+            <input
+              id="googleBusiness"
+              type="text"
+              value={localGoogleBusiness}
+              onChange={(e) => setLocalGoogleBusiness(e.target.value)}
+              className="w-full px-4 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500"
+              disabled={!isEditing}
+            />
+          </div>
+
+          {isEditing && (
+            <div className="flex items-center justify-between">
+              <button
+                type="button"
+                onClick={() => setIsEditing(false)}
+                className="text-gray-600 bg-transparent border border-gray-300 rounded-md py-2 px-4 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200"
+              >
+                Annuler
+              </button>
+              <button
+                type="submit"
+                className="text-white bg-purple-600 border border-transparent rounded-md py-2 px-4 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              >
+                Enregistrer
+              </button>
             </div>
-          ) : (
-            <p><strong>Email:</strong> {user?.email}</p>
           )}
-        </div>
 
-        {isEditing ? (
-          <div className="relative">
-            <button
-              type="button"
-              onClick={() => setIsEditing(false)}
-              className="absolute top-0 right-0 text-gray-500 hover:text-gray-700"
-            >
-              &#x2715; {/* Icône de croix */}
-            </button>
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label htmlFor="entreprise" className="block">Entreprise:</label>
-                  <input
-                    id="entreprise"
-                    type="text"
-                    value={localEntreprise}
-                    onChange={(e) => setLocalEntreprise(e.target.value)}
-                    className="mt-1 p-2 w-full border rounded"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="googleBusiness" className="block">Google Business:</label>
-                  <input
-                    id="googleBusiness"
-                    type="text"
-                    value={localGoogleBusiness}
-                    onChange={(e) => setLocalGoogleBusiness(e.target.value)}
-                    className="mt-1 p-2 w-full border rounded"
-                  />
-                </div>
-              </div>
-              <div className="flex justify-end mt-4 space-x-2">
-                <button
-                  type="button"
-                  onClick={() => window.open(localGoogleBusiness, '_blank')}
-                  className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded text-sm"
-                >
-                  Tester Google Business
-                </button>
-                <button
-                  type="submit"
-                  className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded text-sm"
-                >
-                  Enregistrer les modifications
-                </button>
-              </div>
-            </form>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <p><strong>Entreprise:</strong> {entreprise || 'Veuillez remplir ce champs'}</p>
-            <p><strong>Google Business:</strong> {googleBusiness || 'Veuillez remplir ce champs'}</p>
-          </div>
-        )}
-
-        <div className="text-center mt-6">
           {!isEditing && (
-            <button type="button" onClick={() => setIsEditing(true)} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-              Modifier
-            </button>
+            <div className="text-center">
+              <button
+                type="button"
+                onClick={() => setIsEditing(true)}
+                className="text-white bg-blue-500 border border-transparent rounded-md py-2 px-4 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300"
+              >
+                Modifier le profil
+              </button>
+            </div>
           )}
-        </div>
+        </form>
 
-        {errorMessage && <p className="text-red-600 text-center mt-4">{errorMessage}</p>}
-      </motion.div>
-
-      <motion.div className="w-full max-w-4xl bg-white shadow-xl rounded-lg p-6 mt-6">
-        <h2 className="text-2xl font-bold text-center text-purple-800 mb-6">Guide Google Business</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <p className="text-md mb-4">Vous avez déjà une fiche Google pour votre établissement ?</p>
-            <a href="https://aide.neocamino.com/fr/articles/2613724-comment-trouver-et-partager-mon-adresse-google-my-business-google-maps" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-700">
-              Cliquez-ici pour le guide explicatif.
-            </a>
-          </div>
-          <div>
-            <p className="text-md mb-4">Vous n'avez pas, ou ne savez pas comment configurer votre fiche Google pour votre établissement ?</p>
-            <a href="https://support.google.com/business/answer/2911778?hl=fr" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-700">
-              Cliquez ici pour le guide explicatif.
-            </a>
-          </div>
-        </div>
-      </motion.div>
-    </div>
+        {errorMessage && (
+          <p className="mt-4 text-center text-sm text-red-600">
+            {errorMessage}
+          </p>
+        )}
+      </motion.section>
+    </motion.div>
   );
 };
 
