@@ -293,8 +293,16 @@ export const AuthProvider = ({ children }) => {
       }
 
       // Log la réponse du webhook pour vérification
-      const responseData = await response.json(); // Assurez-vous que votre webhook envoie une réponse JSON
-      console.log('Réponse du webhook :', responseData);
+      const contentType = response.headers.get('Content-Type');
+      if (contentType && contentType.includes('application/json')) {
+        // La réponse est au format JSON, la traiter comme tel
+        const responseData = await response.json();
+        console.log('Réponse du webhook (JSON) :', responseData);
+      } else {
+        // La réponse n'est pas au format JSON, la traiter comme texte
+        const responseText = await response.text();
+        console.log('Réponse du webhook (Texte) :', responseText);
+      }
 
       console.log('Message envoyé avec succès au webhook');
     } catch (error) {
