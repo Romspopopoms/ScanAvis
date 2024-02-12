@@ -7,11 +7,11 @@ const Page = () => {
     e.preventDefault();
     const payload = {
       email,
-      pageId: 'ee37c624-cd0d-46c4-863b-a8e94eba94f4',
+      pageId: '1e6936e4-90ec-4719-ab8f-e99185845e74',
       name: 'Romain Santiago',
       entreprise: 'ScanAvis',
-      google_business: 'https://maps.app.goo.gl/4B1tekbUygZvCcmb6',
-      subscriptionItems: 'Base',
+      google_business: 'https://maps.app.goo.gl/Fgpyd2gyU5WyMhZ36',
+      subscriptionItems: 'Bronze',
     };
 
     try {
@@ -25,7 +25,7 @@ const Page = () => {
       );
 
       if (response.ok) {
-        window.location.href = 'https://maps.app.goo.gl/4B1tekbUygZvCcmb6';
+        window.location.href = 'https://maps.app.goo.gl/Fgpyd2gyU5WyMhZ36';
       } else {
         alert(
           'Une erreur est survenue lors de la soumission. Veuillez réessayer.',
