@@ -27,12 +27,12 @@ exports.envoyerMessage = async (event) => {
     const subscriptionItems = subscriptionResult.rows.map((sub) => sub.items).join(', ');
 
     // Préparation et envoi des données au webhook
-    const webhookUrl = 'https://hook.eu2.make.com/ifknchx9h9banxrnyau6ahqpgz099rp1'; // Utilisez votre URL de webhook
+    const webhookUrl = 'https://hook.eu2.make.com/ifknchx9h9banxrnyau6ahqpgz099rp1';
     const payload = {
       titre,
       message,
-      entreprise: user.entreprise,
-      subscriptionItems,
+      entreprise: user.entreprise, // Inclusion de l'entreprise
+      subscriptionItems, // Inclusion des éléments d'abonnement
     };
 
     const webhookResponse = await fetch(webhookUrl, {

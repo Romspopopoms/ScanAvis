@@ -267,24 +267,29 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  const envoyerMessage = async (titre, message) => {
-    const webhookUrl = 'https://hook.eu2.make.com/ifknchx9h9banxrnyau6ahqpgz099rp1'; // Remplacez par votre URL de webhook réelle
+  const envoyerMessage = async (titre, message, Nomentreprise, subscriptionItems) => {
+    const webhookUrl = 'https://hook.eu2.make.com/ifknchx9h9banxrnyau6ahqpgz099rp1'; // Utilisez votre URL de webhook réelle
     try {
+      const payload = {
+        titre,
+        message,
+        entreprise: Nomentreprise, // Utilisez le paramètre Nomentreprise ici
+        subscriptionItems, // Utilisez le paramètre subscriptionItems ici
+      };
+
       const response = await fetch(webhookUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ titre, message }),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
-        throw new Error('Erreur lors de l\'envoi du message au webhook');
+        throw new Error(`Erreur lors de l'envoi du message au webhook : ${response.statusText}`);
       }
 
-      // Traitez ici la réponse du webhook si nécessaire
       console.log('Message envoyé avec succès au webhook');
     } catch (error) {
-      console.error('Erreur lors de l\'envoi du message:', error);
-      // Gérez l'erreur ici, par exemple, en mettant à jour un état d'erreur dans votre contexte
+      console.error(`Erreur lors de l'envoi du message : ${error.message}`);
     }
   };
 
