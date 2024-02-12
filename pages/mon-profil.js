@@ -3,7 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import MonProfil from '../components/mon-profil';
 import PageForm from '../components/InterfaceCréationPage';
 import AbonnementsComponent from '../components/AbonnementsComponent';
-import EnvoyezVosMessages from '../components/EnvoyezVosMessages'; // Assurez-vous d'importer le nouveau composant
+import EnvoyezVosMessages from '../components/EnvoyezVosMessages';
+import CarteFideliteClient from '../components/CarteFidelite'; // Importez le nouveau composant ici
 import { AuthContext } from '../context/AuthContext';
 
 import { useNavbarHeight } from '../context/NavbarContext';
@@ -12,7 +13,8 @@ const menuItems = [
   { name: 'Profil', key: 'profil' },
   { name: 'Abonnements', key: 'abonnement' },
   { name: 'Création de votre page', key: 'creation' },
-  { name: 'Envoyez vos messages', key: 'messages' }, // Ajout de la nouvelle section ici
+  { name: 'Envoyez vos messages', key: 'messages' },
+  { name: 'Carte de fidélité client', key: 'fidelite' }, // Ajout de la nouvelle section ici
 ];
 
 const variants = {
@@ -41,8 +43,10 @@ const MonProfilPage = () => {
         return <AbonnementsComponent />;
       case 'creation':
         return <PageForm />;
-      case 'messages': // Cas pour la nouvelle section "Envoyez vos messages"
+      case 'messages':
         return <EnvoyezVosMessages />;
+      case 'fidelite': // Cas pour la nouvelle section "Carte de fidélité client"
+        return <CarteFideliteClient />;
       default:
         return <div>Section non trouvée</div>;
     }
