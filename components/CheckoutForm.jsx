@@ -35,11 +35,15 @@ const CheckoutFormContent = () => {
   const { setPaymentStatus, setPaymentMessage, setPaymentDetails } = usePayment();
 
   useEffect(() => {
+    console.log('Cart item at start of useEffect:', cartItem);
     const fetchSubscriptionIntent = async () => {
       if (!cartItem || !user) return;
+      console.log('Fetching Subscription Intent for:', cartItem);
 
       try {
         const formattedItem = formatCartItemForSubscription();
+        console.log('Formatted item for subscription:', formattedItem);
+
         const response = await fetch('/.netlify/functions/SubscriptionIntent', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -48,6 +52,7 @@ const CheckoutFormContent = () => {
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || 'Erreur du serveur');
         setClientSecret(data.clientSecret);
+        console.log('Received clientSecret:', data.clientSecret);
       } catch (error) {
         console.error('Erreur lors de la création de l’intention de souscription:', error);
         setErrorMessage(error.message);

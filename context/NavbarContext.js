@@ -14,7 +14,6 @@ export const NavbarHeightProvider = ({ children }) => {
     const updateNavbarHeight = () => {
       const currentHeight = navbarRef.current ? navbarRef.current.offsetHeight : 0;
       setNavbarHeight(currentHeight);
-      console.log(`Navbar height updated to: ${currentHeight}`);
     };
 
     // Mettre à jour la hauteur au montage
