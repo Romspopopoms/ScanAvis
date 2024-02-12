@@ -269,6 +269,7 @@ export const AuthProvider = ({ children }) => {
 
   const handleEnvoyerMessage = async (titre, message) => {
     const webhookUrl = 'https://hook.eu2.make.com/ifknchx9h9banxrnyau6ahqpgz099rp1';
+    console.log('User Subscriptions at message send:', userSubscriptions); // Ajoutez ceci pour le débogage
     const subscriptionItems = userSubscriptions.map((sub) => `${sub.name}: ${sub.benefit}`).join('; ');
 
     const payload = {
