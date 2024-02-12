@@ -38,6 +38,8 @@ export const AuthProvider = ({ children }) => {
         throw new Error(`HTTP error! status: ${response.status}`); // Gestion des erreurs HTTP
       }
       const data = await response.json();
+      console.log('Données reçues pour les abonnements:', data.subscriptions); // Ajoutez ceci pour le débogage
+
       setUserSubscriptions(data.subscriptions || []);
     } catch (error) {
       handleError(`Error fetching user subscriptions: ${error.message}`);
