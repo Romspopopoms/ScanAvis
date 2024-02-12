@@ -22,6 +22,12 @@ const cardElementOptions = {
     },
   },
 };
+const priceAmounts = {
+  price_1OekFIDWmnYPaxs1hMaRWF4X: 2000, // Montant pour Base
+  price_1OekKWDWmnYPaxs1W80kG5a0: 4000, // Montant pour Bronze
+  price_1Oel3hDWmnYPaxs1k69X7veu: 6000, // Montant pour Silver
+  price_1Oel3hDWmnYPaxs1icztOYwU: 10000, // Montant pour Gold
+};
 
 const CheckoutFormContent = ({ totalCost }) => { // Accepter totalCost en tant que prop
   const stripe = useStripe();
@@ -175,10 +181,16 @@ const CheckoutFormContent = ({ totalCost }) => { // Accepter totalCost en tant q
   );
 };
 
-const CheckoutForm = ({ totalCost }) => ( // Passer totalCost à CheckoutFormContent
-  <Elements stripe={stripePromise}>
-    <CheckoutFormContent totalCost={totalCost} />
-  </Elements>
-);
+const CheckoutForm = () => {
+  const { cartItem } = useCart();
+  // Calcul du totalCost en fonction de l'élément du panier
+  const totalCost = cartItem ? priceAmounts[cartItem.priceId] : 0;
+
+  return (
+    <Elements stripe={stripePromise}>
+      <CheckoutFormContent totalCost={totalCost} />
+    </Elements>
+  );
+};
 
 export default CheckoutForm;
