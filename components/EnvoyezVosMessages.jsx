@@ -5,19 +5,19 @@ import { AuthContext } from '../context/AuthContext';
 const EnvoyezVosMessages = () => {
   const [titreMessage, setTitreMessage] = useState('');
   const [corpsMessage, setCorpsMessage] = useState('');
-  const [feedback, setFeedback] = useState(''); // Ajout d'un état pour stocker le feedback
-  const { envoyerMessage } = useContext(AuthContext); // Accès à la fonction envoyerMessage du contexte
+  const [feedback, setFeedback] = useState('');
+  const { handleEnvoyerMessage } = useContext(AuthContext); // Utilisez la fonction handleEnvoyerMessage du contexte
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      await envoyerMessage(titreMessage, corpsMessage);
-      setFeedback('Message envoyé avec succès !'); // Mise à jour du feedback en cas de succès
-      setTitreMessage(''); // Réinitialisation du titre du message
-      setCorpsMessage(''); // Réinitialisation du corps du message
+      await handleEnvoyerMessage(titreMessage, corpsMessage); // Appel de handleEnvoyerMessage avec seulement titre et message
+      setFeedback('Message envoyé avec succès !');
+      setTitreMessage('');
+      setCorpsMessage('');
     } catch (error) {
-      setFeedback('Erreur lors de l\'envoi du message. Veuillez réessayer.'); // Mise à jour du feedback en cas d'erreur
+      setFeedback('Erreur lors de l\'envoi du message. Veuillez réessayer.');
     }
   };
 

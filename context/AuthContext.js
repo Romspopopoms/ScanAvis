@@ -267,16 +267,18 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  const envoyerMessage = async (titre, message, Nomentreprise, subscriptionItems) => {
-    const webhookUrl = 'https://hook.eu2.make.com/ifknchx9h9banxrnyau6ahqpgz099rp1'; // Utilisez votre URL de webhook réelle
-    try {
-      const payload = {
-        titre,
-        message,
-        entreprise: Nomentreprise, // Utilisez le paramètre Nomentreprise ici
-        subscriptionItems, // Utilisez le paramètre subscriptionItems ici
-      };
+  const handleEnvoyerMessage = async (titre, message) => {
+    const webhookUrl = 'https://hook.eu2.make.com/ifknchx9h9banxrnyau6ahqpgz099rp1';
+    const subscriptionItems = userSubscriptions.map((sub) => `${sub.name}: ${sub.benefit}`).join('; ');
 
+    const payload = {
+      titre,
+      message,
+      entreprise, // Utilise directement l'état 'entreprise'
+      subscriptionItems, // Utilise la chaîne d'éléments d'abonnement transformée
+    };
+
+    try {
       const response = await fetch(webhookUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -316,7 +318,7 @@ export const AuthProvider = ({ children }) => {
       setGoogleBusiness,
       fetchUserDetails,
       updateUserDetails,
-      envoyerMessage,
+      handleEnvoyerMessage,
     }}
     >
       {children}
