@@ -23,11 +23,11 @@ const cardElementOptions = {
   },
 };
 
-const CheckoutFormContent = () => {
+const CheckoutFormContent = ({ totalCost }) => { // Accepter totalCost en tant que prop
   const stripe = useStripe();
   const elements = useElements();
-  const router = useRouter(); // Utiliser le hook useRouter
-  const { cartItem, clearCart, totalCost, formatCartItemForSubscription } = useCart();
+  const router = useRouter();
+  const { cartItem, clearCart, formatCartItemForSubscription } = useCart();
   const { user } = useContext(AuthContext);
   const [clientSecret, setClientSecret] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
@@ -35,15 +35,11 @@ const CheckoutFormContent = () => {
   const { setPaymentStatus, setPaymentMessage, setPaymentDetails } = usePayment();
 
   useEffect(() => {
-    console.log('Cart item at start of useEffect:', cartItem);
     const fetchSubscriptionIntent = async () => {
       if (!cartItem || !user) return;
-      console.log('Fetching Subscription Intent for:', cartItem);
 
       try {
         const formattedItem = formatCartItemForSubscription();
-        console.log('Formatted item for subscription:', formattedItem);
-
         const response = await fetch('/.netlify/functions/SubscriptionIntent', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -52,7 +48,6 @@ const CheckoutFormContent = () => {
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || 'Erreur du serveur');
         setClientSecret(data.clientSecret);
-        console.log('Received clientSecret:', data.clientSecret);
       } catch (error) {
         console.error('Erreur lors de la création de l’intention de souscription:', error);
         setErrorMessage(error.message);
@@ -80,7 +75,6 @@ const CheckoutFormContent = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    console.log('Total cost at the start of handleSubmit:', totalCost);
 
     if (!stripe || !elements) {
       setErrorMessage('Stripe.js n’a pas encore été chargé!');
@@ -153,8 +147,7 @@ const CheckoutFormContent = () => {
           <div className="mb-6">
             <div className="flex justify-between text-lg mb-2">
               <span>{cartItem.name}</span>
-              {console.log('Total cost in render:', totalCost)}
-              <span>${(totalCost / 100).toFixed(2)}</span>
+              <span>${(totalCost / 100).toFixed(2)}</span> {/* Utiliser totalCost ici */}
             </div>
           </div>
         )}
@@ -182,9 +175,9 @@ const CheckoutFormContent = () => {
   );
 };
 
-const CheckoutForm = () => (
+const CheckoutForm = ({ totalCost }) => ( // Passer totalCost à CheckoutFormContent
   <Elements stripe={stripePromise}>
-    <CheckoutFormContent />
+    <CheckoutFormContent totalCost={totalCost} />
   </Elements>
 );
 
