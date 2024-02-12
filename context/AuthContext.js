@@ -269,18 +269,18 @@ export const AuthProvider = ({ children }) => {
 
   const handleEnvoyerMessage = async (titre, message) => {
     const webhookUrl = 'https://hook.eu2.make.com/ifknchx9h9banxrnyau6ahqpgz099rp1';
-    console.log('User Subscriptions at message send:', userSubscriptions); // Ajoutez ceci pour le débogage
-    const subscriptionItems = userSubscriptions.map((sub) => `${sub.name}: ${sub.benefit}`).join('; ');
+
+    // Construisez la chaîne de subscriptionItems en utilisant seulement le nom du service.
+    const subscriptionItems = userSubscriptions.map((sub) => sub.serviceName).join('; ');
 
     const payload = {
       titre,
       message,
       entreprise, // Utilise directement l'état 'entreprise'
-      subscriptionItems, // Utilise la chaîne d'éléments d'abonnement transformée
+      subscriptionItems, // Chaîne des noms de service des abonnements
     };
 
-    // Ajout de logs pour vérifier les données avant l'envoi
-    console.log('Envoi du message avec le payload suivant :', payload);
+    console.log('Payload avant envoi:', payload); // Ajoutez ceci pour le débogage
 
     try {
       const response = await fetch(webhookUrl, {
@@ -293,17 +293,8 @@ export const AuthProvider = ({ children }) => {
         throw new Error(`Erreur lors de l'envoi du message au webhook : ${response.statusText}`);
       }
 
-      // Log la réponse du webhook pour vérification
-      const contentType = response.headers.get('Content-Type');
-      if (contentType && contentType.includes('application/json')) {
-        // La réponse est au format JSON, la traiter comme tel
-        const responseData = await response.json();
-        console.log('Réponse du webhook (JSON) :', responseData);
-      } else {
-        // La réponse n'est pas au format JSON, la traiter comme texte
-        const responseText = await response.text();
-        console.log('Réponse du webhook (Texte) :', responseText);
-      }
+      // Ajoutez un log pour voir la réponse du serveur
+      console.log('Réponse du serveur:', await response.text());
 
       console.log('Message envoyé avec succès au webhook');
     } catch (error) {
