@@ -7,11 +7,11 @@ const Page = () => {
     e.preventDefault();
     const payload = {
       email,
-      pageId: '1e6936e4-90ec-4719-ab8f-e99185845e74',
+      pageId: '72192c1d-437a-4de3-8d42-4b3bfe22bf13',
       name: 'Romain Santiago',
       entreprise: 'ScanAvis',
       google_business: 'https://maps.app.goo.gl/Fgpyd2gyU5WyMhZ36',
-      subscriptionItems: 'Bronze',
+      subscriptionItems: 'Gold',
     };
 
     try {
@@ -56,7 +56,7 @@ const Page = () => {
           alt="Logo"
           className="mb-6 h-12 w-12"
         />
-        <h1 className="text-4xl text-white mb-4">ScanAvis</h1>
+        <h1 className="text-4xl text-white mb-4">Kaoiur</h1>
         <form
           onSubmit={handleSubmit}
           className="bg-white bg-opacity-75 rounded-lg p-4 shadow-lg mb-6"
