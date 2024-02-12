@@ -153,11 +153,11 @@ const CheckoutFormContent = ({ totalCost }) => { // Accepter totalCost en tant q
           <div className="mb-6">
             <div className="flex justify-between text-lg mb-2">
               <span>{cartItem.name}</span>
-              <span>${(totalCost / 100).toFixed(2)}</span> {/* Utiliser totalCost ici */}
+              <span>€{(totalCost / 100).toFixed(2)}</span> {/* Utiliser totalCost ici */}
             </div>
           </div>
         )}
-        <p className="text-lg font-semibold mb-6">Total à payer: ${(totalCost / 100).toFixed(2)}</p>
+        <p className="text-lg font-semibold mb-6">Total à payer: €{(totalCost / 100).toFixed(2)}</p>
         <form onSubmit={handleSubmit} className="space-y-4">
           {errorMessage && <div className="error-message">{errorMessage}</div>}
           <div>

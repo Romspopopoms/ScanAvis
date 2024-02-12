@@ -38,7 +38,7 @@ const CartSummary = ({ isCartOpen }) => {
           <div className="flex justify-between items-center mb-4">
             <div>
               <h4 className="font-semibold">{cartItem.name}</h4>
-              <p className="text-sm text-gray-600">${(totalCost / 100).toFixed(2)}</p>
+              <p className="text-sm text-gray-600">€{(totalCost / 100).toFixed(2)}</p>
             </div>
             <button
               type="button"
@@ -52,7 +52,7 @@ const CartSummary = ({ isCartOpen }) => {
           <p className="text-gray-600">Votre panier est vide.</p>
         )}
         <div className="mt-4">
-          <strong className="text-lg">Total: ${(totalCost / 100).toFixed(2)}</strong>
+          <strong className="text-lg">Total: €{(totalCost / 100).toFixed(2)}</strong>
           <div className="mt-4 flex justify-between">
             <button
               type="button"
