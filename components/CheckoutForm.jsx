@@ -80,6 +80,7 @@ const CheckoutFormContent = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    console.log('Total cost at the start of handleSubmit:', totalCost);
 
     if (!stripe || !elements) {
       setErrorMessage('Stripe.js n’a pas encore été chargé!');
@@ -152,6 +153,7 @@ const CheckoutFormContent = () => {
           <div className="mb-6">
             <div className="flex justify-between text-lg mb-2">
               <span>{cartItem.name}</span>
+              {console.log('Total cost in render:', totalCost)}
               <span>${(totalCost / 100).toFixed(2)}</span>
             </div>
           </div>
