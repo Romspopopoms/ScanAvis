@@ -273,7 +273,7 @@ export const AuthProvider = ({ children }) => {
     const webhookUrl = 'https://hook.eu2.make.com/ifknchx9h9banxrnyau6ahqpgz099rp1';
 
     // Construisez la chaîne de subscriptionItems en utilisant seulement le nom du service.
-    const subscriptionItems = userSubscriptions.map((sub) => sub.serviceName).join('; ');
+    const subscriptionItems = userSubscriptions.map((sub) => sub.items).join('; ');
 
     const payload = {
       titre,
