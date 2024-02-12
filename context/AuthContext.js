@@ -278,6 +278,9 @@ export const AuthProvider = ({ children }) => {
       subscriptionItems, // Utilise la chaîne d'éléments d'abonnement transformée
     };
 
+    // Ajout de logs pour vérifier les données avant l'envoi
+    console.log('Envoi du message avec le payload suivant :', payload);
+
     try {
       const response = await fetch(webhookUrl, {
         method: 'POST',
@@ -288,6 +291,10 @@ export const AuthProvider = ({ children }) => {
       if (!response.ok) {
         throw new Error(`Erreur lors de l'envoi du message au webhook : ${response.statusText}`);
       }
+
+      // Log la réponse du webhook pour vérification
+      const responseData = await response.json(); // Assurez-vous que votre webhook envoie une réponse JSON
+      console.log('Réponse du webhook :', responseData);
 
       console.log('Message envoyé avec succès au webhook');
     } catch (error) {
