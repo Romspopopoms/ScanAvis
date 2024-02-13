@@ -13,7 +13,7 @@ const priceAmounts = {
 };
 
 const CartSummary = () => {
-  const { cartItem, removeFromCart, clearCart, isCartOpen } = useCart();
+  const { cartItem, removeFromCart, clearCart, isCartOpen, setIsCartOpen } = useCart();
 
   // Animation variants for the cart summary panel
   const cartVariants = {
@@ -24,6 +24,10 @@ const CartSummary = () => {
   // Utilisez priceId pour obtenir le coût total à partir de l'objet priceAmounts
   const totalCost = cartItem ? priceAmounts[cartItem.priceId] : 0;
 
+  const handleCloseClick = () => {
+    setIsCartOpen(false); // Ferme le panier en changeant l'état isCartOpen
+  };
+
   return (
     <motion.div
       className={`fixed bottom-0 left-0 z-50 p-4 bg-white rounded-tl-3xl rounded-tr-3xl shadow-xl transform transition-transform ${isCartOpen ? 'translate-x-0' : '-translate-x-full'}`}
@@ -31,6 +35,7 @@ const CartSummary = () => {
       animate={isCartOpen ? 'open' : 'closed'}
       variants={cartVariants}
     >
+      <button type="button" onClick={handleCloseClick} className="absolute top-2 right-2 text-lg font-semibold cursor-pointer">&times;</button> {/* Bouton de fermeture */}
       <div className="overflow-y-auto max-h-96">
         <h2 className="text-lg font-bold text-gray-800 mb-4">Mon Panier</h2>
         {cartItem ? (
