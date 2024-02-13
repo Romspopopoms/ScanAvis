@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
 
 // Détails des produits disponibles pour ajouter au panier
 const productDetails = {
@@ -79,7 +79,8 @@ export const CartProvider = ({ children }) => {
   const addToCart = (productId) => {
     const product = productDetails[productId];
     if (product) {
-      setCartItem(product); // Ici, 'product' est déjà l'objet contenant tous les détails
+      setCartItem(product);
+      localStorage.setItem('cartItem', JSON.stringify(product)); // Sauvegardez dans le localStorage
     } else {
       console.error(`Produit non trouvé pour l'ID : ${productId}`);
     }
@@ -87,12 +88,20 @@ export const CartProvider = ({ children }) => {
 
   const removeFromCart = () => {
     setCartItem(null);
+    localStorage.removeItem('cartItem'); // Supprimez de localStorage
   };
 
   const clearCart = () => {
     setCartItem(null);
+    localStorage.removeItem('cartItem'); // Supprimez de localStorage
   };
 
+  useEffect(() => {
+    const savedCartItem = localStorage.getItem('cartItem');
+    if (savedCartItem) {
+      setCartItem(JSON.parse(savedCartItem));
+    }
+  }, []);
   // Utilisez l'ID de prix et l'ID de produit selon les besoins
   const formatCartItemForSubscription = () => {
     if (!cartItem) {
