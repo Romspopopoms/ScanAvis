@@ -11,15 +11,18 @@ const LoginPage = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      const paymentIntent = localStorage.getItem('paymentIntent');
-      if (paymentIntent === 'pending') {
-        // Nettoyer l'intention de paiement
-        localStorage.removeItem('paymentIntent');
-        // Rediriger vers la page de paiement
-        router.push('/paiement');
+      // Vérifier s'il y a une intention de redirection sauvegardée
+      const redirectPath = localStorage.getItem('redirectAfterLogin');
+
+      if (redirectPath) {
+        // Si oui, rediriger vers cette page
+        router.push(redirectPath);
+
+        // Nettoyer l'intention de redirection du stockage local
+        localStorage.removeItem('redirectAfterLogin');
       } else {
-        // Rediriger vers une autre page, par exemple l'accueil ou le tableau de bord de l'utilisateur
-        router.push('/accueil');
+        // Si non, rediriger vers la page par défaut après le login
+        router.push('/accueil'); // Ou toute autre page de redirection par défaut
       }
     }
   }, [isAuthenticated, router]);

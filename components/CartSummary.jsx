@@ -29,10 +29,13 @@ const CartSummary = () => {
 
   const handleCheckout = () => {
     if (!isAuthenticated) {
-      localStorage.setItem('paymentIntent', 'pending');
+      // Sauvegarder l'intention de redirection
+      localStorage.setItem('redirectAfterLogin', '/paiement');
 
+      // Rediriger vers la page de login
       router.push('/login');
     } else {
+      // Si authentifié, aller directement à la page de paiement
       router.push('/paiement');
     }
   };
