@@ -1,9 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 
-const CartContext = createContext();
-
-export const useCart = () => useContext(CartContext);
-
 // Détails des produits disponibles pour ajouter au panier
 const productDetails = {
   base: {
@@ -72,6 +68,10 @@ const productDetails = {
     ] },
 };
 
+const CartContext = createContext();
+
+export const useCart = () => useContext(CartContext);
+
 const CartProvider = ({ children }) => {
   const [cartItem, setCartItem] = useState(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -106,14 +106,27 @@ const CartProvider = ({ children }) => {
     setCartItem(null);
   };
 
+  // Utilisez l'ID de prix et l'ID de produit selon les besoins
+  const formatCartItemForSubscription = () => {
+    if (!cartItem) {
+      console.error('Aucun abonnement sélectionné ou abonnement manquant priceId');
+      return null;
+    }
+    return {
+      priceId: cartItem.priceId,
+      productId: cartItem.productId, // Ajout de l'ID de produit
+    };
+  };
+
   const value = {
     cartItem,
     addToCart,
     removeFromCart,
     clearCart,
-    isCartOpen,
-    setIsCartOpen,
+    formatCartItemForSubscription,
     productDetails,
+    isCartOpen, // Exposer l'état d'ouverture du panier
+    setIsCartOpen,
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
