@@ -17,7 +17,7 @@ const LoginPage = () => {
       if (redirectPath) {
         // Si oui, rediriger vers cette page
         router.push(redirectPath);
-
+        console.log('Redirecting to:', redirectPath);
         // Nettoyer l'intention de redirection du stockage local
         localStorage.removeItem('redirectAfterLogin');
       } else {
