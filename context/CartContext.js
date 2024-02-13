@@ -73,12 +73,18 @@ const productDetails = {
 };
 
 const CartProvider = ({ children }) => {
-  const [cartItem, setCartItem] = useState(() => {
-    const savedItem = localStorage.getItem('cartItem');
-    return savedItem ? JSON.parse(savedItem) : null;
-  });
+  const [cartItem, setCartItem] = useState(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
 
+  // Charger l'état initial du panier depuis localStorage uniquement côté client
+  useEffect(() => {
+    const savedItem = localStorage.getItem('cartItem');
+    if (savedItem) {
+      setCartItem(JSON.parse(savedItem));
+    }
+  }, []);
+
+  // Sauvegarder l'état du panier dans localStorage à chaque modification de cartItem
   useEffect(() => {
     localStorage.setItem('cartItem', JSON.stringify(cartItem));
   }, [cartItem]);
