@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/router'; // Import pour la redirection
 import { useCart } from '../context/CartContext';
@@ -15,7 +15,7 @@ const priceAmounts = {
 
 const CartSummary = () => {
   const { cartItem, removeFromCart, clearCart, isCartOpen, setIsCartOpen } = useCart();
-  const { isAuthenticated } = AuthContext(); // Utilisez le hook d'authentification pour vérifier si l'utilisateur est connecté
+  const { isAuthenticated } = useContext(AuthContext); // Correction appliquée
   const router = useRouter();
 
   // Animation variants for the cart summary panel
