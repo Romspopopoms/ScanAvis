@@ -1,7 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import Link from 'next/link';
+import { useRouter } from 'next/router'; // Import pour la redirection
 import { useCart } from '../context/CartContext';
+import { AuthContext } from '../context/AuthContext';
 
 // Supposons que vous ayez un objet qui associe priceIds à leurs montants
 // Cela pourrait être placé dans un fichier séparé et importé si utilisé à plusieurs endroits
@@ -14,6 +15,8 @@ const priceAmounts = {
 
 const CartSummary = () => {
   const { cartItem, removeFromCart, clearCart, isCartOpen, setIsCartOpen } = useCart();
+  const { isAuthenticated } = AuthContext(); // Utilisez le hook d'authentification pour vérifier si l'utilisateur est connecté
+  const router = useRouter();
 
   // Animation variants for the cart summary panel
   const cartVariants = {
@@ -28,14 +31,23 @@ const CartSummary = () => {
     setIsCartOpen(false); // Ferme le panier en changeant l'état isCartOpen
   };
 
+  const handleCheckout = () => {
+    if (!isAuthenticated) {
+      // Si l'utilisateur n'est pas connecté, redirigez-le vers la page de connexion
+      router.push('/login'); // Modifiez '/login' par le chemin de votre page de connexion
+    } else {
+      // Si l'utilisateur est connecté, redirigez-le vers la page de paiement
+      router.push('/paiement');
+    }
+  };
+
   return (
-    <motion.div
-      className={`fixed bottom-0 left-0 z-50 p-4 bg-white rounded-tl-3xl rounded-tr-3xl shadow-xl transform transition-transform ${isCartOpen ? 'translate-x-0' : '-translate-x-full'}`}
+    <motion.div className={`fixed bottom-0 left-0 z-50 p-4 bg-white rounded-tl-3xl rounded-tr-3xl shadow-xl transform transition-transform ${isCartOpen ? 'translate-x-0' : '-translate-x-full'}`}
       initial="closed"
       animate={isCartOpen ? 'open' : 'closed'}
       variants={cartVariants}
     >
-      <button type="button" onClick={handleCloseClick} className="absolute top-2 right-2 text-lg font-semibold cursor-pointer">&times;</button> {/* Bouton de fermeture */}
+      <button type="button" onClick={handleCloseClick} className="absolute top-2 right-2 text-lg font-semibold cursor-pointer">&times;</button>
       <div className="overflow-y-auto max-h-96">
         <h2 className="text-lg font-bold text-gray-800 mb-4">Mon Panier</h2>
         {cartItem ? (
@@ -44,13 +56,7 @@ const CartSummary = () => {
               <h4 className="font-semibold">{cartItem.name}</h4>
               <p className="text-sm text-gray-600">€{(totalCost / 100).toFixed(2)}</p>
             </div>
-            <button
-              type="button"
-              className="text-red-500 text-xs"
-              onClick={() => removeFromCart()}
-            >
-              Retirer
-            </button>
+            <button type="button" className="text-red-500 text-xs" onClick={() => removeFromCart()}>Retirer</button>
           </div>
         ) : (
           <p className="text-gray-600">Votre panier est vide.</p>
@@ -58,18 +64,8 @@ const CartSummary = () => {
         <div className="mt-4">
           <strong className="text-lg">Total: €{(totalCost / 100).toFixed(2)}</strong>
           <div className="mt-4 flex justify-between">
-            <button
-              type="button"
-              className="bg-red-500 text-white text-sm px-3 py-1 rounded hover:bg-red-600 transition-colors duration-300"
-              onClick={clearCart}
-            >
-              Vider le Panier
-            </button>
-            <Link href="/paiement"
-              className="inline-block bg-green-500 text-white text-sm px-3 py-1 rounded hover:bg-green-600 transition-colors duration-300 ml-2"
-            >
-              S’abonner
-            </Link>
+            <button type="button" className="bg-red-500 text-white text-sm px-3 py-1 rounded hover:bg-red-600 transition-colors duration-300" onClick={clearCart}>Vider le Panier</button>
+            <button type="button" onClick={handleCheckout} className="bg-blue-500 text-white text-sm px-3 py-1 rounded hover:bg-blue-600 transition-colors duration-300 ml-2">Valider la commande</button>
           </div>
         </div>
       </div>
