@@ -31,7 +31,7 @@ const CartSummary = () => {
     if (!isAuthenticated) {
       // Sauvegarder l'intention de redirection
       localStorage.setItem('redirectAfterLogin', '/paiement');
-
+      console.log('Saving redirect path:', '/paiement');
       // Rediriger vers la page de login
       router.push('/login');
     } else {
