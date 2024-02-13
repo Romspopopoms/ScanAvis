@@ -3,13 +3,13 @@ import { useCart } from '../context/CartContext';
 import FeatureRow from './FeatureRow';
 
 const TarifsContent = () => {
-  const { addToCart, productDetails } = useCart();
+  const { addToCart, productDetails, setIsCartOpen } = useCart(); // Utilisez setIsCartOpen pour contrôler l'ouverture du panier
 
   const handleAddToCart = (productKey) => {
     const product = productDetails[productKey];
     if (product) {
-      // Utilisation de productKey pour ajouter le produit au panier
-      addToCart(productKey);
+      addToCart(productKey); // Ajoute l'article au panier
+      setIsCartOpen(true); // Ouvre le panier
     } else {
       alert('Produit non trouvé!');
     }

@@ -74,6 +74,7 @@ export const useCart = () => useContext(CartContext);
 
 export const CartProvider = ({ children }) => {
   const [cartItem, setCartItem] = useState(null);
+  const [isCartOpen, setIsCartOpen] = useState(false); // Ajout d'un nouvel état pour contrôler l'ouverture du panier
 
   const addToCart = (productId) => {
     const product = productDetails[productId];
@@ -111,6 +112,8 @@ export const CartProvider = ({ children }) => {
     clearCart,
     formatCartItemForSubscription,
     productDetails,
+    isCartOpen, // Exposer l'état d'ouverture du panier
+    setIsCartOpen,
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
