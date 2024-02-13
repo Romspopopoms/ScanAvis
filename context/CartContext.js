@@ -1,5 +1,9 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 
+const CartContext = createContext();
+
+export const useCart = () => useContext(CartContext);
+
 // Détails des produits disponibles pour ajouter au panier
 const productDetails = {
   base: {
@@ -68,50 +72,32 @@ const productDetails = {
     ] },
 };
 
-const CartContext = createContext();
+const CartProvider = ({ children }) => {
+  const [cartItem, setCartItem] = useState(() => {
+    const savedItem = localStorage.getItem('cartItem');
+    return savedItem ? JSON.parse(savedItem) : null;
+  });
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
-export const useCart = () => useContext(CartContext);
-
-export const CartProvider = ({ children }) => {
-  const [cartItem, setCartItem] = useState(null);
-  const [isCartOpen, setIsCartOpen] = useState(false); // Ajout d'un nouvel état pour contrôler l'ouverture du panier
+  useEffect(() => {
+    localStorage.setItem('cartItem', JSON.stringify(cartItem));
+  }, [cartItem]);
 
   const addToCart = (productId) => {
     const product = productDetails[productId];
     if (product) {
       setCartItem(product);
-      localStorage.setItem('cartItem', JSON.stringify(product)); // Sauvegardez dans le localStorage
     } else {
-      console.error(`Produit non trouvé pour l'ID : ${productId}`);
+      console.error(`Produit non trouvé pour l'ID: ${productId}`);
     }
   };
 
   const removeFromCart = () => {
     setCartItem(null);
-    localStorage.removeItem('cartItem'); // Supprimez de localStorage
   };
 
   const clearCart = () => {
     setCartItem(null);
-    localStorage.removeItem('cartItem'); // Supprimez de localStorage
-  };
-
-  useEffect(() => {
-    const savedCartItem = localStorage.getItem('cartItem');
-    if (savedCartItem) {
-      setCartItem(JSON.parse(savedCartItem));
-    }
-  }, []);
-  // Utilisez l'ID de prix et l'ID de produit selon les besoins
-  const formatCartItemForSubscription = () => {
-    if (!cartItem) {
-      console.error('Aucun abonnement sélectionné ou abonnement manquant priceId');
-      return null;
-    }
-    return {
-      priceId: cartItem.priceId,
-      productId: cartItem.productId, // Ajout de l'ID de produit
-    };
   };
 
   const value = {
@@ -119,10 +105,9 @@ export const CartProvider = ({ children }) => {
     addToCart,
     removeFromCart,
     clearCart,
-    formatCartItemForSubscription,
-    productDetails,
-    isCartOpen, // Exposer l'état d'ouverture du panier
+    isCartOpen,
     setIsCartOpen,
+    productDetails,
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

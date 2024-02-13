@@ -1,11 +1,28 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
+import { useRouter } from 'next/router'; // Importez useRouter pour gérer la redirection
 import { AuthContext } from '../context/AuthContext';
 
 const LoginPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const { getAuthUrl, handleAuthCode } = useContext(AuthContext);
+  const { isAuthenticated, getAuthUrl, handleAuthCode } = useContext(AuthContext);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      const paymentIntent = localStorage.getItem('paymentIntent');
+      if (paymentIntent === 'pending') {
+        // Nettoyer l'intention de paiement
+        localStorage.removeItem('paymentIntent');
+        // Rediriger vers la page de paiement
+        router.push('/paiement');
+      } else {
+        // Rediriger vers une autre page, par exemple l'accueil ou le tableau de bord de l'utilisateur
+        router.push('/accueil');
+      }
+    }
+  }, [isAuthenticated, router]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();

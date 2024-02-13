@@ -1,11 +1,9 @@
 import React, { useContext } from 'react';
 import { motion } from 'framer-motion';
-import { useRouter } from 'next/router'; // Import pour la redirection
+import { useRouter } from 'next/router';
 import { useCart } from '../context/CartContext';
 import { AuthContext } from '../context/AuthContext';
 
-// Supposons que vous ayez un objet qui associe priceIds à leurs montants
-// Cela pourrait être placé dans un fichier séparé et importé si utilisé à plusieurs endroits
 const priceAmounts = {
   price_1OekFIDWmnYPaxs1hMaRWF4X: 2000, // Montant pour Base
   price_1OekKWDWmnYPaxs1W80kG5a0: 4000, // Montant pour Bronze
@@ -15,34 +13,33 @@ const priceAmounts = {
 
 const CartSummary = () => {
   const { cartItem, removeFromCart, clearCart, isCartOpen, setIsCartOpen } = useCart();
-  const { isAuthenticated } = useContext(AuthContext); // Correction appliquée
+  const { isAuthenticated } = useContext(AuthContext);
   const router = useRouter();
 
-  // Animation variants for the cart summary panel
   const cartVariants = {
     open: { x: 0, opacity: 1, scale: 1, transition: { type: 'spring', stiffness: 120 } },
     closed: { x: '-100%', opacity: 0, scale: 0.95, transition: { type: 'spring', stiffness: 120 } },
   };
 
-  // Utilisez priceId pour obtenir le coût total à partir de l'objet priceAmounts
   const totalCost = cartItem ? priceAmounts[cartItem.priceId] : 0;
 
   const handleCloseClick = () => {
-    setIsCartOpen(false); // Ferme le panier en changeant l'état isCartOpen
+    setIsCartOpen(false);
   };
 
   const handleCheckout = () => {
     if (!isAuthenticated) {
-      // Si l'utilisateur n'est pas connecté, redirigez-le vers la page de connexion
-      router.push('/login'); // Modifiez '/login' par le chemin de votre page de connexion
+      localStorage.setItem('paymentIntent', 'pending');
+
+      router.push('/login');
     } else {
-      // Si l'utilisateur est connecté, redirigez-le vers la page de paiement
       router.push('/paiement');
     }
   };
 
   return (
-    <motion.div className={`fixed bottom-0 left-0 z-50 p-4 bg-white rounded-tl-3xl rounded-tr-3xl shadow-xl transform transition-transform ${isCartOpen ? 'translate-x-0' : '-translate-x-full'}`}
+    <motion.div
+      className={`fixed bottom-0 left-0 z-50 p-4 bg-white rounded-tl-3xl rounded-tr-3xl shadow-xl transform transition-transform ${isCartOpen ? 'translate-x-0' : '-translate-x-full'}`}
       initial="closed"
       animate={isCartOpen ? 'open' : 'closed'}
       variants={cartVariants}
@@ -56,7 +53,7 @@ const CartSummary = () => {
               <h4 className="font-semibold">{cartItem.name}</h4>
               <p className="text-sm text-gray-600">€{(totalCost / 100).toFixed(2)}</p>
             </div>
-            <button type="button" className="text-red-500 text-xs" onClick={() => removeFromCart()}>Retirer</button>
+            <button type="button" className="text-red-500 text-xs" onClick={removeFromCart}>Retirer</button>
           </div>
         ) : (
           <p className="text-gray-600">Votre panier est vide.</p>
