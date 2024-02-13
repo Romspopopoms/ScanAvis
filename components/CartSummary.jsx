@@ -12,8 +12,8 @@ const priceAmounts = {
   price_1Oel3hDWmnYPaxs1icztOYwU: 10000, // Montant pour Gold
 };
 
-const CartSummary = ({ isCartOpen }) => {
-  const { cartItem, removeFromCart, clearCart } = useCart();
+const CartSummary = () => {
+  const { cartItem, removeFromCart, clearCart, isCartOpen } = useCart();
 
   // Animation variants for the cart summary panel
   const cartVariants = {
@@ -26,8 +26,7 @@ const CartSummary = ({ isCartOpen }) => {
 
   return (
     <motion.div
-      className={`fixed bottom-0 left-0 z-50 p-4 bg-white rounded-tl-3xl rounded-tr-3xl shadow-xl transform transition-transform ${isCartOpen ? 'translate-x-0' : '-translate-x-full'
-      }`}
+      className={`fixed bottom-0 left-0 z-50 p-4 bg-white rounded-tl-3xl rounded-tr-3xl shadow-xl transform transition-transform ${isCartOpen ? 'translate-x-0' : '-translate-x-full'}`}
       initial="closed"
       animate={isCartOpen ? 'open' : 'closed'}
       variants={cartVariants}
