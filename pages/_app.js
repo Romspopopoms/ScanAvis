@@ -3,7 +3,7 @@ import '../styles/globals.css';
 import Head from 'next/head';
 import React from 'react';
 import { useRouter } from 'next/router';
-import { CartProvider } from '../context/CartContext';
+import CartProvider from '../context/CartContext';
 import { AuthProvider } from '../context/AuthContext';
 import { PaymentProvider } from '../context/PaymentContext';
 import { NavbarHeightProvider } from '../context/NavbarContext'; // Assurez-vous d'importer le NavbarHeightProvider
