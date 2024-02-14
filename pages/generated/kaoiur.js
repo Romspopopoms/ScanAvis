@@ -7,11 +7,11 @@ const Page = () => {
     e.preventDefault();
     const payload = {
       email,
-      pageId: '72192c1d-437a-4de3-8d42-4b3bfe22bf13',
+      pageId: '07014889-eb16-4a62-9d8b-cc96ed5b7ad0',
       name: 'Romain Santiago',
       entreprise: 'ScanAvis',
       google_business: 'https://maps.app.goo.gl/Fgpyd2gyU5WyMhZ36',
-      subscriptionItems: 'Gold',
+      subscriptionItems: '',
     };
 
     try {
