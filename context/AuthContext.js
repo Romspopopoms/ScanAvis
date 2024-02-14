@@ -18,23 +18,30 @@ export const AuthProvider = ({ children }) => {
 
   const [isFormLocked, setIsFormLocked] = useState(false);
   const [confirmationMessage, setConfirmationMessage] = useState('');
-  const [avantages, setAvantages] = useState([]);
+  // Initialiser les avantages avec une valeur vide pour éviter l'utilisation de localStorage côté serveur
+  const [avantages, setAvantages] = useState(Array(10).fill(''));
 
-  // Effectue des actions uniquement côté client
+  // Charger et mettre à jour les états à partir de localStorage seulement côté client
   useEffect(() => {
-    // S'assurer que ces opérations sont exécutées seulement côté client
     if (typeof window !== 'undefined') {
       const isLocked = localStorage.getItem('isFormLocked');
-      setIsFormLocked(isLocked ? JSON.parse(isLocked) : false);
+      if (isLocked !== null) {
+        setIsFormLocked(JSON.parse(isLocked));
+      }
 
       const message = localStorage.getItem('confirmationMessage');
-      setConfirmationMessage(message || '');
+      if (message) {
+        setConfirmationMessage(message);
+      }
 
       const savedAvantages = localStorage.getItem('avantages');
-      setAvantages(savedAvantages ? JSON.parse(savedAvantages) : Array(10).fill(''));
+      if (savedAvantages) {
+        setAvantages(JSON.parse(savedAvantages));
+      }
     }
   }, []);
 
+  // Mettre à jour isFormLocked et sauvegarder dans localStorage
   const updateFormLock = (lockStatus) => {
     setIsFormLocked(lockStatus);
     if (typeof window !== 'undefined') {
@@ -42,6 +49,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Mettre à jour confirmationMessage et sauvegarder dans localStorage
   const updateConfirmationMessage = (message) => {
     setConfirmationMessage(message);
     if (typeof window !== 'undefined') {
@@ -49,6 +57,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Mettre à jour les avantages et sauvegarder dans localStorage
   const updateAvantages = (newAvantages) => {
     setAvantages(newAvantages);
     if (typeof window !== 'undefined') {
