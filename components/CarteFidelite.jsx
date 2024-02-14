@@ -1,20 +1,31 @@
 import React, { useState, useContext } from 'react';
 import { motion } from 'framer-motion';
-import { AuthContext } from '../context/AuthContext'; // Assurez-vous d'ajuster le chemin
+import { AuthContext } from '../context/AuthContext'; // Ajustez le chemin selon votre structure
 
 const CarteFideliteClient = () => {
   const [avantages, setAvantages] = useState(Array(10).fill(''));
-  const { envoyerAvantagesAuWebhook } = useContext(AuthContext); // Accès à la fonction du contexte
+  const { envoyerAvantagesAuWebhook } = useContext(AuthContext);
+  const [isFormLocked, setIsFormLocked] = useState(false); // Nouvel état pour le verrouillage du formulaire
+  const [confirmationMessage, setConfirmationMessage] = useState(''); // État pour le message de confirmation
 
   const handleInputChange = (index, value) => {
-    const newAvantages = [...avantages];
-    newAvantages[index] = value;
-    setAvantages(newAvantages);
+    if (!isFormLocked) { // Permettre la modification seulement si le formulaire n'est pas verrouillé
+      const newAvantages = [...avantages];
+      newAvantages[index] = value;
+      setAvantages(newAvantages);
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await envoyerAvantagesAuWebhook(avantages); // Envoi des avantages au webhook
+    await envoyerAvantagesAuWebhook(avantages);
+    setIsFormLocked(true); // Verrouiller le formulaire après la soumission
+    setConfirmationMessage('Formulaire bien sauvegardé.'); // Message de confirmation
+  };
+
+  const handleEdit = () => {
+    setIsFormLocked(false); // Déverrouiller le formulaire pour modification
+    setConfirmationMessage(''); // Réinitialiser le message de confirmation
   };
 
   return (
@@ -24,6 +35,7 @@ const CarteFideliteClient = () => {
       transition={{ duration: 0.5 }}
       className="max-w-lg mx-auto my-12 bg-white p-8 rounded-xl shadow-xl border border-gray-200"
     >
+      {confirmationMessage && <p className="text-green-500">{confirmationMessage}</p>}
       <form onSubmit={handleSubmit} className="space-y-6">
         <h2 className="text-2xl font-bold text-center text-purple-800">Carte de fidélité client</h2>
         {avantages.map((avantage, index) => (
@@ -37,6 +49,7 @@ const CarteFideliteClient = () => {
               onChange={(e) => handleInputChange(index, e.target.value)}
               className="mt-1 block w-full px-4 py-3 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
               placeholder={`Avantage #${index + 1}`}
+              disabled={isFormLocked} // Désactiver l'input si le formulaire est verrouillé
             />
           </div>
         ))}
@@ -45,9 +58,19 @@ const CarteFideliteClient = () => {
           whileTap={{ scale: 0.95 }}
           type="submit"
           className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+          disabled={isFormLocked} // Désactiver le bouton de soumission si le formulaire est verrouillé
         >
           Enregistrer les avantages
         </motion.button>
+        {isFormLocked && (
+          <button
+            type="button"
+            onClick={handleEdit}
+            className="mt-4 w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-lg font-medium text-gray-700 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+          >
+            Modifier
+          </button>
+        )}
       </form>
     </motion.div>
   );
