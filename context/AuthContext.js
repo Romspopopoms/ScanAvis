@@ -19,34 +19,36 @@ export const AuthProvider = ({ children }) => {
   const [isFormLocked, setIsFormLocked] = useState(false);
   const [confirmationMessage, setConfirmationMessage] = useState('');
 
-  useEffect(() => {
-    // Accès à localStorage seulement côté client
-    const isLocked = localStorage.getItem('isFormLocked');
-    if (isLocked !== null) {
-      setIsFormLocked(JSON.parse(isLocked));
+  // Mettre à jour isFormLocked et sauvegarder dans localStorage
+  const updateFormLock = (lockStatus) => {
+    setIsFormLocked(lockStatus);
+    if (typeof window !== 'undefined') { // S'assurer que window est défini (exécution côté client)
+      localStorage.setItem('isFormLocked', lockStatus);
     }
+  };
 
-    const message = localStorage.getItem('confirmationMessage');
-    if (message) {
-      setConfirmationMessage(message);
-    }
-  }, []);
-
+  // Mettre à jour confirmationMessage et sauvegarder dans localStorage
   const updateConfirmationMessage = (message) => {
     setConfirmationMessage(message);
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined') { // S'assurer que window est défini (exécution côté client)
       localStorage.setItem('confirmationMessage', message);
     }
   };
 
+  // Charger l'état initial à partir de localStorage
   useEffect(() => {
-    // Stocker les valeurs dans localStorage seulement côté client
-    localStorage.setItem('isFormLocked', isFormLocked);
-  }, [isFormLocked]);
+    if (typeof window !== 'undefined') { // S'assurer que window est défini (exécution côté client)
+      const isLocked = localStorage.getItem('isFormLocked');
+      if (isLocked !== null) {
+        setIsFormLocked(JSON.parse(isLocked));
+      }
 
-  useEffect(() => {
-    localStorage.setItem('confirmationMessage', confirmationMessage);
-  }, [confirmationMessage]);
+      const message = localStorage.getItem('confirmationMessage');
+      if (message) {
+        setConfirmationMessage(message);
+      }
+    }
+  }, []);
 
   const logout = () => {
     localStorage.removeItem('user');
@@ -398,6 +400,7 @@ export const AuthProvider = ({ children }) => {
       confirmationMessage,
       setIsFormLocked,
       updateConfirmationMessage,
+      updateFormLock,
     }}
     >
       {children}
