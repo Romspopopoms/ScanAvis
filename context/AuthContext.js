@@ -32,6 +32,11 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
+  const updateConfirmationMessage = (message) => {
+    setConfirmationMessage(message);
+    localStorage.setItem('confirmationMessage', message); // Mettre à jour le localStorage
+  };
+
   useEffect(() => {
     // Stocker les valeurs dans localStorage seulement côté client
     localStorage.setItem('isFormLocked', isFormLocked);
@@ -388,6 +393,7 @@ export const AuthProvider = ({ children }) => {
       setConfirmationMessage,
       confirmationMessage,
       setIsFormLocked,
+      updateConfirmationMessage,
     }}
     >
       {children}
