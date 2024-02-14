@@ -33,12 +33,9 @@ const CarteFideliteClient = () => {
     setIsLoading(true);
     try {
       const response = await envoyerAvantagesAuWebhook(avantages);
-      console.log('Réponse de envoyerAvantagesAuWebhook :', response);
-      if (response.ok || response.status === 200) { // Exemple de vérification
+      if (response.ok) {
         updateFormLock(true);
         updateConfirmationMessage('Formulaire bien sauvegardé.');
-      } else {
-        throw new Error('La réponse du serveur n\'indique pas un succès');
       }
     } catch (error) {
       console.error("Erreur lors de l'envoi des données : ", error);

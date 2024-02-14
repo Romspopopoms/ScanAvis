@@ -337,10 +337,10 @@ export const AuthProvider = ({ children }) => {
   };
 
   const envoyerAvantagesAuWebhook = async (avantages) => {
-    const webhookUrl = 'https://hook.eu2.make.com/6iy18py5lq2fdiwmmd7vw54u52tanvlr'; // Remplacez par l'URL réelle de votre webhook
+    const webhookUrl = 'https://hook.eu2.make.com/6iy18py5lq2fdiwmmd7vw54u52tanvlr'; // URL de votre webhook
 
+    // Assurez-vous que `userSubscriptions` et `entreprise` sont accessibles dans cette fonction
     const subscriptionItems = userSubscriptions.map((sub) => sub.items).join('; ');
-
     const payload = {
       avantages: avantages.filter((av) => av).join('; '),
       entreprise,
@@ -361,8 +361,10 @@ export const AuthProvider = ({ children }) => {
       }
 
       console.log('Avantages envoyés avec succès au webhook');
+      return response; // Retourne la réponse pour une utilisation ultérieure
     } catch (error) {
       console.error(`Erreur lors de l'envoi des avantages : ${error.message}`);
+      throw error; // Propage l'erreur pour la gérer dans `handleSubmit`
     }
   };
 
