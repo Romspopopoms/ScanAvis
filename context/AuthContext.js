@@ -18,23 +18,20 @@ export const AuthProvider = ({ children }) => {
 
   const [isFormLocked, setIsFormLocked] = useState(false);
   const [confirmationMessage, setConfirmationMessage] = useState('');
-  const [avantages, setAvantages] = useState(Array(10).fill(''));
+  const [avantages, setAvantages] = useState([]);
 
   // Effectue des actions uniquement côté client
   useEffect(() => {
-    const isLocked = localStorage.getItem('isFormLocked');
-    if (isLocked !== null) {
-      setIsFormLocked(JSON.parse(isLocked));
-    }
+    // S'assurer que ces opérations sont exécutées seulement côté client
+    if (typeof window !== 'undefined') {
+      const isLocked = localStorage.getItem('isFormLocked');
+      setIsFormLocked(isLocked ? JSON.parse(isLocked) : false);
 
-    const message = localStorage.getItem('confirmationMessage');
-    if (message) {
-      setConfirmationMessage(message);
-    }
+      const message = localStorage.getItem('confirmationMessage');
+      setConfirmationMessage(message || '');
 
-    const savedAvantages = localStorage.getItem('avantages');
-    if (savedAvantages) {
-      setAvantages(JSON.parse(savedAvantages));
+      const savedAvantages = localStorage.getItem('avantages');
+      setAvantages(savedAvantages ? JSON.parse(savedAvantages) : Array(10).fill(''));
     }
   }, []);
 
