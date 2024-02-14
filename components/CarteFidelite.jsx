@@ -30,15 +30,21 @@ const CarteFideliteClient = () => {
   // Gère la soumission du formulaire
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true); // Active l'indicateur de chargement
+    setIsLoading(true);
     try {
-      await envoyerAvantagesAuWebhook(avantages); // Envoie les avantages via le webhook
-      updateFormLock(true); // Verrouille le formulaire après la soumission réussie
-      updateConfirmationMessage('Formulaire bien sauvegardé.'); // Met à jour le message de confirmation
+      const response = await envoyerAvantagesAuWebhook(avantages);
+      console.log('Réponse de envoyerAvantagesAuWebhook :', response);
+      if (response.ok || response.status === 200) { // Exemple de vérification
+        updateFormLock(true);
+        updateConfirmationMessage('Formulaire bien sauvegardé.');
+      } else {
+        throw new Error('La réponse du serveur n\'indique pas un succès');
+      }
     } catch (error) {
-      updateConfirmationMessage('Erreur lors de la sauvegarde. Veuillez réessayer.'); // Gère les erreurs
+      console.error("Erreur lors de l'envoi des données : ", error);
+      updateConfirmationMessage('Erreur lors de la sauvegarde. Veuillez réessayer.');
     }
-    setIsLoading(false); // Désactive l'indicateur de chargement
+    setIsLoading(false);
   };
 
   // Permet de déverrouiller le formulaire pour modification
