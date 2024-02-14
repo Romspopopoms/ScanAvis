@@ -34,7 +34,9 @@ export const AuthProvider = ({ children }) => {
 
   const updateConfirmationMessage = (message) => {
     setConfirmationMessage(message);
-    localStorage.setItem('confirmationMessage', message); // Mettre à jour le localStorage
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('confirmationMessage', message);
+    }
   };
 
   useEffect(() => {
