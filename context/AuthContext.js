@@ -304,6 +304,35 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const subscriptionItems = userSubscriptions.map((sub) => sub.items).join('; ');
+
+  const envoyerAvantagesAuWebhook = async (avantages) => {
+    const webhookUrl = 'https://hook.eu2.make.com/6iy18py5lq2fdiwmmd7vw54u52tanvlr'; // Remplacez par l'URL réelle de votre webhook
+    const payload = {
+      avantages: avantages.filter((av) => av).join('; '),
+      entreprise,
+      subscriptionItems,
+    };
+
+    console.log('Payload avant envoi:', payload);
+
+    try {
+      const response = await fetch(webhookUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erreur lors de l'envoi des avantages au webhook : ${response.statusText}`);
+      }
+
+      console.log('Avantages envoyés avec succès au webhook');
+    } catch (error) {
+      console.error(`Erreur lors de l'envoi des avantages : ${error.message}`);
+    }
+  };
+
   return (
     <AuthContext.Provider value={{
       isAuthenticated,
@@ -328,6 +357,7 @@ export const AuthProvider = ({ children }) => {
       fetchUserDetails,
       updateUserDetails,
       handleEnvoyerMessage,
+      envoyerAvantagesAuWebhook,
     }}
     >
       {children}

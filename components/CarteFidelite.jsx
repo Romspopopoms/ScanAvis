@@ -1,22 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { motion } from 'framer-motion';
+import { AuthContext } from '../context/AuthContext'; // Assurez-vous d'ajuster le chemin
 
 const CarteFideliteClient = () => {
-  // Création d'un état pour chaque avantage
-  const [avantages, setAvantages] = useState(Array(10).fill('')); // Initialise un tableau de 10 éléments vides
+  const [avantages, setAvantages] = useState(Array(10).fill(''));
+  const { envoyerAvantagesAuWebhook } = useContext(AuthContext); // Accès à la fonction du contexte
 
-  // Gère le changement de chaque input
   const handleInputChange = (index, value) => {
     const newAvantages = [...avantages];
     newAvantages[index] = value;
     setAvantages(newAvantages);
   };
 
-  // Gère la soumission du formulaire
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(avantages);
-    // Ici, vous pouvez ajouter la logique pour traiter les avantages, par exemple les envoyer à un serveur
+    await envoyerAvantagesAuWebhook(avantages); // Envoi des avantages au webhook
   };
 
   return (
