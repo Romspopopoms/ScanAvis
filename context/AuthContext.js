@@ -304,10 +304,11 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const subscriptionItems = userSubscriptions.map((sub) => sub.items).join('; ');
-
   const envoyerAvantagesAuWebhook = async (avantages) => {
     const webhookUrl = 'https://hook.eu2.make.com/6iy18py5lq2fdiwmmd7vw54u52tanvlr'; // Remplacez par l'URL réelle de votre webhook
+
+    const subscriptionItems = userSubscriptions.map((sub) => sub.items).join('; ');
+
     const payload = {
       avantages: avantages.filter((av) => av).join('; '),
       entreprise,
