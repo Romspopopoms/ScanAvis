@@ -4,12 +4,16 @@ import { AuthContext } from '../context/AuthContext'; // Ajustez le chemin selon
 
 const CarteFideliteClient = () => {
   const [avantages, setAvantages] = useState(Array(10).fill(''));
-  const { envoyerAvantagesAuWebhook } = useContext(AuthContext);
-  const [isFormLocked, setIsFormLocked] = useState(false); // Nouvel état pour le verrouillage du formulaire
-  const [confirmationMessage, setConfirmationMessage] = useState(''); // État pour le message de confirmation
+  const {
+    envoyerAvantagesAuWebhook,
+    isFormLocked,
+    updateFormLock,
+    confirmationMessage,
+    updateConfirmationMessage,
+  } = useContext(AuthContext);
 
   const handleInputChange = (index, value) => {
-    if (!isFormLocked) { // Permettre la modification seulement si le formulaire n'est pas verrouillé
+    if (!isFormLocked) {
       const newAvantages = [...avantages];
       newAvantages[index] = value;
       setAvantages(newAvantages);
@@ -19,13 +23,13 @@ const CarteFideliteClient = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     await envoyerAvantagesAuWebhook(avantages);
-    setIsFormLocked(true); // Verrouiller le formulaire après la soumission
-    setConfirmationMessage('Formulaire bien sauvegardé.'); // Message de confirmation
+    updateFormLock(true);
+    updateConfirmationMessage('Formulaire bien sauvegardé.');
   };
 
   const handleEdit = () => {
-    setIsFormLocked(false); // Déverrouiller le formulaire pour modification
-    setConfirmationMessage(''); // Réinitialiser le message de confirmation
+    updateFormLock(false);
+    updateConfirmationMessage('');
   };
 
   return (

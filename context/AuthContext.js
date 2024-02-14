@@ -12,9 +12,19 @@ export const AuthProvider = ({ children }) => {
   const [entreprise, setEntreprise] = useState('');
   const [googleBusiness, setGoogleBusiness] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isFormLocked, setIsFormLocked] = useState(false);
+  const [confirmationMessage, setConfirmationMessage] = useState('');
 
   const clearError = () => setErrorMessage('');
   const handleError = (message) => setErrorMessage(message);
+
+  const updateFormLock = (isLocked) => {
+    setIsFormLocked(isLocked);
+  };
+
+  const updateConfirmationMessage = (message) => {
+    setConfirmationMessage(message);
+  };
 
   const logout = () => {
     localStorage.removeItem('user');
@@ -359,6 +369,10 @@ export const AuthProvider = ({ children }) => {
       updateUserDetails,
       handleEnvoyerMessage,
       envoyerAvantagesAuWebhook,
+      isFormLocked,
+      updateFormLock,
+      confirmationMessage,
+      updateConfirmationMessage,
     }}
     >
       {children}
