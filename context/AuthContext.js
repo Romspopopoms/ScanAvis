@@ -12,19 +12,27 @@ export const AuthProvider = ({ children }) => {
   const [entreprise, setEntreprise] = useState('');
   const [googleBusiness, setGoogleBusiness] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isFormLocked, setIsFormLocked] = useState(false);
-  const [confirmationMessage, setConfirmationMessage] = useState('');
 
   const clearError = () => setErrorMessage('');
   const handleError = (message) => setErrorMessage(message);
 
-  const updateFormLock = (isLocked) => {
-    setIsFormLocked(isLocked);
-  };
+  const [isFormLocked, setIsFormLocked] = useState(() => {
+    // Vérifiez si une valeur est stockée dans localStorage et parsez-la, sinon false par défaut
+    const isLocked = localStorage.getItem('isFormLocked');
+    return isLocked ? JSON.parse(isLocked) : false;
+  });
 
-  const updateConfirmationMessage = (message) => {
-    setConfirmationMessage(message);
-  };
+  const [confirmationMessage, setConfirmationMessage] = useState(() => localStorage.getItem('confirmationMessage') || '');
+
+  useEffect(() => {
+    // Stockez l'état isFormLocked dans localStorage chaque fois qu'il change
+    localStorage.setItem('isFormLocked', isFormLocked);
+  }, [isFormLocked]);
+
+  useEffect(() => {
+    // Stockez l'état confirmationMessage dans localStorage chaque fois qu'il change
+    localStorage.setItem('confirmationMessage', confirmationMessage);
+  }, [confirmationMessage]);
 
   const logout = () => {
     localStorage.removeItem('user');
@@ -370,9 +378,9 @@ export const AuthProvider = ({ children }) => {
       handleEnvoyerMessage,
       envoyerAvantagesAuWebhook,
       isFormLocked,
-      updateFormLock,
+      setConfirmationMessage,
       confirmationMessage,
-      updateConfirmationMessage,
+      setIsFormLocked,
     }}
     >
       {children}
