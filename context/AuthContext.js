@@ -18,35 +18,40 @@ export const AuthProvider = ({ children }) => {
 
   const [isFormLocked, setIsFormLocked] = useState(false);
   const [confirmationMessage, setConfirmationMessage] = useState('');
+  const [avantages, setAvantages] = useState(() => {
+    // Initialiser les avantages depuis localStorage ou par défaut
+    const savedAvantages = localStorage.getItem('avantages');
+    return savedAvantages ? JSON.parse(savedAvantages) : Array(10).fill('');
+  });
 
   // Mettre à jour isFormLocked et sauvegarder dans localStorage
   const updateFormLock = (lockStatus) => {
     setIsFormLocked(lockStatus);
-    if (typeof window !== 'undefined') { // S'assurer que window est défini (exécution côté client)
-      localStorage.setItem('isFormLocked', lockStatus);
-    }
+    localStorage.setItem('isFormLocked', JSON.stringify(lockStatus));
   };
 
   // Mettre à jour confirmationMessage et sauvegarder dans localStorage
   const updateConfirmationMessage = (message) => {
     setConfirmationMessage(message);
-    if (typeof window !== 'undefined') { // S'assurer que window est défini (exécution côté client)
-      localStorage.setItem('confirmationMessage', message);
-    }
+    localStorage.setItem('confirmationMessage', message);
+  };
+
+  // Mettre à jour les avantages et sauvegarder dans localStorage
+  const updateAvantages = (newAvantages) => {
+    setAvantages(newAvantages);
+    localStorage.setItem('avantages', JSON.stringify(newAvantages));
   };
 
   // Charger l'état initial à partir de localStorage
   useEffect(() => {
-    if (typeof window !== 'undefined') { // S'assurer que window est défini (exécution côté client)
-      const isLocked = localStorage.getItem('isFormLocked');
-      if (isLocked !== null) {
-        setIsFormLocked(JSON.parse(isLocked));
-      }
+    const isLocked = localStorage.getItem('isFormLocked');
+    if (isLocked !== null) {
+      setIsFormLocked(JSON.parse(isLocked));
+    }
 
-      const message = localStorage.getItem('confirmationMessage');
-      if (message) {
-        setConfirmationMessage(message);
-      }
+    const message = localStorage.getItem('confirmationMessage');
+    if (message) {
+      setConfirmationMessage(message);
     }
   }, []);
 
@@ -338,13 +343,13 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const envoyerAvantagesAuWebhook = async (avantages) => {
+  const envoyerAvantagesAuWebhook = async (avantagesList) => {
     const webhookUrl = 'https://hook.eu2.make.com/6iy18py5lq2fdiwmmd7vw54u52tanvlr'; // URL de votre webhook
 
     // Assurez-vous que `userSubscriptions` et `entreprise` sont accessibles dans cette fonction
     const subscriptionItems = userSubscriptions.map((sub) => sub.items).join('; ');
     const payload = {
-      avantages: avantages.filter((av) => av).join('; '),
+      avantages: avantagesList.filter((av) => av).join('; '),
       entreprise,
       subscriptionItems,
     };
@@ -369,7 +374,6 @@ export const AuthProvider = ({ children }) => {
       throw error; // Propage l'erreur pour la gérer dans `handleSubmit`
     }
   };
-
   return (
     <AuthContext.Provider value={{
       isAuthenticated,
@@ -396,11 +400,14 @@ export const AuthProvider = ({ children }) => {
       handleEnvoyerMessage,
       envoyerAvantagesAuWebhook,
       isFormLocked,
-      setConfirmationMessage,
-      confirmationMessage,
       setIsFormLocked,
-      updateConfirmationMessage,
+      confirmationMessage,
+      setConfirmationMessage,
+      avantages,
+      setAvantages,
       updateFormLock,
+      updateConfirmationMessage,
+      updateAvantages,
     }}
     >
       {children}
