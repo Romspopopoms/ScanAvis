@@ -16,21 +16,28 @@ export const AuthProvider = ({ children }) => {
   const clearError = () => setErrorMessage('');
   const handleError = (message) => setErrorMessage(message);
 
-  const [isFormLocked, setIsFormLocked] = useState(() => {
-    // Vérifiez si une valeur est stockée dans localStorage et parsez-la, sinon false par défaut
-    const isLocked = localStorage.getItem('isFormLocked');
-    return isLocked ? JSON.parse(isLocked) : false;
-  });
-
-  const [confirmationMessage, setConfirmationMessage] = useState(() => localStorage.getItem('confirmationMessage') || '');
+  const [isFormLocked, setIsFormLocked] = useState(false);
+  const [confirmationMessage, setConfirmationMessage] = useState('');
 
   useEffect(() => {
-    // Stockez l'état isFormLocked dans localStorage chaque fois qu'il change
+    // Accès à localStorage seulement côté client
+    const isLocked = localStorage.getItem('isFormLocked');
+    if (isLocked !== null) {
+      setIsFormLocked(JSON.parse(isLocked));
+    }
+
+    const message = localStorage.getItem('confirmationMessage');
+    if (message) {
+      setConfirmationMessage(message);
+    }
+  }, []);
+
+  useEffect(() => {
+    // Stocker les valeurs dans localStorage seulement côté client
     localStorage.setItem('isFormLocked', isFormLocked);
   }, [isFormLocked]);
 
   useEffect(() => {
-    // Stockez l'état confirmationMessage dans localStorage chaque fois qu'il change
     localStorage.setItem('confirmationMessage', confirmationMessage);
   }, [confirmationMessage]);
 
