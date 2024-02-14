@@ -18,31 +18,9 @@ export const AuthProvider = ({ children }) => {
 
   const [isFormLocked, setIsFormLocked] = useState(false);
   const [confirmationMessage, setConfirmationMessage] = useState('');
-  const [avantages, setAvantages] = useState(() => {
-    // Initialiser les avantages depuis localStorage ou par défaut
-    const savedAvantages = localStorage.getItem('avantages');
-    return savedAvantages ? JSON.parse(savedAvantages) : Array(10).fill('');
-  });
+  const [avantages, setAvantages] = useState(Array(10).fill(''));
 
-  // Mettre à jour isFormLocked et sauvegarder dans localStorage
-  const updateFormLock = (lockStatus) => {
-    setIsFormLocked(lockStatus);
-    localStorage.setItem('isFormLocked', JSON.stringify(lockStatus));
-  };
-
-  // Mettre à jour confirmationMessage et sauvegarder dans localStorage
-  const updateConfirmationMessage = (message) => {
-    setConfirmationMessage(message);
-    localStorage.setItem('confirmationMessage', message);
-  };
-
-  // Mettre à jour les avantages et sauvegarder dans localStorage
-  const updateAvantages = (newAvantages) => {
-    setAvantages(newAvantages);
-    localStorage.setItem('avantages', JSON.stringify(newAvantages));
-  };
-
-  // Charger l'état initial à partir de localStorage
+  // Effectue des actions uniquement côté client
   useEffect(() => {
     const isLocked = localStorage.getItem('isFormLocked');
     if (isLocked !== null) {
@@ -53,7 +31,33 @@ export const AuthProvider = ({ children }) => {
     if (message) {
       setConfirmationMessage(message);
     }
+
+    const savedAvantages = localStorage.getItem('avantages');
+    if (savedAvantages) {
+      setAvantages(JSON.parse(savedAvantages));
+    }
   }, []);
+
+  const updateFormLock = (lockStatus) => {
+    setIsFormLocked(lockStatus);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('isFormLocked', JSON.stringify(lockStatus));
+    }
+  };
+
+  const updateConfirmationMessage = (message) => {
+    setConfirmationMessage(message);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('confirmationMessage', message);
+    }
+  };
+
+  const updateAvantages = (newAvantages) => {
+    setAvantages(newAvantages);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('avantages', JSON.stringify(newAvantages));
+    }
+  };
 
   const logout = () => {
     localStorage.removeItem('user');
