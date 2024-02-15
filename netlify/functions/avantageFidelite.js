@@ -18,8 +18,9 @@ exports.handler = async (event) => {
 
     try {
       const query = 'SELECT avantages_fidelite FROM users WHERE uuid = ?';
-      const [rows] = await conn.query(query, [userUuid]);
-      console.log('Query results:', rows);
+      // Utilisation de conn.execute au lieu de conn.query
+      const [rows] = await conn.execute(query, [userUuid]);
+      console.log('Résultats de la requête:', rows);
 
       if (!rows || rows.length === 0) {
         console.log(`Aucun utilisateur trouvé pour userUuid: ${userUuid}`);
@@ -61,7 +62,8 @@ exports.handler = async (event) => {
     try {
       const avantagesJson = JSON.stringify(avantages);
       const query = 'UPDATE users SET avantages_fidelite = ? WHERE uuid = ?';
-      await conn.query(query, [avantagesJson, userUuid]);
+      // Utilisation de conn.execute au lieu de conn.query
+      await conn.execute(query, [avantagesJson, userUuid]);
 
       return {
         statusCode: 200,
@@ -78,7 +80,6 @@ exports.handler = async (event) => {
     }
   }
 
-  // Si la méthode HTTP n'est ni GET ni POST
   return {
     statusCode: 405,
     headers: { 'Content-Type': 'application/json' },
