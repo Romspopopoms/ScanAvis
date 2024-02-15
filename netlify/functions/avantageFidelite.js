@@ -13,15 +13,16 @@ exports.handler = async (event) => {
       }
 
       const query = 'SELECT avantages_fidelite FROM users WHERE uuid = ?';
-      const rows = await conn.execute(query, [userUuid]);
+      const [rows] = await conn.execute(query, [userUuid]);
 
+      // Si aucun utilisateur trouvé, on renvoie une réponse vide (ou une logique par défaut)
       if (rows.length === 0) {
-        console.error('Utilisateur non trouvé.');
-        return { statusCode: 404, headers, body: JSON.stringify({ message: 'Utilisateur non trouvé.' }) };
+        console.log('Utilisateur non trouvé, prêt à être créé après soumission.');
+        return { statusCode: 200, headers, body: JSON.stringify({ avantages: [] }) }; // Retourne une structure vide ou par défaut
       }
 
-      const avantages = JSON.parse(rows[0].avantages_fidelite || '[]');
-      return { statusCode: 200, headers, body: JSON.stringify(avantages) };
+      const avantages = rows[0].avantages_fidelite ? JSON.parse(rows[0].avantages_fidelite) : [];
+      return { statusCode: 200, headers, body: JSON.stringify({ avantages }) };
     } if (event.httpMethod === 'POST') {
       const { userUuid, avantages } = JSON.parse(event.body);
 
@@ -31,12 +32,19 @@ exports.handler = async (event) => {
       }
 
       const avantagesJson = JSON.stringify(avantages);
-      const updateQuery = 'UPDATE users SET avantages_fidelite = ? WHERE uuid = ?';
-      const { affectedRows } = await conn.execute(updateQuery, [avantagesJson, userUuid]);
+      const findUserQuery = 'SELECT uuid FROM users WHERE uuid = ?';
+      const [userRows] = await conn.execute(findUserQuery, [userUuid]);
 
-      if (affectedRows === 0) {
-        console.error('Mise à jour échouée.');
-        return { statusCode: 404, headers, body: JSON.stringify({ message: 'Mise à jour échouée, utilisateur non trouvé.' }) };
+      if (userRows.length === 0) {
+        // Si l'utilisateur n'existe pas, insérez un nouvel utilisateur avec les avantages_fidelite
+        const insertQuery = 'INSERT INTO users (uuid, avantages_fidelite) VALUES (?, ?)';
+        await conn.execute(insertQuery, [userUuid, avantagesJson]);
+        console.log('Nouvel utilisateur créé avec avantages.');
+      } else {
+        // Si l'utilisateur existe, mettez à jour les avantages_fidelite
+        const updateQuery = 'UPDATE users SET avantages_fidelite = ? WHERE uuid = ?';
+        await conn.execute(updateQuery, [avantagesJson, userUuid]);
+        console.log('Avantages mis à jour pour l\'utilisateur existant.');
       }
 
       return { statusCode: 200, headers, body: JSON.stringify({ message: 'Les avantages de fidélité ont été mis à jour avec succès.' }) };
