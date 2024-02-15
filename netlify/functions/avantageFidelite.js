@@ -4,9 +4,9 @@ exports.handler = async (event) => {
   console.log('Événement reçu:', JSON.stringify(event));
 
   try {
-    // Gestion des requêtes GET pour récupérer les avantages
     if (event.httpMethod === 'GET') {
-      const userUuid = event.queryStringParameters?.userId?.trim(); // Si le paramètre passé est userId
+      // Assurez-vous que le paramètre de requête correspond à celui attendu par la fonction.
+      const userUuid = event.queryStringParameters?.userUuid?.trim();
       console.log('userUuid nettoyé:', userUuid);
 
       if (!userUuid) {
@@ -18,7 +18,7 @@ exports.handler = async (event) => {
       }
 
       const query = 'SELECT avantages_fidelite FROM users WHERE uuid = ?';
-      const [rows] = await conn.execute(query, [userUuid]); // Correction pour utiliser conn.execute
+      const [rows] = await conn.execute(query, [userUuid]);
 
       if (rows.length === 0) {
         return {
@@ -28,16 +28,14 @@ exports.handler = async (event) => {
         };
       }
 
+      // Assurez-vous de renvoyer un tableau d'avantages ou un message d'erreur approprié.
       const avantages = JSON.parse(rows[0].avantages_fidelite || '[]');
       return {
         statusCode: 200,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(avantages),
+        body: JSON.stringify({ avantages }),
       };
-    }
-
-    // Gestion des requêtes POST pour sauvegarder les avantages
-    if (event.httpMethod === 'POST') {
+    } if (event.httpMethod === 'POST') {
       const { userUuid, avantages } = JSON.parse(event.body);
 
       if (!userUuid || !avantages) {
@@ -50,7 +48,7 @@ exports.handler = async (event) => {
 
       const avantagesJson = JSON.stringify(avantages);
       const query = 'UPDATE users SET avantages_fidelite = ? WHERE uuid = ?';
-      await conn.execute(query, [avantagesJson, userUuid]); // Correction pour utiliser conn.execute
+      await conn.execute(query, [avantagesJson, userUuid]);
 
       return {
         statusCode: 200,
@@ -58,9 +56,6 @@ exports.handler = async (event) => {
         body: JSON.stringify({ message: 'Les avantages de fidélité ont été mis à jour avec succès.' }),
       };
     }
-
-    // Si la méthode HTTP n'est ni GET ni POST
-
     return {
       statusCode: 405,
       headers: { 'Content-Type': 'application/json' },
