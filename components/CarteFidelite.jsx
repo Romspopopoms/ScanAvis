@@ -18,23 +18,27 @@ const CarteFideliteClient = () => {
     const fetchAvantages = async () => {
       const urlApi = 'https://scanavis.netlify.app/.netlify/functions/avantageFidelite';
       try {
-        const response = await fetch(`${urlApi}?userId=${user.uuid}`);
+        // Correction pour utiliser userUuid au lieu de userId
+        const response = await fetch(`${urlApi}?userUuid=${user.uuid}`);
         if (!response.ok) {
           throw new Error(`Erreur lors de la récupération des avantages: ${response.statusText}`);
         }
         const data = await response.json();
         if (data.avantages) {
-          setAvantages(data.avantages.split('; ')); // Supposant que les avantages sont stockés sous forme de chaîne séparée par des ';'
+          // Assurez-vous que les avantages sont un tableau avant de les diviser
+          const avantagesList = typeof data.avantages === 'string' ? data.avantages.split('; ') : data.avantages;
+          setAvantages(avantagesList);
         }
       } catch (error) {
         console.error('Erreur lors de la récupération des avantages : ', error);
+        updateConfirmationMessage(`Erreur lors de la récupération des avantages: ${error.message}`);
       }
     };
 
     if (user && user.uuid) {
       fetchAvantages();
     }
-  }, [user]);
+  }, [user, updateConfirmationMessage]);
 
   const handleInputChange = (index, value) => {
     if (!isFormLocked) {
@@ -48,13 +52,12 @@ const CarteFideliteClient = () => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      // Utilisez `envoyerAvantagesAuWebhookEtApi` qui prend en charge l'envoi à la fois au webhook et à l'API pour la sauvegarde
-      await envoyerAvantagesAuWebhookEtAPI(user.uuid, avantages);
+      await envoyerAvantagesAuWebhookEtAPI(user.uuid, avantages.join('; '));
       updateFormLock(true);
       updateConfirmationMessage('Avantages enregistrés avec succès.');
     } catch (error) {
       console.error("Erreur lors de l'envoi des données : ", error);
-      updateConfirmationMessage('Erreur lors de la sauvegarde. Veuillez réessayer.');
+      updateConfirmationMessage(`Erreur lors de l'envoi des avantages: ${error.message}`);
     } finally {
       setIsLoading(false);
     }
