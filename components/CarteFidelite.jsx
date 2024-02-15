@@ -6,7 +6,7 @@ const CarteFideliteClient = () => {
   const [avantages, setAvantages] = useState(Array(10).fill(''));
   const [isLoading, setIsLoading] = useState(false);
   const {
-    envoyerAvantagesAuWebhookEtApi,
+    envoyerAvantagesAuWebhookEtAPI,
     isFormLocked,
     updateFormLock,
     confirmationMessage,
@@ -49,7 +49,7 @@ const CarteFideliteClient = () => {
     setIsLoading(true);
     try {
       // Utilisez `envoyerAvantagesAuWebhookEtApi` qui prend en charge l'envoi à la fois au webhook et à l'API pour la sauvegarde
-      await envoyerAvantagesAuWebhookEtApi(user.uuid, avantages);
+      await envoyerAvantagesAuWebhookEtAPI(user.uuid, avantages);
       updateFormLock(true);
       updateConfirmationMessage('Avantages enregistrés avec succès.');
     } catch (error) {
