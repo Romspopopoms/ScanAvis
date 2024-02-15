@@ -6,54 +6,58 @@ import AbonnementsComponent from '../components/AbonnementsComponent';
 import EnvoyezVosMessages from '../components/EnvoyezVosMessages';
 import CarteFideliteClient from '../components/CarteFidelite';
 import { AuthContext } from '../context/AuthContext';
-
 import { useNavbarHeight } from '../context/NavbarContext';
-
-const menuItems = [
-  { name: 'Profil', key: 'profil' },
-  { name: 'Abonnements', key: 'abonnement' },
-  { name: 'Création de votre page', key: 'creation' },
-  { name: 'Envoyez vos messages', key: 'messages' },
-  { name: 'Carte de fidélité client', key: 'fidelite' },
-];
-
-const variants = {
-  open: { opacity: 1, height: 'auto' },
-  collapsed: { opacity: 0, height: 0 },
-};
 
 const MonProfilPage = () => {
   const [activeSection, setActiveSection] = useState('profil');
   const { navbarHeight } = useNavbarHeight();
   const { userSubscriptions } = useContext(AuthContext);
 
-  const hasBronzeAccess = userSubscriptions.some((sub) => ['Bronze', 'Silver', 'Gold'].includes(sub.name));
-  const hasSilverAccess = userSubscriptions.some((sub) => ['Silver', 'Gold'].includes(sub.name));
-  const hasGoldAccess = userSubscriptions.some((sub) => sub.name === 'Gold');
-
   const adjustedPaddingTop = navbarHeight > 64 ? `${navbarHeight - 30}px` : '60px';
+
+  const checkAccess = (subscriptionKey) => {
+    const accessLevels = {
+      Base: ['profil', 'abonnement'],
+      Bronze: ['profil', 'abonnement', 'creation'],
+      Silver: ['profil', 'abonnement', 'creation', 'messages'],
+      Gold: ['profil', 'abonnement', 'creation', 'messages', 'fidelite'],
+    };
+
+    // Rechercher le niveau d'accès le plus élevé parmi les abonnements de l'utilisateur
+    let highestAccessLevel = 'Base'; // Valeur par défaut si aucun abonnement trouvé
+    userSubscriptions.forEach((sub) => {
+      if (Object.keys(accessLevels).includes(sub.items) && accessLevels[sub.items].includes(subscriptionKey)) {
+        highestAccessLevel = sub.items; // Mettre à jour le niveau d'accès le plus élevé trouvé
+      }
+    });
+
+    return accessLevels[highestAccessLevel].includes(subscriptionKey);
+  };
+
+  const menuItems = [
+    { name: 'Profil', key: 'profil' },
+    { name: 'Abonnements', key: 'abonnement' },
+    { name: 'Création de votre page', key: 'creation' },
+    { name: 'Envoyez vos messages', key: 'messages' },
+    { name: 'Carte de fidélité client', key: 'fidelite' },
+  ];
 
   const renderSection = (key) => {
     switch (key) {
-      case 'profil':
-      case 'abonnement':
-        return key === 'profil' ? <MonProfil /> : <AbonnementsComponent />;
-      case 'creation':
-        return hasBronzeAccess ? <PageForm /> : <p>Accès restreint. Veuillez souscrire à l'abonnement Bronze ou supérieur.</p>;
-      case 'messages':
-        return hasSilverAccess ? <EnvoyezVosMessages /> : <p>Accès restreint. Veuillez souscrire à l'abonnement Silver ou supérieur.</p>;
-      case 'fidelite':
-        return hasGoldAccess ? <CarteFideliteClient /> : <p>Accès restreint. Veuillez souscrire à l'abonnement Gold.</p>;
-      default:
-        return <div>Section non trouvée</div>;
+      case 'profil': return <MonProfil />;
+      case 'abonnement': return <AbonnementsComponent />;
+      case 'creation': return <PageForm />;
+      case 'messages': return <EnvoyezVosMessages />;
+      case 'fidelite': return <CarteFideliteClient />;
+      default: return <div>Section non trouvée</div>;
     }
   };
 
   return (
-    <div className="bg-gradient-to-b from-purple-800 to-purple-500 min-h-screen">
-      <div style={{ paddingTop: adjustedPaddingTop }}>
-        <div className="flex justify-center space-x-4 p-4">
-          {menuItems.map((item) => (
+    <div className="bg-gradient-to-b from-purple-800 to-purple-500 min-h-screen" style={{ paddingTop: adjustedPaddingTop }}>
+      <div className="flex justify-center space-x-4 p-4">
+        {menuItems.map((item) => (
+          checkAccess(item.key) && (
             <motion.div
               key={item.key}
               whileHover={{ scale: 1.1 }}
@@ -63,22 +67,24 @@ const MonProfilPage = () => {
             >
               {item.name}
             </motion.div>
-          ))}
-        </div>
+          )
+        ))}
       </div>
       <AnimatePresence>
-        {menuItems.map((item) => activeSection === item.key && (
-          <motion.div
-            key={item.key}
-            initial="collapsed"
-            animate="open"
-            exit="collapsed"
-            variants={variants}
-            transition={{ duration: 0.8 }}
-            className="overflow-hidden"
-          >
-            {renderSection(item.key)}
-          </motion.div>
+        {menuItems.map((item) => (
+          activeSection === item.key && checkAccess(item.key) && (
+            <motion.div
+              key={item.key}
+              initial="collapsed"
+              animate="open"
+              exit="collapsed"
+              variants={{ open: { opacity: 1, height: 'auto' }, collapsed: { opacity: 0, height: 0 } }}
+              transition={{ duration: 0.8 }}
+              className="overflow-hidden"
+            >
+              {renderSection(item.key)}
+            </motion.div>
+          )
         ))}
       </AnimatePresence>
     </div>
