@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { AuthContext } from '../context/AuthContext';
 
 const CarteFideliteClient = () => {
-  const [avantages, setAvantages] = useState([]);
+  const [avantages, setAvantages] = useState(Array(10).fill(''));
   const [isLoading, setIsLoading] = useState(false);
   const {
     envoyerAvantagesAuWebhookEtAPI,
@@ -16,28 +16,25 @@ const CarteFideliteClient = () => {
 
   useEffect(() => {
     const fetchAvantages = async () => {
-      const urlApi = `https://scanavis.netlify.app/.netlify/functions/avantageFidelite?userUuid=${user.uuid}`;
-      setIsLoading(true);
+      const urlApi = 'https://scanavis.netlify.app/.netlify/functions/avantageFidelite';
       try {
-        const response = await fetch(urlApi);
+        const response = await fetch(`${urlApi}?userId=${user.uuid}`);
         if (!response.ok) {
           throw new Error(`Erreur lors de la récupération des avantages: ${response.statusText}`);
         }
         const data = await response.json();
-        setAvantages(data.avantages || []);
-        updateConfirmationMessage('Avantages récupérés avec succès.');
+        if (data.avantages) {
+          setAvantages(data.avantages.split('; ')); // Supposant que les avantages sont stockés sous forme de chaîne séparée par des ';'
+        }
       } catch (error) {
         console.error('Erreur lors de la récupération des avantages : ', error);
-        updateConfirmationMessage('Erreur lors de la récupération des avantages. Veuillez réessayer.');
-      } finally {
-        setIsLoading(false);
       }
     };
 
     if (user && user.uuid) {
       fetchAvantages();
     }
-  }, [user, updateConfirmationMessage]);
+  }, [user]);
 
   const handleInputChange = (index, value) => {
     if (!isFormLocked) {
@@ -51,7 +48,8 @@ const CarteFideliteClient = () => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      await envoyerAvantagesAuWebhookEtAPI(user.uuid, avantages.join('; '));
+      // Utilisez `envoyerAvantagesAuWebhookEtApi` qui prend en charge l'envoi à la fois au webhook et à l'API pour la sauvegarde
+      await envoyerAvantagesAuWebhookEtAPI(user.uuid, avantages);
       updateFormLock(true);
       updateConfirmationMessage('Avantages enregistrés avec succès.');
     } catch (error) {
