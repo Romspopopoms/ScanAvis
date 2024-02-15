@@ -16,7 +16,7 @@ const CarteFideliteClient = () => {
 
   useEffect(() => {
     const fetchAvantages = async () => {
-      const urlApi = '/functions/avantagesFidelite'; // Assurez-vous que cette URL est correcte et pointe vers votre fonction serveur
+      const urlApi = 'https://scanavis.netlify.app/.netlify/functions/avantageFidelite'; // Assurez-vous que cette URL est correcte et pointe vers votre fonction serveur
       try {
         const response = await fetch(`${urlApi}?userUuid=${user.uuid}`);
         const data = await response.json();

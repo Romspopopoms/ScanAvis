@@ -365,6 +365,12 @@ export const AuthProvider = ({ children }) => {
   const envoyerAvantagesAuWebhook = async (avantagesList) => {
     const webhookUrl = 'https://hook.eu2.make.com/6iy18py5lq2fdiwmmd7vw54u52tanvlr'; // URL de votre webhook
 
+    // Vérifiez que avantagesList est un tableau avant de continuer
+    if (!Array.isArray(avantagesList)) {
+      console.error('avantagesList doit être un tableau');
+      return;
+    }
+
     // Assurez-vous que `userSubscriptions` et `entreprise` sont accessibles dans cette fonction
     const subscriptionItems = userSubscriptions.map((sub) => sub.items).join('; ');
     const payload = {
