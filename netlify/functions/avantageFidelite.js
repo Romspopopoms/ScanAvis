@@ -27,7 +27,7 @@ exports.handler = async (event) => {
       const avantagesJson = JSON.stringify(avantages);
 
       const findUserQuery = 'SELECT uuid FROM users WHERE uuid = ?';
-      const [userRows] = await conn.execute(findUserQuery, [userUuid]);
+      const userRows = await conn.execute(findUserQuery, [userUuid]);
 
       if (userRows.length === 0) {
         // Insertion d'un nouvel utilisateur si non trouvé
