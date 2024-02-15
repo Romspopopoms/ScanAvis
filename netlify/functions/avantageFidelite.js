@@ -6,7 +6,7 @@ exports.handler = async (event) => {
   try {
     // Gestion des requêtes GET pour récupérer les avantages
     if (event.httpMethod === 'GET') {
-      const userUuid = event.queryStringParameters?.userUuid?.trim();
+      const userUuid = event.queryStringParameters?.userId?.trim(); // Si le paramètre passé est userId
       console.log('userUuid nettoyé:', userUuid);
 
       if (!userUuid) {
