@@ -97,6 +97,14 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
+  const refreshUserSubscriptions = async () => {
+    if (user && user.uuid) {
+      await fetchUserSubscriptions(user.uuid);
+      // Incrémentez subscriptionsUpdate pour forcer une mise à jour
+      setSubscriptionsUpdate((prevUpdate) => prevUpdate + 1);
+    }
+  };
+
   const fetchUserDetails = useCallback(async (uuid) => {
     try {
       const response = await fetch(`/.netlify/functions/getUserDetails?userUuid=${uuid}`, {
@@ -180,7 +188,8 @@ export const AuthProvider = ({ children }) => {
 
       if (!response.ok) throw new Error(`Erreur HTTP ! Statut : ${response.status}`);
 
-      await fetchUserSubscriptions(user.uuid);
+      // Rafraîchissez les abonnements de l'utilisateur après une réponse réussie
+      await refreshUserSubscriptions();
     } catch (error) {
       console.error('Erreur lors de la réabonnement:', error);
       handleError(`Erreur lors de la réabonnement: ${error.message}`);
@@ -418,6 +427,7 @@ export const AuthProvider = ({ children }) => {
       updateFormLock,
       updateConfirmationMessage,
       updateAvantages,
+      refreshUserSubscriptions,
     }}
     >
       {children}

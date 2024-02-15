@@ -34,7 +34,7 @@ const CheckoutFormContent = ({ totalCost }) => { // Accepter totalCost en tant q
   const elements = useElements();
   const router = useRouter();
   const { cartItem, clearCart, formatCartItemForSubscription } = useCart();
-  const { user } = useContext(AuthContext);
+  const { user, refreshUserSubscriptions } = useContext(AuthContext);
   const [clientSecret, setClientSecret] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -63,10 +63,11 @@ const CheckoutFormContent = ({ totalCost }) => { // Accepter totalCost en tant q
     fetchSubscriptionIntent();
   }, [cartItem, user]);
 
-  const onSuccessfulSubscription = (subscriptionData) => {
+  const onSuccessfulSubscription = async (subscriptionData) => {
     console.log('Subscription Data in CheckoutFormContent:', subscriptionData);
     clearCart();
     setPaymentStatus('succeeded');
+    await refreshUserSubscriptions();
     setPaymentDetails(subscriptionData); // Assurez-vous que c'est l'objet complet
     router.push(`/paymentstatus?subscriptionStatus=succeeded&subscriptionId=${subscriptionData.subscriptionId}`);
   };
