@@ -16,12 +16,15 @@ const CarteFideliteClient = () => {
 
   useEffect(() => {
     const fetchAvantages = async () => {
-      const urlApi = 'https://scanavis.netlify.app/.netlify/functions/avantageFidelite'; // Assurez-vous que cette URL est correcte et pointe vers votre fonction serveur
+      const urlApi = 'https://scanavis.netlify.app/.netlify/functions/avantageFidelite';
       try {
-        const response = await fetch(`${urlApi}?userUuid=${user.uuid}`);
+        const response = await fetch(`${urlApi}?userId=${user.uuid}`);
+        if (!response.ok) {
+          throw new Error(`Erreur lors de la récupération des avantages: ${response.statusText}`);
+        }
         const data = await response.json();
         if (data.avantages) {
-          setAvantages(data.avantages.split(';')); // Assumant que les avantages sont stockés sous forme de chaîne séparée par des points-virgules
+          setAvantages(data.avantages.split('; ')); // Supposant que les avantages sont stockés sous forme de chaîne séparée par des ';'
         }
       } catch (error) {
         console.error('Erreur lors de la récupération des avantages : ', error);
