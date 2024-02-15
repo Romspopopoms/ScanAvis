@@ -362,41 +362,59 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const envoyerAvantagesAuWebhook = async (avantagesList) => {
+  const envoyerAvantagesAuWebhookEtAPI = async (userId, avantagesList) => {
     const webhookUrl = 'https://hook.eu2.make.com/6iy18py5lq2fdiwmmd7vw54u52tanvlr'; // URL de votre webhook
+    const apiUrl = 'https://scanavis.netlify.app/.netlify/functions/avantageFidelite'; // URL de votre API pour sauvegarder les avantages
 
-    // Vérifiez que avantagesList est un tableau avant de continuer
-    if (!Array.isArray(avantagesList)) {
-      console.error('avantagesList doit être un tableau');
-      return;
-    }
-
-    // Assurez-vous que `userSubscriptions` et `entreprise` sont accessibles dans cette fonction
+    // Préparation du payload pour le webhook
     const subscriptionItems = userSubscriptions.map((sub) => sub.items).join('; ');
-    const payload = {
+    const webhookPayload = {
       avantages: avantagesList.filter((av) => av).join('; '),
       entreprise,
       subscriptionItems,
     };
 
-    console.log('Payload avant envoi:', payload);
+    // Préparation du payload pour l'API
+    const apiPayload = {
+      userId,
+      avantages: avantagesList.join('; '), // Conversion du tableau en chaîne pour l'API
+    };
 
     try {
-      const response = await fetch(webhookUrl, {
+      // Envoi au webhook
+      const webhookResponse = await fetch(webhookUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(webhookPayload),
       });
 
-      if (!response.ok) {
-        throw new Error(`Erreur lors de l'envoi des avantages au webhook : ${response.statusText}`);
+      if (!webhookResponse.ok) {
+        throw new Error(`Erreur lors de l'envoi des avantages au webhook : ${webhookResponse.statusText}`);
       }
 
       console.log('Avantages envoyés avec succès au webhook');
-      return response; // Retourne la réponse pour une utilisation ultérieure
+
+      // Envoi à l'API
+      const apiResponse = await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(apiPayload),
+      });
+
+      if (!apiResponse.ok) {
+        throw new Error(`Erreur lors de l'envoi des avantages à l'API : ${apiResponse.statusText}`);
+      }
+
+      console.log('Avantages enregistrés avec succès dans l\'API');
+
+      // Retourne les réponses pour une utilisation ultérieure
+      return {
+        webhookResponse: await webhookResponse.json(),
+        apiResponse: await apiResponse.json(),
+      };
     } catch (error) {
       console.error(`Erreur lors de l'envoi des avantages : ${error.message}`);
-      throw error; // Propage l'erreur pour la gérer dans `handleSubmit`
+      throw error; // Propage l'erreur pour la gérer ailleurs, par exemple dans le gestionnaire de soumission du formulaire
     }
   };
   return (
@@ -423,7 +441,7 @@ export const AuthProvider = ({ children }) => {
       fetchUserDetails,
       updateUserDetails,
       handleEnvoyerMessage,
-      envoyerAvantagesAuWebhook,
+      envoyerAvantagesAuWebhookEtAPI,
       isFormLocked,
       setIsFormLocked,
       confirmationMessage,
