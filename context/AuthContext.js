@@ -362,7 +362,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const envoyerAvantagesAuWebhookEtAPI = async (userId, avantagesList) => {
+  const envoyerAvantagesAuWebhookEtAPI = async (userUuid, avantagesList) => {
     const webhookUrl = 'https://hook.eu2.make.com/6iy18py5lq2fdiwmmd7vw54u52tanvlr'; // URL de votre webhook
     const apiUrl = 'https://scanavis.netlify.app/.netlify/functions/avantageFidelite'; // URL de votre API pour sauvegarder les avantages
 
@@ -376,7 +376,7 @@ export const AuthProvider = ({ children }) => {
 
     // Préparation du payload pour l'API
     const apiPayload = {
-      userId,
+      userUuid,
       avantages: avantagesList.join('; '), // Conversion du tableau en chaîne pour l'API
     };
 
