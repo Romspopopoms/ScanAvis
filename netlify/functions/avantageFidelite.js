@@ -5,23 +5,24 @@ exports.handler = async (event) => {
   const headers = { 'Content-Type': 'application/json' };
 
   try {
+    if (event.httpMethod !== 'GET' && event.httpMethod !== 'POST') {
+      return { statusCode: 405, headers, body: JSON.stringify({ message: 'Méthode HTTP non autorisée.' }) };
+    }
+
     const userUuid = event.queryStringParameters?.userUuid?.trim();
     if (!userUuid) {
-      console.error('Le userUuid est requis et ne peut pas être vide.');
-      return { statusCode: 400, headers, body: JSON.stringify({ message: 'Le userUuid est requis et ne peut pas être vide.' }) };
+      return { statusCode: 400, headers, body: JSON.stringify({ message: 'Le userUuid est requis.' }) };
     }
 
     if (event.httpMethod === 'GET') {
-      const query = 'SELECT avantages_fidelite FROM users WHERE uuid = ?';
-      const rows = await conn.execute(query, [userUuid]);
+      const selectQuery = 'SELECT avantages_fidelite FROM users WHERE uuid = ?';
+      const [rows] = await conn.execute(selectQuery, [userUuid]);
 
       if (rows.length === 0) {
-        console.log('Aucun utilisateur trouvé. Prêt pour une insertion potentielle.');
         return { statusCode: 404, headers, body: JSON.stringify({ message: 'Utilisateur non trouvé.' }) };
       }
-
-      const avantages = JSON.parse(rows[0].avantages_fidelite || '[]');
-      return { statusCode: 200, headers, body: JSON.stringify({ avantages }) };
+      const avantages = rows[0].avantages_fidelite ? JSON.parse(rows[0].avantages_fidelite) : [];
+      return { statusCode: 200, headers, body: JSON.stringify(avantages) };
     } if (event.httpMethod === 'POST') {
       const { avantages } = JSON.parse(event.body);
       const avantagesJson = JSON.stringify(avantages);
