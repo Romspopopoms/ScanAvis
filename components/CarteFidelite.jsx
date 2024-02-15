@@ -16,12 +16,12 @@ const CarteFideliteClient = () => {
 
   useEffect(() => {
     const fetchAvantages = async () => {
-      const urlApi = '/functions/avantageFidelite';
+      const urlApi = '/functions/avantagesFidelite'; // Assurez-vous que cette URL est correcte et pointe vers votre fonction serveur
       try {
-        const response = await fetch(`${urlApi}?userId=${user.uuid}`);
+        const response = await fetch(`${urlApi}?userUuid=${user.uuid}`);
         const data = await response.json();
         if (data.avantages) {
-          setAvantages(data.avantages);
+          setAvantages(data.avantages.split(';')); // Assumant que les avantages sont stockés sous forme de chaîne séparée par des points-virgules
         }
       } catch (error) {
         console.error('Erreur lors de la récupération des avantages : ', error);
@@ -45,7 +45,8 @@ const CarteFideliteClient = () => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const response = await envoyerAvantagesAuWebhook(user.uuid, avantages); // Assurez-vous que cette fonction prend en compte l'ID utilisateur et les avantages
+      const avantagesString = avantages.join(';'); // Convertit le tableau des avantages en chaîne séparée par des points-virgules pour la sauvegarde
+      const response = await envoyerAvantagesAuWebhook(user.uuid, avantagesString); // La fonction doit être ajustée pour prendre un string
       if (response.ok) {
         updateFormLock(true);
         updateConfirmationMessage('Avantages enregistrés avec succès.');
