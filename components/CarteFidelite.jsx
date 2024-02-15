@@ -6,7 +6,7 @@ const CarteFideliteClient = () => {
   const [avantages, setAvantages] = useState(Array(10).fill(''));
   const [isLoading, setIsLoading] = useState(false);
   const {
-    envoyerAvantagesAuWebhook,
+    envoyerAvantagesAuWebhookEtApi,
     isFormLocked,
     updateFormLock,
     confirmationMessage,
@@ -48,19 +48,16 @@ const CarteFideliteClient = () => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const avantagesString = avantages.join(';'); // Convertit le tableau des avantages en chaîne séparée par des points-virgules pour la sauvegarde
-      const response = await envoyerAvantagesAuWebhook(user.uuid, avantagesString); // La fonction doit être ajustée pour prendre un string
-      if (response.ok) {
-        updateFormLock(true);
-        updateConfirmationMessage('Avantages enregistrés avec succès.');
-      } else {
-        throw new Error('La sauvegarde a échoué');
-      }
+      // Utilisez `envoyerAvantagesAuWebhookEtApi` qui prend en charge l'envoi à la fois au webhook et à l'API pour la sauvegarde
+      await envoyerAvantagesAuWebhookEtApi(user.uuid, avantages);
+      updateFormLock(true);
+      updateConfirmationMessage('Avantages enregistrés avec succès.');
     } catch (error) {
       console.error("Erreur lors de l'envoi des données : ", error);
       updateConfirmationMessage('Erreur lors de la sauvegarde. Veuillez réessayer.');
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   const handleEdit = () => {
