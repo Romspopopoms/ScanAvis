@@ -1,24 +1,38 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { AuthContext } from '../context/AuthContext'; // Vérifiez que le chemin d'accès est correct
+import { AuthContext } from '../context/AuthContext';
 
 const CarteFideliteClient = () => {
-  // État local pour gérer les avantages
   const [avantages, setAvantages] = useState(Array(10).fill(''));
-
-  // État local pour gérer l'affichage de l'indicateur de chargement
   const [isLoading, setIsLoading] = useState(false);
-
-  // Accès aux fonctions et états du contexte
   const {
     envoyerAvantagesAuWebhook,
     isFormLocked,
     updateFormLock,
     confirmationMessage,
     updateConfirmationMessage,
+    user,
   } = useContext(AuthContext);
 
-  // Gère les modifications des champs d'input
+  useEffect(() => {
+    const fetchAvantages = async () => {
+      const urlApi = '/functions/avantageFidelite';
+      try {
+        const response = await fetch(`${urlApi}?userId=${user.uuid}`);
+        const data = await response.json();
+        if (data.avantages) {
+          setAvantages(data.avantages);
+        }
+      } catch (error) {
+        console.error('Erreur lors de la récupération des avantages : ', error);
+      }
+    };
+
+    if (user && user.uuid) {
+      fetchAvantages();
+    }
+  }, [user]);
+
   const handleInputChange = (index, value) => {
     if (!isFormLocked) {
       const newAvantages = [...avantages];
@@ -27,15 +41,16 @@ const CarteFideliteClient = () => {
     }
   };
 
-  // Gère la soumission du formulaire
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const response = await envoyerAvantagesAuWebhook(avantages);
+      const response = await envoyerAvantagesAuWebhook(user.uuid, avantages); // Assurez-vous que cette fonction prend en compte l'ID utilisateur et les avantages
       if (response.ok) {
         updateFormLock(true);
-        updateConfirmationMessage('Formulaire bien sauvegardé.');
+        updateConfirmationMessage('Avantages enregistrés avec succès.');
+      } else {
+        throw new Error('La sauvegarde a échoué');
       }
     } catch (error) {
       console.error("Erreur lors de l'envoi des données : ", error);
@@ -44,10 +59,9 @@ const CarteFideliteClient = () => {
     setIsLoading(false);
   };
 
-  // Permet de déverrouiller le formulaire pour modification
   const handleEdit = () => {
     updateFormLock(false);
-    updateConfirmationMessage(''); // Réinitialise le message de confirmation
+    updateConfirmationMessage('');
   };
 
   return (
@@ -71,7 +85,7 @@ const CarteFideliteClient = () => {
               onChange={(e) => handleInputChange(index, e.target.value)}
               className="mt-1 block w-full px-4 py-3 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
               placeholder={`Avantage #${index + 1}`}
-              disabled={isFormLocked || isLoading} // Désactive les inputs si le formulaire est verrouillé ou en chargement
+              disabled={isFormLocked || isLoading}
             />
           </div>
         ))}
@@ -80,7 +94,7 @@ const CarteFideliteClient = () => {
           whileTap={{ scale: 0.95 }}
           type="submit"
           className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
-          disabled={isFormLocked || isLoading} // Désactive le bouton de soumission pendant le chargement ou si le formulaire est verrouillé
+          disabled={isFormLocked || isLoading}
         >
           {isLoading ? 'Envoi en cours...' : 'Enregistrer les avantages'}
         </motion.button>
