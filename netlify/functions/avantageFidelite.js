@@ -13,7 +13,7 @@ exports.handler = async (event) => {
       }
 
       const query = 'SELECT avantages_fidelite FROM users WHERE uuid = ?';
-      const [rows] = await conn.execute(query, [userUuid]);
+      const rows = await conn.execute(query, [userUuid]);
 
       if (rows.length === 0) {
         console.error('Utilisateur non trouvé.');
