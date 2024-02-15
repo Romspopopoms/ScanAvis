@@ -13,7 +13,7 @@ exports.handler = async (event) => {
 
     if (event.httpMethod === 'GET') {
       const query = 'SELECT avantages_fidelite FROM users WHERE uuid = ?';
-      const [rows] = await conn.execute(query, [userUuid]);
+      const rows = await conn.execute(query, [userUuid]);
 
       if (rows.length === 0) {
         console.log('Aucun utilisateur trouvé. Prêt pour une insertion potentielle.');
