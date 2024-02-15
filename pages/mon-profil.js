@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useContext } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import MonProfil from '../components/mon-profil';
 import PageForm from '../components/InterfaceCréationPage';
 import AbonnementsComponent from '../components/AbonnementsComponent';
 import EnvoyezVosMessages from '../components/EnvoyezVosMessages';
-import CarteFideliteClient from '../components/CarteFidelite'; // Importez le nouveau composant ici
+import CarteFideliteClient from '../components/CarteFidelite';
 import { AuthContext } from '../context/AuthContext';
 
 import { useNavbarHeight } from '../context/NavbarContext';
@@ -14,7 +14,7 @@ const menuItems = [
   { name: 'Abonnements', key: 'abonnement' },
   { name: 'Création de votre page', key: 'creation' },
   { name: 'Envoyez vos messages', key: 'messages' },
-  { name: 'Carte de fidélité client', key: 'fidelite' }, // Ajout de la nouvelle section ici
+  { name: 'Carte de fidélité client', key: 'fidelite' },
 ];
 
 const variants = {
@@ -25,28 +25,25 @@ const variants = {
 const MonProfilPage = () => {
   const [activeSection, setActiveSection] = useState('profil');
   const { navbarHeight } = useNavbarHeight();
-  const { fetchUserSubscriptions, user } = useContext(AuthContext);
+  const { userSubscriptions } = useContext(AuthContext);
+
+  const hasBronzeAccess = userSubscriptions.some((sub) => ['Bronze', 'Silver', 'Gold'].includes(sub.name));
+  const hasSilverAccess = userSubscriptions.some((sub) => ['Silver', 'Gold'].includes(sub.name));
+  const hasGoldAccess = userSubscriptions.some((sub) => sub.name === 'Gold');
 
   const adjustedPaddingTop = navbarHeight > 64 ? `${navbarHeight - 30}px` : '60px';
-
-  useEffect(() => {
-    if (user && user.uuid) {
-      fetchUserSubscriptions(user.uuid);
-    }
-  }, [user, fetchUserSubscriptions]);
 
   const renderSection = (key) => {
     switch (key) {
       case 'profil':
-        return <MonProfil />;
       case 'abonnement':
-        return <AbonnementsComponent />;
+        return key === 'profil' ? <MonProfil /> : <AbonnementsComponent />;
       case 'creation':
-        return <PageForm />;
+        return hasBronzeAccess ? <PageForm /> : <p>Accès restreint. Veuillez souscrire à l'abonnement Bronze ou supérieur.</p>;
       case 'messages':
-        return <EnvoyezVosMessages />;
-      case 'fidelite': // Cas pour la nouvelle section "Carte de fidélité client"
-        return <CarteFideliteClient />;
+        return hasSilverAccess ? <EnvoyezVosMessages /> : <p>Accès restreint. Veuillez souscrire à l'abonnement Silver ou supérieur.</p>;
+      case 'fidelite':
+        return hasGoldAccess ? <CarteFideliteClient /> : <p>Accès restreint. Veuillez souscrire à l'abonnement Gold.</p>;
       default:
         return <div>Section non trouvée</div>;
     }
