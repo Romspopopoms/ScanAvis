@@ -24,11 +24,9 @@ const CarteFideliteClient = () => {
           throw new Error(`Erreur lors de la récupération des avantages: ${response.statusText}`);
         }
         const data = await response.json();
-        if (data.avantages) {
-          // Assurez-vous que les avantages sont un tableau avant de les diviser
-          const avantagesList = typeof data.avantages === 'string' ? data.avantages.split('; ') : data.avantages;
-          setAvantages(avantagesList);
-        }
+        // Vérifie si 'avantages' existe et est un tableau, sinon utilise un tableau vide
+        const avantagesList = Array.isArray(data.avantages) ? data.avantages : [];
+        setAvantages(avantagesList);
       } catch (error) {
         console.error('Erreur lors de la récupération des avantages : ', error);
         updateConfirmationMessage(`Erreur lors de la récupération des avantages: ${error.message}`);

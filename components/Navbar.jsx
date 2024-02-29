@@ -65,12 +65,12 @@ const Navbar = () => {
         initial="closed"
         animate={isMenuOpen ? 'open' : 'closed'}
         variants={sidebarVariants}
-        className="fixed inset-y-0 right-0 z-40 w-5/6 sm:w-2/3 md:w-1/2 lg:w-1/3 xl:w-1/4 bg-white shadow-xl p-6 flex flex-col justify-between transform transition-transform duration-300 ease-in-out"
+        className="fixed inset-y-0 right-0 z-40 w-5/6 sm:w-2/3 md:w-1/2 lg:w-1/3 xl:w-1/4 bg-white/30 shadow-xl p-6 flex flex-col justify-between transform transition-transform duration-300 ease-in-out"
         style={{ top: navbarHeight }}
         transition={{ type: 'tween' }}
       >
         <button type="button" onClick={handleToggleMenu} className="self-end">
-          <img src="/icon-close.png" alt="Fermer" className="w-8 h-8" />
+          <img src="/arrow.svg" alt="Fermer" className="w-8 h-8" />
         </button>
         <nav className="flex-grow">
           <Link href="/"

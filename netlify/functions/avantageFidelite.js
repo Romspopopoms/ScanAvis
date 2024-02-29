@@ -6,45 +6,49 @@ exports.handler = async (event) => {
 
   try {
     if (event.httpMethod !== 'GET' && event.httpMethod !== 'POST') {
+      console.log('Méthode HTTP non autorisée:', event.httpMethod);
       return { statusCode: 405, headers, body: JSON.stringify({ message: 'Méthode HTTP non autorisée.' }) };
     }
 
     const userUuid = event.queryStringParameters?.userUuid?.trim();
+    console.log('userUuid:', userUuid);
+
     if (!userUuid) {
+      console.log('userUuid manquant dans les paramètres de la requête');
       return { statusCode: 400, headers, body: JSON.stringify({ message: 'Le userUuid est requis.' }) };
     }
 
     if (event.httpMethod === 'GET') {
+      console.log('Traitement d\'une requête GET');
       const selectQuery = 'SELECT avantages_fidelite FROM users WHERE uuid = ?';
       const [rows] = await conn.execute(selectQuery, [userUuid]);
 
       if (rows.length === 0) {
+        console.log('Utilisateur non trouvé pour le uuid:', userUuid);
         return { statusCode: 404, headers, body: JSON.stringify({ message: 'Utilisateur non trouvé.' }) };
       }
-      const avantages = rows[0].avantages_fidelite ? JSON.parse(rows[0].avantages_fidelite) : [];
-      return { statusCode: 200, headers, body: JSON.stringify(avantages) };
+
+      const avantages = rows[0].avantages_fidelite ? rows[0].avantages_fidelite.split('; ') : [];
+      console.log('Avantages récupérés:', avantages);
+      return { statusCode: 200, headers, body: JSON.stringify({ avantages }) };
     } if (event.httpMethod === 'POST') {
-      const { avantages } = JSON.parse(event.body);
-      const avantagesJson = JSON.stringify(avantages);
+      console.log('Traitement d\'une requête POST');
+      const requestBody = JSON.parse(event.body);
+      const { avantages } = requestBody;
+      console.log('Avantages reçus:', avantages);
+      const avantagesString = avantages.join('; ');
 
-      const findUserQuery = 'SELECT uuid FROM users WHERE uuid = ?';
-      const userRows = await conn.execute(findUserQuery, [userUuid]);
+      const updateQuery = 'UPDATE users SET avantages_fidelite = ? WHERE uuid = ?';
+      const [updateResult] = await conn.execute(updateQuery, [avantagesString, userUuid]);
 
-      if (userRows.length === 0) {
-        // Insertion d'un nouvel utilisateur si non trouvé
-        const insertQuery = 'INSERT INTO users (uuid, avantages_fidelite) VALUES (?, ?)';
-        await conn.execute(insertQuery, [userUuid, avantagesJson]);
-        console.log('Nouvel utilisateur avec avantages inséré.');
-      } else {
-        // Mise à jour des avantages si l'utilisateur existe déjà
-        const updateQuery = 'UPDATE users SET avantages_fidelite = ? WHERE uuid = ?';
-        await conn.execute(updateQuery, [avantagesJson, userUuid]);
-        console.log('Avantages mis à jour pour l\'utilisateur.');
+      if (updateResult.affectedRows === 0) {
+        console.log('Aucun utilisateur mis à jour, vérifiez le uuid:', userUuid);
+        return { statusCode: 404, headers, body: JSON.stringify({ message: 'Utilisateur non trouvé ou non mis à jour.' }) };
       }
 
-      return { statusCode: 200, headers, body: JSON.stringify({ message: 'Les avantages ont été traités avec succès.' }) };
+      console.log('Avantages mis à jour pour l\'utilisateur:', userUuid);
+      return { statusCode: 200, headers, body: JSON.stringify({ message: 'Avantages mis à jour avec succès.' }) };
     }
-    return { statusCode: 405, headers, body: JSON.stringify({ message: 'Méthode HTTP non autorisée.' }) };
   } catch (error) {
     console.error('Erreur lors du traitement:', error);
     return { statusCode: 500, headers, body: JSON.stringify({ message: `Erreur serveur: ${error.message}` }) };
