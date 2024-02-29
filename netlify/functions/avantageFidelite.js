@@ -24,15 +24,15 @@ exports.handler = async (event) => {
 
       // Exécutez la requête et attendez les résultats
       const [results] = await conn.execute(selectQuery, [userUuid]);
-      console.log(results);
-      // Vérifiez si des résultats ont été trouvés
-      if (!results.length) {
+      const rows = results[0]; // Accès correct aux résultats de la requête
+      console.log('Résultats de la requête:', rows);
+
+      if (!rows.length) {
         console.log(`Aucun avantage trouvé pour l'UUID: ${userUuid}`);
         return { statusCode: 404, headers, body: JSON.stringify({ message: 'Aucun avantage trouvé.' }) };
       }
 
-      // Extrait les avantages et les divise en tableau
-      const avantages = results[0].avantages_fidelite.split('; ');
+      const avantages = rows[0].avantages_fidelite ? rows[0].avantages_fidelite.split('; ') : [];
       console.log('Avantages récupérés:', avantages);
       return { statusCode: 200, headers, body: JSON.stringify({ avantages }) };
     } if (event.httpMethod === 'POST') {
