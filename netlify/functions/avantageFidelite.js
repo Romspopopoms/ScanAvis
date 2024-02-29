@@ -20,7 +20,10 @@ exports.handler = async (event) => {
     if (event.httpMethod === 'GET') {
       console.log('Traitement d\'une requête GET');
       const selectQuery = 'SELECT avantages_fidelite FROM users WHERE uuid = ?';
+      console.log(`Exécution de la requête avec UUID: ${userUuid}`);
+
       const results = await conn.execute(selectQuery, [userUuid]);
+      console.log('Résultats de la requête:', results);
 
       if (!results || !results.length || !results[0].length) {
         console.log('Aucun résultat trouvé ou structure des résultats inattendue');
@@ -28,14 +31,21 @@ exports.handler = async (event) => {
       }
 
       const rows = results[0];
+      console.log('Première ligne des résultats:', rows[0]);
+
       const avantages = rows[0]?.avantages_fidelite ? rows[0].avantages_fidelite.split('; ') : [];
       console.log('Avantages récupérés:', avantages);
       return { statusCode: 200, headers, body: JSON.stringify({ avantages }) };
     } if (event.httpMethod === 'POST') {
       console.log('Traitement d\'une requête POST');
       const { avantages } = JSON.parse(event.body);
+      console.log('Avantages reçus dans la requête:', avantages);
+
       const avantagesString = avantages.join('; ');
+      console.log('Chaine des avantages à enregistrer:', avantagesString);
+
       const updateQuery = 'UPDATE users SET avantages_fidelite = ? WHERE uuid = ?';
+      console.log('Avantages mis à jour pour l\'utilisateur:', userUuid);
 
       await conn.execute(updateQuery, [avantagesString, userUuid]);
       console.log('Avantages mis à jour pour l\'utilisateur:', userUuid);
