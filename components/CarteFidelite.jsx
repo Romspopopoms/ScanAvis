@@ -26,7 +26,7 @@ const CarteFideliteClient = () => {
         const avantagesList = Array.isArray(data.avantages) ? data.avantages : [];
         setAvantages(avantagesList);
       } catch (error) {
-        updateConfirmationMessage(`Erreur lors de la récupération des avantages: ${error.message}`);
+        updateConfirmationMessage();
       }
     };
 
