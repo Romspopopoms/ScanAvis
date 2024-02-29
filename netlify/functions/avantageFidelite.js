@@ -22,21 +22,20 @@ exports.handler = async (event) => {
       const selectQuery = 'SELECT avantages_fidelite FROM users WHERE uuid = ?';
       console.log(`Exécution de la requête avec UUID: ${userUuid}`);
 
-      // La structure attendue de results était incorrecte dans votre code original
-      const results = await conn.execute(selectQuery, [userUuid]);
-      console.log(results);
+      const result = await conn.execute(selectQuery, [userUuid]);
+      console.log('Résultats de la requête:', result);
 
-      if (!results || results.length === 0) {
-        console.log('Aucun résultat trouvé ou structure des résultats inattendue');
-        return { statusCode: 404, headers, body: JSON.stringify({ message: 'Aucun avantage trouvé.' }) };
+      if (!result.rows || result.rows.length === 0) {
+        console.log('Aucun avantage fidélité trouvé ou structure des résultats inattendue');
+        return { statusCode: 404, headers, body: JSON.stringify({ message: 'Aucun avantage fidélité trouvé.' }) };
       }
 
-      // Correction ici: accès direct aux rows retournés par la requête
-      const rows = results;
-      console.log('Première ligne des résultats:', rows[0]);
+      const avantages = result.rows[0].avantages_fidelite
+        ? result.rows[0].avantages_fidelite.split(';').map((avantage) => avantage.trim())
+        : [];
 
-      const avantages = rows[0].avantages_fidelite ? rows[0].avantages_fidelite.split('; ') : [];
-      console.log('Avantages récupérés:', avantages);
+      console.log('Avantages fidélité récupérés:', avantages);
+
       return { statusCode: 200, headers, body: JSON.stringify({ avantages }) };
     } if (event.httpMethod === 'POST') {
       console.log('Traitement d\'une requête POST');
@@ -44,15 +43,17 @@ exports.handler = async (event) => {
       console.log('Avantages reçus dans la requête:', avantages);
 
       const avantagesString = avantages.join('; ');
-      console.log('Chaine des avantages à enregistrer:', avantagesString);
+      console.log('Chaîne des avantages à enregistrer:', avantagesString);
 
       const updateQuery = 'UPDATE users SET avantages_fidelite = ? WHERE uuid = ?';
       await conn.execute(updateQuery, [avantagesString, userUuid]);
       console.log('Avantages mis à jour pour l\'utilisateur:', userUuid);
+
       return { statusCode: 200, headers, body: JSON.stringify({ message: 'Avantages mis à jour avec succès.' }) };
     }
-  } catch (error) {
+  } catch (error) { // Correction ici: Ajout du bloc catch
     console.error('Erreur lors du traitement:', error);
     return { statusCode: 500, headers, body: JSON.stringify({ message: `Erreur serveur: ${error.message}` }) };
   }
+  // Pas de bloc finally nécessaire dans ce contexte, mais vous pouvez en ajouter un si besoin.
 };
