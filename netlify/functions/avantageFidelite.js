@@ -5,7 +5,7 @@ async function handleGetRequest(userUuid, headers) {
   console.log('Traitement d\'une requête GET');
   const selectQuery = 'SELECT avantages_fidelite FROM users WHERE uuid = ?';
 
-  const results = await conn.query(selectQuery, [userUuid]);
+  const results = await conn.execute(selectQuery, [userUuid]);
   console.log('Résultats de la requête:', results);
 
   if (results.length === 0 || !results[0].avantages_fidelite) {
@@ -24,7 +24,7 @@ async function handlePostRequest(userUuid, body, headers) {
   const avantagesString = avantages.join('; ');
 
   const updateQuery = 'UPDATE users SET avantages_fidelite = ? WHERE uuid = ?';
-  await conn.query(updateQuery, [avantagesString, userUuid]);
+  await conn.execute(updateQuery, [avantagesString, userUuid]);
   console.log('Avantages mis à jour pour l\'utilisateur:', userUuid);
 
   return { statusCode: 200, headers, body: JSON.stringify({ message: 'Avantages mis à jour avec succès.' }) };
