@@ -20,15 +20,12 @@ const CarteFideliteClient = () => {
       try {
         // Correction pour utiliser userUuid au lieu de userId
         const response = await fetch(`${urlApi}?userUuid=${user.uuid}`);
-        if (!response.ok) {
-          throw new Error(`Erreur lors de la récupération des avantages: ${response.statusText}`);
-        }
+        if (!response.ok) { /* empty */ }
         const data = await response.json();
         // Vérifie si 'avantages' existe et est un tableau, sinon utilise un tableau vide
         const avantagesList = Array.isArray(data.avantages) ? data.avantages : [];
         setAvantages(avantagesList);
       } catch (error) {
-        console.error('Erreur lors de la récupération des avantages : ', error);
         updateConfirmationMessage(`Erreur lors de la récupération des avantages: ${error.message}`);
       }
     };
