@@ -22,18 +22,18 @@ exports.handler = async (event) => {
       console.log('Traitement d\'une requête GET');
       const selectQuery = 'SELECT avantages_fidelite FROM users WHERE uuid = ?';
       try {
-        const [rows] = await conn.execute(selectQuery, [userUuid]);
-        if (!rows || rows.length === 0) {
-          console.log('Utilisateur non trouvé pour le uuid:', userUuid);
-          return { statusCode: 404, headers, body: JSON.stringify({ message: 'Utilisateur non trouvé.' }) };
+        const results = await conn.execute(selectQuery, [userUuid]);
+        if (!Array.isArray(results) || results.length === 0 || !Array.isArray(results[0])) {
+          console.log('Résultat inattendu ou utilisateur non trouvé pour le uuid:', userUuid);
+          return { statusCode: 404, headers, body: JSON.stringify({ message: 'Résultat inattendu ou utilisateur non trouvé.' }) };
         }
-
-        const avantages = rows[0].avantages_fidelite ? rows[0].avantages_fidelite.split('; ') : [];
+        const rows = results[0];
+        const avantages = rows[0]?.avantages_fidelite ? rows[0].avantages_fidelite.split('; ') : [];
         console.log('Avantages récupérés:', avantages);
         return { statusCode: 200, headers, body: JSON.stringify({ avantages }) };
-      } catch (queryError) {
-        console.error('Erreur lors de l\'exécution de la requête:', queryError);
-        return { statusCode: 500, headers, body: JSON.stringify({ message: `Erreur lors de l'exécution de la requête: ${queryError.message}` }) };
+      } catch (error) {
+        console.error('Erreur lors de l\'exécution de la requête:', error);
+        return { statusCode: 500, headers, body: JSON.stringify({ message: `Erreur lors de l'exécution de la requête: ${error.message}` }) };
       }
     } else if (event.httpMethod === 'POST') {
       console.log('Traitement d\'une requête POST');
