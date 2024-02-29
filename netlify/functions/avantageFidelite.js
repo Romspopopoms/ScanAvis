@@ -25,7 +25,7 @@ exports.handler = async (event) => {
       const results = await conn.execute(selectQuery, [userUuid]);
       console.log('Résultats de la requête:', results);
 
-      if (!results || !results.length || !results[0].length) {
+      if (!results.rows || results.rows.length === 0) {
         console.log('Aucun résultat trouvé ou structure des résultats inattendue');
         return { statusCode: 404, headers, body: JSON.stringify({ message: 'Aucun avantage trouvé.' }) };
       }
@@ -33,7 +33,7 @@ exports.handler = async (event) => {
       const rows = results[0];
       console.log('Première ligne des résultats:', rows[0]);
 
-      const avantages = rows[0]?.avantages_fidelite ? rows[0].avantages_fidelite.split('; ') : [];
+      const avantages = results.rows[0].avantages_fidelite ? results.rows[0].avantages_fidelite.split('; ') : [];
       console.log('Avantages récupérés:', avantages);
       return { statusCode: 200, headers, body: JSON.stringify({ avantages }) };
     } if (event.httpMethod === 'POST') {
