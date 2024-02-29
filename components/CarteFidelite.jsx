@@ -26,7 +26,7 @@ const CarteFideliteClient = () => {
         const avantagesList = Array.isArray(data.avantages) ? data.avantages : [];
         setAvantages(avantagesList);
       } catch (error) {
-        updateConfirmationMessage('');
+        setTimeout(() => updateConfirmationMessage(''), 5000); // Efface le message après 5 secondes
       }
     };
 
