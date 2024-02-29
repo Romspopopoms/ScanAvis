@@ -11,29 +11,31 @@ exports.handler = async (event) => {
     }
 
     const userUuid = event.queryStringParameters?.userUuid?.trim();
+    console.log('userUuid:', userUuid);
     if (!userUuid) {
       console.log('userUuid manquant dans les paramètres de la requête');
       return { statusCode: 400, headers, body: JSON.stringify({ message: 'Le userUuid est requis.' }) };
     }
-    console.log('userUuid:', userUuid);
 
     if (event.httpMethod === 'GET') {
       console.log('Traitement d\'une requête GET');
       const selectQuery = 'SELECT avantages_fidelite FROM users WHERE uuid = ?';
       console.log(`Exécution de la requête avec UUID: ${userUuid}`);
 
+      // La structure attendue de results était incorrecte dans votre code original
       const results = await conn.execute(selectQuery, [userUuid]);
-      console.log('Résultats de la requête:', results);
+      console.log(results);
 
-      if (!results.rows || results.rows.length === 0) {
+      if (!results || results.length === 0) {
         console.log('Aucun résultat trouvé ou structure des résultats inattendue');
         return { statusCode: 404, headers, body: JSON.stringify({ message: 'Aucun avantage trouvé.' }) };
       }
 
-      const rows = results[0];
+      // Correction ici: accès direct aux rows retournés par la requête
+      const rows = results;
       console.log('Première ligne des résultats:', rows[0]);
 
-      const avantages = results.rows[0].avantages_fidelite ? results.rows[0].avantages_fidelite.split('; ') : [];
+      const avantages = rows[0].avantages_fidelite ? rows[0].avantages_fidelite.split('; ') : [];
       console.log('Avantages récupérés:', avantages);
       return { statusCode: 200, headers, body: JSON.stringify({ avantages }) };
     } if (event.httpMethod === 'POST') {
@@ -45,8 +47,6 @@ exports.handler = async (event) => {
       console.log('Chaine des avantages à enregistrer:', avantagesString);
 
       const updateQuery = 'UPDATE users SET avantages_fidelite = ? WHERE uuid = ?';
-      console.log('Avantages mis à jour pour l\'utilisateur:', userUuid);
-
       await conn.execute(updateQuery, [avantagesString, userUuid]);
       console.log('Avantages mis à jour pour l\'utilisateur:', userUuid);
       return { statusCode: 200, headers, body: JSON.stringify({ message: 'Avantages mis à jour avec succès.' }) };
