@@ -21,21 +21,20 @@ exports.handler = async (event) => {
     if (event.httpMethod === 'GET') {
       console.log('Traitement d\'une requête GET');
       const selectQuery = 'SELECT avantages_fidelite FROM users WHERE uuid = ?';
-      try {
-        const results = await conn.execute(selectQuery, [userUuid]);
-        if (!Array.isArray(results) || results.length === 0 || !Array.isArray(results[0])) {
-          console.log('Résultat inattendu ou utilisateur non trouvé pour le uuid:', userUuid);
-          return { statusCode: 404, headers, body: JSON.stringify({ message: 'Résultat inattendu ou utilisateur non trouvé.' }) };
-        }
-        const rows = results[0];
-        const avantages = rows[0]?.avantages_fidelite ? rows[0].avantages_fidelite.split('; ') : [];
-        console.log('Avantages récupérés:', avantages);
-        return { statusCode: 200, headers, body: JSON.stringify({ avantages }) };
-      } catch (error) {
-        console.error('Erreur lors de l\'exécution de la requête:', error);
-        return { statusCode: 500, headers, body: JSON.stringify({ message: `Erreur lors de l'exécution de la requête: ${error.message}` }) };
+      console.log(`Exécution de la requête: ${selectQuery} avec uuid = ${userUuid}`);
+      const results = await conn.execute(selectQuery, [userUuid]);
+      console.log('Résultats de la requête:', results);
+
+      if (!Array.isArray(results) || results.length === 0 || !Array.isArray(results[0]) || results[0].length === 0) {
+        console.log('Utilisateur non trouvé ou aucun avantage pour le uuid:', userUuid);
+        return { statusCode: 404, headers, body: JSON.stringify({ message: 'Utilisateur non trouvé ou aucun avantage disponible.' }) };
       }
-    } else if (event.httpMethod === 'POST') {
+
+      const rows = results[0];
+      const avantages = rows[0]?.avantages_fidelite ? rows[0].avantages_fidelite.split('; ') : [];
+      console.log('Avantages récupérés:', avantages);
+      return { statusCode: 200, headers, body: JSON.stringify({ avantages }) };
+    } if (event.httpMethod === 'POST') {
       console.log('Traitement d\'une requête POST');
       const { avantages } = JSON.parse(event.body);
       const avantagesString = avantages.join('; ');
