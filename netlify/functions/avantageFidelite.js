@@ -11,28 +11,24 @@ exports.handler = async (event) => {
     }
 
     const userUuid = event.queryStringParameters?.userUuid?.trim();
-    console.log('userUuid:', userUuid);
-
     if (!userUuid) {
       console.log('userUuid manquant dans les paramètres de la requête');
       return { statusCode: 400, headers, body: JSON.stringify({ message: 'Le userUuid est requis.' }) };
     }
+    console.log('userUuid:', userUuid);
 
     if (event.httpMethod === 'GET') {
       console.log('Traitement d\'une requête GET');
       const selectQuery = 'SELECT avantages_fidelite FROM users WHERE uuid = ?';
+      const results = await conn.execute(selectQuery, [userUuid]);
 
-      // Exécutez la requête et attendez les résultats
-      const [results] = await conn.execute(selectQuery, [userUuid]);
-      const rows = results[0]; // Accès correct aux résultats de la requête
-      console.log('Résultats de la requête:', rows);
-
-      if (!rows.length) {
-        console.log(`Aucun avantage trouvé pour l'UUID: ${userUuid}`);
+      if (!results || !results.length || !results[0].length) {
+        console.log('Aucun résultat trouvé ou structure des résultats inattendue');
         return { statusCode: 404, headers, body: JSON.stringify({ message: 'Aucun avantage trouvé.' }) };
       }
 
-      const avantages = rows[0].avantages_fidelite ? rows[0].avantages_fidelite.split('; ') : [];
+      const rows = results[0];
+      const avantages = rows[0]?.avantages_fidelite ? rows[0].avantages_fidelite.split('; ') : [];
       console.log('Avantages récupérés:', avantages);
       return { statusCode: 200, headers, body: JSON.stringify({ avantages }) };
     } if (event.httpMethod === 'POST') {
