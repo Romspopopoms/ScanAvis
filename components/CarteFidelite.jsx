@@ -6,7 +6,7 @@ const CarteFideliteClient = () => {
   const [avantages, setAvantages] = useState(Array(10).fill(''));
   const [isLoading, setIsLoading] = useState(false);
   const {
-    envoyerAvantagesAuWebhookEtAPI,
+    envoyerAvantagesAuWebhookEtAPI, // Assurez-vous que cette fonction est définie pour gérer l'envoi des données à l'API et au webhook.
     isFormLocked,
     updateFormLock,
     confirmationMessage,
@@ -47,7 +47,11 @@ const CarteFideliteClient = () => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      await envoyerAvantagesAuWebhookEtAPI(user.uuid, avantages);
+      // Correction : Appeler la fonction avec le format de données attendu par le backend
+      await envoyerAvantagesAuWebhookEtAPI({
+        userUuid: user.uuid,
+        avantages: avantages.filter((avantage) => avantage.trim() !== ''), // Filtrer les avantages vides
+      });
       updateFormLock(true);
       updateConfirmationMessage('Avantages enregistrés avec succès.');
     } catch (error) {
