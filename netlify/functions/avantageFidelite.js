@@ -45,27 +45,18 @@ exports.handler = async (event) => {
         headers,
         body: JSON.stringify({ avantages }),
       };
-    } if (event.httpMethod === 'POST') { // Traitement des requêtes POST pour mettre à jour les avantages
-      const body = JSON.parse(event.body);
-      const { userUuid } = body;
+    } if (event.httpMethod === 'POST') {
+      const { userUuid, avantages } = JSON.parse(event.body);
 
-      if (!userUuid || !body.avantages || !Array.isArray(body.avantages)) {
-        return {
-          statusCode: 400,
-          headers,
-          body: JSON.stringify({ message: 'Données manquantes ou format incorrect.' }),
-        };
+      if (!userUuid || !Array.isArray(avantages)) {
+        return { statusCode: 400, headers, body: JSON.stringify({ message: 'Données manquantes ou format incorrect.' }) };
       }
 
-      const avantagesString = body.avantages.join(';');
+      const avantagesString = avantages.join(';');
       const updateQuery = 'UPDATE users SET avantages_fidelite = ? WHERE uuid = ?';
       await conn.execute(updateQuery, [avantagesString, userUuid]);
 
-      return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify({ message: 'Avantages mis à jour avec succès.' }),
-      };
+      return { statusCode: 200, headers, body: JSON.stringify({ message: 'Avantages mis à jour avec succès.' }) };
     }
   } catch (error) {
     console.error('Erreur lors du traitement:', error);
