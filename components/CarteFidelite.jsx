@@ -24,8 +24,11 @@ const CarteFideliteClient = () => {
           const response = await fetch(`https://scanavis.netlify.app/.netlify/functions/avantageFidelite?userUuid=${user.uuid}`);
           if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
           const data = await response.json();
-          // Convertir la chaîne d'avantages en un tableau, en supprimant les guillemets et en divisant par ';'
-          const avantagesArray = data.avantages ? data.avantages.replace(/^"|"$/g, '').split(';').map((avantage) => avantage.trim()) : Array(10).fill('');
+
+          // Suppression des guillemets doubles au début et à la fin, puis découpage par ';'
+          const avantagesStripped = data.avantages.replace(/^"|"$/g, '');
+          const avantagesArray = avantagesStripped.split(';').map((avantage) => avantage.trim());
+
           setAvantages(avantagesArray);
         } catch (error) {
           updateConfirmationMessage(`Erreur: ${error.message}`);
