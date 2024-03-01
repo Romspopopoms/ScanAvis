@@ -9,6 +9,8 @@ exports.handler = async (event) => {
   try {
     if (event.httpMethod !== 'GET' && event.httpMethod !== 'POST') {
       console.log('Méthode HTTP non autorisée:', event.httpMethod);
+      console.log('Traitement d\'une requête GET');
+
       return {
         statusCode: 405,
         headers,
@@ -19,6 +21,8 @@ exports.handler = async (event) => {
     // Traitement des requêtes GET
     if (event.httpMethod === 'GET') {
       const userUuid = event.queryStringParameters?.userUuid?.trim();
+      console.log('userUuid extrait:', userUuid);
+
       if (!userUuid) {
         return {
           statusCode: 400,
@@ -28,6 +32,8 @@ exports.handler = async (event) => {
       }
 
       const selectQuery = 'SELECT avantages_fidelite FROM users WHERE uuid = ?';
+      console.log('Exécution de la requête SELECT:', selectQuery, userUuid);
+
       const result = await conn.execute(selectQuery, [userUuid]);
 
       // Si aucune donnée n'est trouvée, renvoie une liste vide sans générer d'erreur
@@ -40,21 +46,31 @@ exports.handler = async (event) => {
       }
 
       const avantages = result[0][0].avantages_fidelite ? result[0][0].avantages_fidelite.split(';') : Array(10).fill('');
+      console.log('Avantages extraits:', avantages);
+
       return {
         statusCode: 200,
         headers,
         body: JSON.stringify({ avantages }),
       };
     } if (event.httpMethod === 'POST') {
+      console.log('Traitement d\'une requête POST');
+
       const { userUuid, avantages } = JSON.parse(event.body);
+      console.log('Données extraites du corps de la requête:', userUuid, avantages);
 
       if (!userUuid || !Array.isArray(avantages)) {
+        console.log('Données manquantes ou format incorrect dans la requête POST');
+
         return { statusCode: 400, headers, body: JSON.stringify({ message: 'Données manquantes ou format incorrect.' }) };
       }
 
       const avantagesString = avantages.join(';');
       const updateQuery = 'UPDATE users SET avantages_fidelite = ? WHERE uuid = ?';
+      console.log('Exécution de la requête UPDATE:', updateQuery, avantagesString, userUuid);
+
       await conn.execute(updateQuery, [avantagesString, userUuid]);
+      console.log('Avantages mis à jour avec succès pour userUuid:', userUuid);
 
       return { statusCode: 200, headers, body: JSON.stringify({ message: 'Avantages mis à jour avec succès.' }) };
     }
