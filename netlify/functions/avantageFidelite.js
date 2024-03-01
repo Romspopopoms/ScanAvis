@@ -38,11 +38,13 @@ exports.handler = async (event) => {
 
       return { statusCode: 200, headers, body: JSON.stringify({ avantages }) };
     } if (event.httpMethod === 'POST') {
-      console.log('Traitement d\'une requête POST');
-      const { avantages } = JSON.parse(event.body);
-      console.log('Avantages reçus dans la requête:', avantages);
+      // Logique pour traiter une requête POST
+      const requestBody = JSON.parse(event.body);
+      if (!Array.isArray(requestBody.avantages)) {
+        return { statusCode: 400, headers, body: JSON.stringify({ message: 'Format des avantages incorrect.' }) };
+      }
 
-      const avantagesString = avantages.join('; ');
+      const avantagesString = requestBody.join('; ');
       console.log('Chaîne des avantages à enregistrer:', avantagesString);
 
       const updateQuery = 'UPDATE users SET avantages_fidelite = ? WHERE uuid = ?';
