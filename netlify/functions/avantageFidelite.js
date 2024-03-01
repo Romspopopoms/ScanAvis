@@ -6,8 +6,6 @@ exports.handler = async (event) => {
     'Content-Type': 'application/json',
   };
 
-  let userUuid; // Déclaration unique de userUuid au début
-
   try {
     if (event.httpMethod !== 'GET' && event.httpMethod !== 'POST') {
       console.log('Méthode HTTP non autorisée:', event.httpMethod);
@@ -20,7 +18,7 @@ exports.handler = async (event) => {
 
     // Traitement des requêtes GET
     if (event.httpMethod === 'GET') {
-      userUuid = event.queryStringParameters?.userUuid?.trim(); // Utilisation directe de userUuid
+      const userUuid = event.queryStringParameters?.userUuid?.trim();
       if (!userUuid) {
         return {
           statusCode: 400,
@@ -32,25 +30,27 @@ exports.handler = async (event) => {
       const selectQuery = 'SELECT avantages_fidelite FROM users WHERE uuid = ?';
       const result = await conn.execute(selectQuery, [userUuid]);
 
-      if (!result || result.length === 0) {
+      // Si aucune donnée n'est trouvée, retourne une liste vide d'avantages sans générer d'erreur
+      if (!result[0] || result[0].length === 0) {
         return {
-          statusCode: 404,
+          statusCode: 200,
           headers,
-          body: JSON.stringify({ message: 'Aucun avantage fidélité trouvé.' }),
+          body: JSON.stringify({ avantages: [] }), // Retourne un tableau vide pour les avantages
         };
       }
 
-      const avantages = result[0].avantages_fidelite ? result[0].avantages_fidelite.split(';') : [];
+      const avantages = result[0][0].avantages_fidelite ? result[0][0].avantages_fidelite.split(';') : [];
       return {
         statusCode: 200,
         headers,
         body: JSON.stringify({ avantages }),
       };
+    }
 
     // Traitement des requêtes POST pour mettre à jour les avantages
-    } if (event.httpMethod === 'POST') {
+    if (event.httpMethod === 'POST') {
       const body = JSON.parse(event.body);
-      userUuid = body.userUuid; // Réassignation de userUuid sans re-déclaration
+      const { userUuid } = body;
 
       if (!userUuid || !body.avantages || !Array.isArray(body.avantages)) {
         return {
