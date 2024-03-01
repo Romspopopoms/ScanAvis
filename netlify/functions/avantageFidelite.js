@@ -47,12 +47,13 @@ exports.handler = async (event) => {
       }
 
       const avantages = result[0][0].avantages_fidelite ? result[0][0].avantages_fidelite.split(';') : Array(10).fill('');
-      console.log('Avantages extraits:', avantages);
-
+      // Supprimer les guillemets doubles au début et à la fin de la chaîne
+      const avantagesSansGuillemets = avantages.map((avantage) => avantage.replace(/^"|"$/g, ''));
       return {
         statusCode: 200,
         headers,
-        body: JSON.stringify({ avantages }),
+        body: JSON.stringify({ avantages: avantagesSansGuillemets }),
+
       };
     } if (event.httpMethod === 'POST') {
       console.log('Traitement d\'une requête POST');
