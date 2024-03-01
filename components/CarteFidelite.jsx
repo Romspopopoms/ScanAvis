@@ -3,7 +3,6 @@ import { motion } from 'framer-motion';
 import { AuthContext } from '../context/AuthContext';
 
 const CarteFideliteClient = () => {
-  // Initialiser les états
   const [avantages, setAvantages] = useState(Array(10).fill(''));
   const [isLoading, setIsLoading] = useState(false);
   const {
@@ -15,13 +14,12 @@ const CarteFideliteClient = () => {
     user,
   } = useContext(AuthContext);
 
-  // Récupérer les avantages de fidélité de l'utilisateur
   useEffect(() => {
     const fetchAvantages = async () => {
       if (user && user.uuid) {
         setIsLoading(true);
-        const urlApi = `https://scanavis.netlify.app/.netlify/functions/avantageFidelite?userUuid=${user.uuid}`;
         try {
+          const urlApi = `https://scanavis.netlify.app/.netlify/functions/avantageFidelite?userUuid=${user.uuid}`;
           const response = await fetch(urlApi);
           if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
           const data = await response.json();
@@ -39,14 +37,12 @@ const CarteFideliteClient = () => {
     fetchAvantages();
   }, [user, updateConfirmationMessage]);
 
-  // Gérer les changements dans les inputs
-  const handleInputChange = (index, value) => {
+  const handleInputChange = (index, event) => {
     const newAvantages = [...avantages];
-    newAvantages[index] = value;
+    newAvantages[index] = event.target.value;
     setAvantages(newAvantages);
   };
 
-  // Gérer la soumission du formulaire
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -61,13 +57,11 @@ const CarteFideliteClient = () => {
     }
   };
 
-  // Activer l'édition des avantages
   const handleEdit = () => {
     updateFormLock(false);
     updateConfirmationMessage('');
   };
 
-  // Rendu du composant
   return (
     <motion.div
       initial={{ scale: 0.95, opacity: 0 }}
@@ -77,7 +71,7 @@ const CarteFideliteClient = () => {
     >
       <form onSubmit={handleSubmit} className="space-y-6">
         <h2 className="text-2xl font-bold text-center text-purple-800">Carte de fidélité client</h2>
-        {avantages.map((avantage, index) => (
+        {Array.from({ length: 10 }, (_, index) => (
           <div key={index} className="space-y-2">
             <label htmlFor={`avantage-${index}`} className="block text-lg font-semibold text-gray-700">
               Avantage #{index + 1}
@@ -86,8 +80,8 @@ const CarteFideliteClient = () => {
               type="text"
               id={`avantage-${index}`}
               name={`avantage-${index}`}
-              value={avantage}
-              onChange={(e) => handleInputChange(index, e.target.value)}
+              value={avantages[index]}
+              onChange={(e) => handleInputChange(index, e)}
               className="mt-1 block w-full px-4 py-3 bg-white border border-gray-300 rounded-md shadow-sm focus:ring-purple-500"
               placeholder={`Avantage #${index + 1}`}
               disabled={isFormLocked || isLoading}
