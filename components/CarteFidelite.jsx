@@ -11,6 +11,9 @@ const CarteFideliteClient = () => {
     confirmationMessage,
     updateConfirmationMessage,
     user,
+    envoyerAvantagesAuWebhookEtAPI, // Fonction pour envoyer les avantages au webhook
+    entreprise,
+    userSubscriptions,
   } = useContext(AuthContext);
 
   useEffect(() => {
@@ -21,7 +24,7 @@ const CarteFideliteClient = () => {
           const response = await fetch(`https://scanavis.netlify.app/.netlify/functions/avantageFidelite?userUuid=${user.uuid}`);
           if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
           const data = await response.json();
-          setAvantages(data.avantages || Array(10).fill('')); // Utilise des inputs vides si aucune donnée n'est trouvée
+          setAvantages(data.avantages || Array(10).fill(''));
         } catch (error) {
           updateConfirmationMessage(`Erreur: ${error.message}`);
         } finally {
@@ -42,22 +45,27 @@ const CarteFideliteClient = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+
     try {
-      const response = await fetch('https://scanavis.netlify.app/.netlify/functions/avantageFidelite', {
+      // Mise à jour des avantages dans la base de données
+      const apiResponse = await fetch('https://scanavis.netlify.app/.netlify/functions/avantageFidelite', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userUuid: user.uuid,
-          avantages: avantages.filter((avantage) => avantage.trim() !== ''),
-        }),
+        body: JSON.stringify({ userUuid: user.uuid, avantages: avantages.filter((avantage) => avantage.trim() !== '') }),
       });
 
-      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-      const data = await response.json();
-      updateConfirmationMessage(data.message || 'Avantages enregistrés avec succès.');
+      if (!apiResponse.ok) throw new Error(`HTTP error! Status: ${apiResponse.status}`);
+
+      // Récupérer les éléments d'abonnement sous forme de chaîne
+      const subscriptionItemsString = userSubscriptions.map((sub) => sub.items).join('; ');
+
+      // Envoyer les avantages mis à jour au webhook
+      await envoyerAvantagesAuWebhookEtAPI(user.uuid, avantages.filter((avantage) => avantage.trim() !== ''), entreprise, subscriptionItemsString);
+
       updateFormLock(true);
+      updateConfirmationMessage('Avantages enregistrés avec succès et envoyés au webhook.');
     } catch (error) {
-      updateConfirmationMessage(`Erreur lors de l'envoi des avantages: ${error.message}`);
+      updateConfirmationMessage(`Erreur lors de la mise à jour et de l'envoi des avantages: ${error.message}`);
     } finally {
       setIsLoading(false);
     }
