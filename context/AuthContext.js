@@ -369,18 +369,18 @@ export const AuthProvider = ({ children }) => {
     // Normalisation des avantagesList pour retirer les guillemets doubles de début et de fin
     const normalizedAvantagesList = avantagesList.map((avantage) => avantage.replace(/^"|"$/g, ''));
 
-    // Préparation du payload pour le webhook
+    // Utilisation des valeurs du contexte pour le payload du webhook
     const subscriptionItems = userSubscriptions.map((sub) => sub.items).join('; ');
     const webhookPayload = {
       avantages: normalizedAvantagesList.join('; '),
-      entreprise,
-      subscriptionItems,
+      entreprise, // déjà disponible dans le contexte
+      subscriptionItems, // déjà construit à partir du contexte
     };
 
-    // Préparation du payload pour l'API
+    // Payload pour l'API
     const apiPayload = {
       userUuid,
-      avantages: normalizedAvantagesList.join('; '), // Assurez-vous que c'est une string valide pour l'API
+      avantages: normalizedAvantagesList.join('; '),
     };
 
     try {
@@ -408,14 +408,14 @@ export const AuthProvider = ({ children }) => {
       }
       console.log('Avantages enregistrés avec succès dans l\'API');
 
-      // Retourne les réponses pour une utilisation ultérieure
+      // Retour des réponses
       return {
         webhookResponse: await webhookResponse.json(),
         apiResponse: await apiResponse.json(),
       };
     } catch (error) {
       console.error(`Erreur lors de l'envoi des avantages : ${error.message}`);
-      throw error;
+      throw error; // Remonter l'erreur pour la gestionnaire d'erreur
     }
   };
 
