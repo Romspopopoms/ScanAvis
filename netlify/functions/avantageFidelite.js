@@ -30,7 +30,7 @@ exports.handler = async (event) => {
       }
 
       const selectQuery = 'SELECT avantages_fidelite FROM users WHERE uuid = ?';
-      const result = await conn.query(selectQuery, [userUuid]);
+      const result = await conn.execute(selectQuery, [userUuid]);
 
       if (!result || result.length === 0) {
         return {
