@@ -363,13 +363,16 @@ export const AuthProvider = ({ children }) => {
   };
 
   const envoyerAvantagesAuWebhookEtAPI = async (userUuid, avantagesList) => {
-    const webhookUrl = 'https://hook.eu2.make.com/6iy18py5lq2fdiwmmd7vw54u52tanvlr'; // URL de votre webhook
-    const apiUrl = 'https://scanavis.netlify.app/.netlify/functions/avantageFidelite'; // URL de votre API pour sauvegarder les avantages
+    const webhookUrl = 'https://hook.eu2.make.com/6iy18py5lq2fdiwmmd7vw54u52tanvlr';
+    const apiUrl = 'https://scanavis.netlify.app/.netlify/functions/avantageFidelite';
+
+    // Normalisation des avantagesList pour retirer les guillemets doubles de début et de fin
+    const normalizedAvantagesList = avantagesList.map((avantage) => avantage.replace(/^"|"$/g, ''));
 
     // Préparation du payload pour le webhook
     const subscriptionItems = userSubscriptions.map((sub) => sub.items).join('; ');
     const webhookPayload = {
-      avantages: avantagesList.filter((av) => av).join('; '),
+      avantages: normalizedAvantagesList.join('; '),
       entreprise,
       subscriptionItems,
     };
@@ -377,7 +380,7 @@ export const AuthProvider = ({ children }) => {
     // Préparation du payload pour l'API
     const apiPayload = {
       userUuid,
-      avantages: avantagesList.join('; '), // Conversion du tableau en chaîne pour l'API
+      avantages: normalizedAvantagesList.join('; '), // Assurez-vous que c'est une string valide pour l'API
     };
 
     try {
@@ -391,7 +394,6 @@ export const AuthProvider = ({ children }) => {
       if (!webhookResponse.ok) {
         throw new Error(`Erreur lors de l'envoi des avantages au webhook : ${webhookResponse.statusText}`);
       }
-
       console.log('Avantages envoyés avec succès au webhook');
 
       // Envoi à l'API
@@ -404,7 +406,6 @@ export const AuthProvider = ({ children }) => {
       if (!apiResponse.ok) {
         throw new Error(`Erreur lors de l'envoi des avantages à l'API : ${apiResponse.statusText}`);
       }
-
       console.log('Avantages enregistrés avec succès dans l\'API');
 
       // Retourne les réponses pour une utilisation ultérieure
@@ -414,9 +415,10 @@ export const AuthProvider = ({ children }) => {
       };
     } catch (error) {
       console.error(`Erreur lors de l'envoi des avantages : ${error.message}`);
-      throw error; // Propage l'erreur pour la gérer ailleurs, par exemple dans le gestionnaire de soumission du formulaire
+      throw error;
     }
   };
+
   return (
     <AuthContext.Provider value={{
       isAuthenticated,
