@@ -30,25 +30,22 @@ exports.handler = async (event) => {
       const selectQuery = 'SELECT avantages_fidelite FROM users WHERE uuid = ?';
       const result = await conn.execute(selectQuery, [userUuid]);
 
-      // Si aucune donnée n'est trouvée, retourne une liste vide d'avantages sans générer d'erreur
+      // Si aucune donnée n'est trouvée, renvoie une liste vide sans générer d'erreur
       if (!result[0] || result[0].length === 0) {
         return {
           statusCode: 200,
           headers,
-          body: JSON.stringify({ avantages: [] }), // Retourne un tableau vide pour les avantages
+          body: JSON.stringify({ avantages: Array(10).fill('') }),
         };
       }
 
-      const avantages = result[0][0].avantages_fidelite ? result[0][0].avantages_fidelite.split(';') : [];
+      const avantages = result[0][0].avantages_fidelite ? result[0][0].avantages_fidelite.split(';') : Array(10).fill('');
       return {
         statusCode: 200,
         headers,
         body: JSON.stringify({ avantages }),
       };
-    }
-
-    // Traitement des requêtes POST pour mettre à jour les avantages
-    if (event.httpMethod === 'POST') {
+    } if (event.httpMethod === 'POST') { // Traitement des requêtes POST pour mettre à jour les avantages
       const body = JSON.parse(event.body);
       const { userUuid } = body;
 
