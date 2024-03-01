@@ -24,8 +24,8 @@ const CarteFideliteClient = () => {
           const response = await fetch(`https://scanavis.netlify.app/.netlify/functions/avantageFidelite?userUuid=${user.uuid}`);
           if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
           const data = await response.json();
-          // Supposons que data.avantages est une chaîne de caractères d'avantages séparés par des ';'
-          const avantagesArray = data.avantages ? data.avantages.split(';').map((avantage) => avantage.trim()) : Array(10).fill('');
+          // Convertir la chaîne d'avantages en un tableau, en supprimant les guillemets et en divisant par ';'
+          const avantagesArray = data.avantages ? data.avantages.replace(/^"|"$/g, '').split(';').map((avantage) => avantage.trim()) : Array(10).fill('');
           setAvantages(avantagesArray);
         } catch (error) {
           updateConfirmationMessage(`Erreur: ${error.message}`);
