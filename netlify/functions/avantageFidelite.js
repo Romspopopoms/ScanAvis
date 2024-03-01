@@ -35,6 +35,7 @@ exports.handler = async (event) => {
       console.log('Exécution de la requête SELECT:', selectQuery, userUuid);
 
       const result = await conn.execute(selectQuery, [userUuid]);
+      console.log(`Résultats obtenus pour ${userUuid}:`, JSON.stringify(result));
 
       // Si aucune donnée n'est trouvée, renvoie une liste vide sans générer d'erreur
       if (!result[0] || result[0].length === 0) {
