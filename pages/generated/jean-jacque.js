@@ -7,7 +7,7 @@ const Page = () => {
     e.preventDefault();
     const payload = {
       email,
-      pageId: '9d5e4393-6da3-4a0b-838c-a09cbd9064f5',
+      pageId: '6b3d10e4-fe42-453c-a07e-d90c3efb4d8b',
       name: 'Romain Santiago',
       entreprise: 'Jean-Jacque',
       google_business:
@@ -54,7 +54,7 @@ const Page = () => {
     >
       <div className="flex flex-col items-center">
         <img
-          src="https://github.com/Romspopopoms/ScanAvis/blob/main/uploaded_images/iconarrow.png?raw=true"
+          src="https://github.com/Romspopopoms/ScanAvis/blob/main/uploaded_images/people-01.png?raw=true"
           alt="Logo"
           className="mb-6 h-12 w-12"
         />
