@@ -7,11 +7,12 @@ const Page = () => {
     e.preventDefault();
     const payload = {
       email,
-      pageId: '07014889-eb16-4a62-9d8b-cc96ed5b7ad0',
-      name: 'Romain Santiago',
-      entreprise: 'ScanAvis',
-      google_business: 'https://maps.app.goo.gl/Fgpyd2gyU5WyMhZ36',
-      subscriptionItems: '',
+      pageId: '1bfda22c-366a-44ee-a464-dd751c581c32',
+      name: 'Romain',
+      entreprise: 'RFFZZ',
+      google_business:
+        "https://www.google.fr/maps/place/CAVE+DU+BEC+DE+L'AIGLE/@43.2023898,5.5900857,15z/data=!4m8!3m7!1s0x12c9a579159a93bb:0x8ee79d113715dfa2!8m2!3d43.2023893!4d5.6003857!9m1!1b1!16s%2Fg%2F11s7d2tjcz?entry=ttu",
+      subscriptionItems: 'Gold',
     };
 
     try {
@@ -25,7 +26,8 @@ const Page = () => {
       );
 
       if (response.ok) {
-        window.location.href = 'https://maps.app.goo.gl/Fgpyd2gyU5WyMhZ36';
+        window.location.href =
+          "https://www.google.fr/maps/place/CAVE+DU+BEC+DE+L'AIGLE/@43.2023898,5.5900857,15z/data=!4m8!3m7!1s0x12c9a579159a93bb:0x8ee79d113715dfa2!8m2!3d43.2023893!4d5.6003857!9m1!1b1!16s%2Fg%2F11s7d2tjcz?entry=ttu";
       } else {
         alert(
           'Une erreur est survenue lors de la soumission. Veuillez réessayer.',
@@ -52,7 +54,7 @@ const Page = () => {
     >
       <div className="flex flex-col items-center">
         <img
-          src="https://github.com/Romspopopoms/ScanAvis/blob/main/uploaded_images/iconarrow.png?raw=true"
+          src="https://github.com/Romspopopoms/ScanAvis/blob/main/uploaded_images/logosimple.png?raw=true"
           alt="Logo"
           className="mb-6 h-12 w-12"
         />
