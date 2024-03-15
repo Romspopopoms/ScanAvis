@@ -7,10 +7,11 @@ const Page = () => {
     e.preventDefault();
     const payload = {
       email,
-      pageId: 'b4bf2507-2227-459c-8bd8-8a11e055b6a4',
+      pageId: '43b0cadf-aa64-4d1f-aae1-0cfae89895ad',
       name: 'Romain Santiago',
-      entreprise: 'ScanAvis',
-      google_business: 'https://maps.app.goo.gl/Fgpyd2gyU5WyMhZ36',
+      entreprise: 'Jean-Jacque',
+      google_business:
+        'https://www.google.fr/maps/place/Sport+D%C3%A9couverte/@43.2078327,5.5884013,15z/data=!4m6!3m5!1s0x12c9a5b412c6f2d5:0x38fd2c8210624f50!8m2!3d43.2078324!4d5.5987005!16s%2Fg%2F11hfx1587j?entry=tts',
       subscriptionItems: 'Gold',
     };
 
@@ -25,7 +26,8 @@ const Page = () => {
       );
 
       if (response.ok) {
-        window.location.href = 'https://maps.app.goo.gl/Fgpyd2gyU5WyMhZ36';
+        window.location.href =
+          'https://www.google.fr/maps/place/Sport+D%C3%A9couverte/@43.2078327,5.5884013,15z/data=!4m6!3m5!1s0x12c9a5b412c6f2d5:0x38fd2c8210624f50!8m2!3d43.2078324!4d5.5987005!16s%2Fg%2F11hfx1587j?entry=tts';
       } else {
         alert(
           'Une erreur est survenue lors de la soumission. Veuillez réessayer.',
@@ -52,11 +54,11 @@ const Page = () => {
     >
       <div className="flex flex-col items-center">
         <img
-          src="https://github.com/Romspopopoms/ScanAvis/blob/main/uploaded_images/iconarrow.png?raw=true"
+          src="https://github.com/Romspopopoms/ScanAvis/blob/main/uploaded_images/web.png?raw=true"
           alt="Logo"
           className="mb-6 h-12 w-12"
         />
-        <h1 className="text-4xl text-white mb-4">ScanAvis</h1>
+        <h1 className="text-4xl text-white mb-4">Scan'Avis</h1>
         <form
           onSubmit={handleSubmit}
           className="bg-white bg-opacity-75 rounded-lg p-4 shadow-lg mb-6"
